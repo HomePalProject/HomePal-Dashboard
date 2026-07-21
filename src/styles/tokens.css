@@ -1,0 +1,47 @@
+:root {
+  /* Surface Colors */
+  --color-background: #faf8f3;
+  --color-surface: #ffffff;
+  --color-surface-variant: #f4f2ee;
+  --color-border: #e4e0da;
+
+  /* Brand Colors */
+  --color-primary: #356859;
+  --color-primary-active: #2a5347;
+  --color-accent: #d99a3d;
+
+  /* Text Colors */
+  --color-text-primary: #2d2a26;
+  --color-text-secondary: #6d6862;
+  --color-text-inverse: #ffffff;
+
+  /* Status Colors */
+  --color-status-error: #d9534f;
+  --color-status-warning: #e6a33a;
+
+  /* Spacing Base (8px system) */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-level-0: none;
+  --shadow-level-1: 0 2px 8px 0 rgba(45, 42, 38, 0.06);
+  --shadow-level-2: 0 4px 16px 0 rgba(45, 42, 38, 0.1);
+  --shadow-level-3: 0 8px 24px 0 rgba(45, 42, 38, 0.14);
+
+  /* Typography */
+  --font-family-primary: 'Cairo', 'Noto Sans Arabic', system-ui, -apple-system, sans-serif;
+}

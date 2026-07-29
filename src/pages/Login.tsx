@@ -10,7 +10,7 @@ export default function Login() {
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    login({ email, password });
+    login({ emailOrUsername: email, password });
   };
 
   return (

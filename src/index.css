@@ -1,109 +1,192 @@
+@import 'tailwindcss';
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* =========================================
+     PRIMITIVE TOKENS
+     ========================================= */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Green */
+  --color-green-50: #dcfeeb;
+  --color-green-300: #67d69b;
+  --color-green-400: #53c284;
+  --color-green-500: #43a86f;
+  --color-green-600: #356859;
+  --color-green-800: #2a5347;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Amber */
+  --color-amber-50: #fdf5d3;
+  --color-amber-300: #f2c94c;
+  --color-amber-400: #f1b432;
+  --color-amber-500: #e6a33a;
+  --color-amber-600: #d99a3d;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* Gray */
+  --color-gray-25: #ffffff;
+  --color-gray-50: #faf8f3;
+  --color-gray-100: #f6f4eb;
+  --color-gray-200: #f4f2ee;
+  --color-gray-300: #e4e0da;
+  --color-gray-400: #cac5bf;
+  --color-gray-500: #a8a39d;
+  --color-gray-600: #7a7571;
+  --color-gray-700: #6d6862;
+  --color-gray-800: #434140;
+  --color-gray-850: #30312f;
+  --color-gray-900: #2d2a26;
+  --color-gray-920: #242523;
+  --color-gray-950: #171818;
+
+  /* Red */
+  --color-red-50: #fde8e8;
+  --color-red-400: #f87171;
+  --color-red-500: #d9534f;
+  --color-red-800: #991b1b;
+
+  /* Blue */
+  --color-blue-50: #eff6ff;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+  --color-blue-800: #1e40af;
+
+  /* =========================================
+     SEMANTIC TOKENS (LIGHT MODE)
+     ========================================= */
+
+  --sys-background: var(--color-gray-50);
+  --sys-surface: var(--color-gray-25);
+  --sys-surface-variant: var(--color-gray-200);
+  --sys-border: var(--color-gray-300);
+
+  --sys-primary: var(--color-green-600);
+  --sys-primary-active: var(--color-green-800);
+  --sys-primary-container: var(--color-green-50);
+
+  --sys-accent: var(--color-amber-600);
+  --sys-accent-container: var(--color-amber-50);
+
+  --sys-text-primary: var(--color-gray-900);
+  --sys-text-secondary: var(--color-gray-700);
+  --sys-text-disabled: var(--color-gray-500);
+  --sys-text-inverse: var(--color-gray-25);
+  --sys-text-on-accent: var(--color-gray-900);
+
+  --sys-status-success: var(--color-green-500);
+  --sys-status-success-container: var(--color-green-50);
+
+  --sys-status-warning: var(--color-amber-500);
+  --sys-status-warning-container: var(--color-amber-50);
+
+  --sys-status-error: var(--color-red-500);
+  --sys-status-error-container: var(--color-red-50);
+
+  --sys-status-info: var(--color-blue-500);
+  --sys-status-info-container: var(--color-blue-50);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* =========================================
+   SEMANTIC TOKENS (DARK MODE)
+   ========================================= */
+.dark {
+  --sys-background: var(--color-gray-950);
+  --sys-surface: var(--color-gray-920);
+  --sys-surface-variant: var(--color-gray-850);
+  --sys-border: var(--color-gray-800);
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
+  --sys-primary: var(--color-green-400);
+  --sys-primary-active: var(--color-green-500);
+  --sys-primary-container: var(--color-green-800);
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
+  --sys-accent: var(--color-amber-400);
+  --sys-accent-container: var(--color-amber-600);
 
-body {
-  margin: 0;
-}
+  --sys-text-primary: var(--color-gray-100);
+  --sys-text-secondary: var(--color-gray-400);
+  --sys-text-disabled: var(--color-gray-600);
+  --sys-text-inverse: var(--color-gray-900);
+  --sys-text-on-accent: var(--color-gray-900);
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+  --sys-status-success: var(--color-green-300);
+  --sys-status-success-container: var(--color-green-800);
+
+  --sys-status-warning: var(--color-amber-300);
+  --sys-status-warning-container: var(--color-amber-600);
+
+  --sys-status-error: var(--color-red-400);
+  --sys-status-error-container: var(--color-red-800);
+
+  --sys-status-info: var(--color-blue-400);
+  --sys-status-info-container: var(--color-blue-800);
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
+@theme {
+  /* Colors */
+  --color-background: var(--sys-background);
+  --color-surface: var(--sys-surface);
+  --color-surface-variant: var(--sys-surface-variant);
+  --color-border: var(--sys-border);
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
+  --color-primary: var(--sys-primary);
+  --color-primary-active: var(--sys-primary-active);
+  --color-primary-container: var(--sys-primary-container);
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+  --color-accent: var(--sys-accent);
+  --color-accent-container: var(--sys-accent-container);
+
+  --color-text-primary: var(--sys-text-primary);
+  --color-text-secondary: var(--sys-text-secondary);
+  --color-text-disabled: var(--sys-text-disabled);
+  --color-text-inverse: var(--sys-text-inverse);
+  --color-text-on-accent: var(--sys-text-on-accent);
+
+  --color-status-success: var(--sys-status-success);
+  --color-status-success-container: var(--sys-status-success-container);
+  --color-status-warning: var(--sys-status-warning);
+  --color-status-warning-container: var(--sys-status-warning-container);
+  --color-status-error: var(--sys-status-error);
+  --color-status-error-container: var(--sys-status-error-container);
+  --color-status-info: var(--sys-status-info);
+  --color-status-info-container: var(--sys-status-info-container);
+
+  /* Spacing */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-52: 52px;
+  --spacing-56: 56px;
+  --spacing-72: 72px;
+  --spacing-64: 64px;
+  --spacing-72: 72px;
+
+  /* Typography */
+  --text-12: 12px;
+  --text-13: 13px;
+  --text-14: 14px;
+  --text-16: 16px;
+  --text-18: 18px;
+  --text-20: 20px;
+  --text-22: 22px;
+  --text-24: 24px;
+  --text-28: 28px;
+  --text-32: 32px;
+  --text-36: 36px;
+  --text-48: 48px;
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Font Family */
+  --font-family-cairo: 'Cairo', 'Noto Sans Arabic', sans-serif;
+  --font-sans: var(--font-family-cairo);
+
+  /* Global Utilities overrides to enforce design system defaults */
+  /* Ensures our focus rings are exactly what we want if we apply ring classes */
 }

@@ -4,7 +4,7 @@ import { useAuthStore, type User } from '../store/auth.store';
 import { useNavigate } from 'react-router-dom';
 
 interface LoginCredentials {
-  email?: string;
+  emailOrUsername?: string;
   password?: string;
 }
 
@@ -19,7 +19,7 @@ export const useAuth = () => {
 
   return useMutation({
     mutationFn: async (credentials: LoginCredentials) => {
-      const response = await api.post<LoginResponse>('/api/admin/login', credentials);
+      const response = await api.post<LoginResponse>('/api/Auth/login', credentials);
       return response.data;
     },
     onSuccess: (data) => {

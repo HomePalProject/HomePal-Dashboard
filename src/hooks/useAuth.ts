@@ -8,8 +8,14 @@ interface LoginCredentials {
   password?: string;
 }
 
+interface TokenResponse {
+  accessToken: string;
+  refreshToken?: string;
+}
+
 interface LoginResponse {
-  token: string;
+  tokens?: TokenResponse;
+  token?: string;
   user: User;
 }
 
@@ -23,7 +29,7 @@ export const useAuth = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      const token = data?.token || 'mock_token_123';
+      const token = data?.tokens?.accessToken || data?.token || 'mock_token_123';
       const user = data?.user || { id: '1', email: 'admin@homepal.com', role: 'Admin' };
 
       setAuth(token, user);

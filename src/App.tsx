@@ -1,31 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
+import Overview from './pages/Overview';
+import DashboardLayout from './layouts/DashboardLayout';
 import { useAuthStore } from './store/auth.store';
+
+import Profile from './pages/Profile';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
   return <>{children}</>;
-}
-
-function DashboardPlaceholder() {
-  return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-24 font-cairo">
-      <div className="w-64 h-64 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-16">
-        <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-        </svg>
-      </div>
-      <h1 className="text-28 font-bold text-text-primary mb-8">Admin Dashboard</h1>
-      <p className="text-text-secondary text-16">
-        Welcome, Ammar! You have successfully signed in.
-      </p>
-    </div>
-  );
 }
 
 function App() {
@@ -33,15 +17,30 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+
+        {/* Protected dashboard shell */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardPlaceholder />
+              <DashboardLayout />
             </ProtectedRoute>
           }
-        />
-        {/* Fallback route redirects to login */}
+        >
+          {/* Nested pages rendered inside DashboardLayout's <Outlet /> */}
+          <Route index element={<Overview />} />
+          {/* Future pages plugged in here */}
+          <Route
+            path="preferences"
+            element={<div className="text-text-secondary p-24">Preferences page — coming soon</div>}
+          />
+          <Route
+            path="households"
+            element={<div className="text-text-secondary p-24">Households page — coming soon</div>}
+          />
+          <Route path="profile" element={<Profile />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

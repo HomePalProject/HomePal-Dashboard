@@ -7,7 +7,24 @@ import logoImg from '../assets/logo.png';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { mutate: login, isPending, isError } = useAuth();
+  const { mutate: login, isPending, isError, error } = useAuth();
+
+  const getErrorMessage = () => {
+    if (!error) return 'Login failed. Please try again.';
+    // Check if network is offline or axios network error
+    if (!navigator.onLine || (error as any)?.code === 'ERR_NETWORK' || !(error as any)?.response) {
+      return 'Network Error: Unable to connect to the server. Please check your internet connection.';
+    }
+    const status = (error as any)?.response?.status;
+    if (status === 401 || status === 400) {
+      return 'Invalid credentials. Please check your email/username and password.';
+    }
+    return (
+      (error as any)?.response?.data?.message ||
+      (error as any)?.response?.data?.title ||
+      'Login failed. Please check your credentials and try again.'
+    );
+  };
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -96,7 +113,7 @@ export default function Login() {
 
             {isError && (
               <div className="p-12 bg-status-error-container text-status-error rounded-md text-14 font-medium border border-status-error/20">
-                Login failed. Please check your credentials and try again.
+                {getErrorMessage()}
               </div>
             )}
 

@@ -123,18 +123,14 @@
   --color-background: var(--sys-background);
   --color-surface: var(--sys-surface);
   --color-surface-variant: var(--sys-surface-variant);
-  --color-surfacevariant: var(--sys-surface-variant);
   --color-border: var(--sys-border);
 
   --color-primary: var(--sys-primary);
   --color-primary-active: var(--sys-primary-active);
-  --color-primaryactive: var(--sys-primary-active);
   --color-primary-container: var(--sys-primary-container);
-  --color-primarycontainer: var(--sys-primary-container);
 
   --color-accent: var(--sys-accent);
   --color-accent-container: var(--sys-accent-container);
-  --color-accentcontainer: var(--sys-accent-container);
 
   --color-text-primary: var(--sys-text-primary);
   --color-text-secondary: var(--sys-text-secondary);

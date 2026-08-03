@@ -159,11 +159,10 @@
   --spacing-48: 48px;
   --spacing-52: 52px;
   --spacing-56: 56px;
-  --spacing-72: 72px;
   --spacing-64: 64px;
   --spacing-72: 72px;
 
-  /* Typography */
+  /* Typography Sizes */
   --text-12: 12px;
   --text-13: 13px;
   --text-14: 14px;
@@ -186,7 +185,57 @@
   /* Font Family */
   --font-family-cairo: 'Cairo', 'Noto Sans Arabic', sans-serif;
   --font-sans: var(--font-family-cairo);
+}
 
-  /* Global Utilities overrides to enforce design system defaults */
-  /* Ensures our focus rings are exactly what we want if we apply ring classes */
+/* =========================================
+   HOME PAL DESIGN SYSTEM TYPOGRAPHY UTILITIES
+   ========================================= */
+
+@utility text-typography-h2 {
+  font-family: var(--font-family-cairo);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 36px;
+}
+
+@utility text-typography-h3 {
+  font-family: var(--font-family-cairo);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 30px;
+}
+
+@utility text-typography-bodylarge {
+  font-family: var(--font-family-cairo);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 28px;
+}
+
+@utility text-typography-body {
+  font-family: var(--font-family-cairo);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+@utility text-typography-bodysmall {
+  font-family: var(--font-family-cairo);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+@utility text-typography-caption {
+  font-family: var(--font-family-cairo);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+@utility text-typography-label {
+  font-family: var(--font-family-cairo);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
 }

@@ -27,7 +27,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Preferences',
+    label: 'Preferences & Categories',
     to: '/dashboard/preferences',
     end: false,
     icon: (
@@ -66,12 +66,54 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
+  {
+    label: 'Supermarkets',
+    to: '/dashboard/supermarkets',
+    end: false,
+    icon: (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M3 3h18v18H3zM3 9h18M9 21V9" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Analytics',
+    to: '/dashboard/stats',
+    end: false,
+    icon: (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+      </svg>
+    ),
+  },
 ];
 
 const PAGE_LABELS: Record<string, string> = {
   '/dashboard': 'Overview',
-  '/dashboard/preferences': 'Preferences',
+  '/dashboard/preferences': 'Preferences & Categories',
   '/dashboard/households': 'Households',
+  '/dashboard/supermarkets': 'Offers & Supermarkets',
+  '/dashboard/stats': 'Analytics',
   '/dashboard/profile': 'Account Settings',
 };
 
@@ -206,8 +248,49 @@ export default function DashboardLayout() {
           ))}
         </nav>
 
-        {/* Sign out */}
-        <div style={{ padding: '12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        {/* Bottom actions */}
+        <div
+          style={{
+            padding: '12px',
+            borderTop: '1px solid rgba(255,255,255,0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+          }}
+        >
+          {/* Settings link to profile for now */}
+          <NavLink
+            to="/dashboard/profile"
+            style={({ isActive }) => ({
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              padding: '10px 12px',
+              borderRadius: 8,
+              fontSize: 14,
+              fontWeight: isActive ? 600 : 400,
+              color: isActive ? '#fff' : 'rgba(255,255,255,0.55)',
+              background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
+              textDecoration: 'none',
+              transition: 'all 150ms ease',
+            })}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            Settings
+          </NavLink>
+
           <button
             onClick={handleLogout}
             style={{
@@ -236,8 +319,8 @@ export default function DashboardLayout() {
             }}
           >
             <svg
-              width="16"
-              height="16"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -249,7 +332,7 @@ export default function DashboardLayout() {
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
-            Sign Out
+            Logout
           </button>
         </div>
       </aside>

@@ -28,9 +28,12 @@ export const useAuth = () => {
       const response = await api.post<LoginResponse>('/api/Auth/login', credentials);
       return response.data;
     },
-    onSuccess: (data) => {
-      const token = data?.tokens?.accessToken || data?.token || 'mock_token_123';
-      const user = data?.user || { id: '1', email: 'admin@homepal.com', role: 'Admin' };
+    onSuccess: (data: any) => {
+      // Backend wraps response in { success: true, data: { ... } }
+      const payload = data?.data || data;
+      const token =
+        payload?.tokens?.accessToken || payload?.accessToken || payload?.token || 'mock_token_123';
+      const user = payload?.user || { id: '1', email: 'admin@homepal.com', role: 'Admin' };
 
       setAuth(token, user);
       navigate('/dashboard');

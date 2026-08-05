@@ -102,7 +102,7 @@ export default function Profile() {
 
     try {
       // Send register request to backend
-      const res = await fetch(`${API}/api/Auth/register`, {
+      await fetch(`${API}/api/Auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

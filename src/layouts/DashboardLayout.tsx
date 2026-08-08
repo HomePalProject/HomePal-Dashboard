@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
-import logoImg from '../assets/logo.png';
 
 const NAV_ITEMS = [
   {
@@ -166,25 +165,11 @@ export default function DashboardLayout() {
           style={{ padding: '20px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                background: 'rgba(255,255,255,0.92)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 5,
-                flexShrink: 0,
-              }}
-            >
-              <img
-                src={logoImg}
-                alt="HomePal"
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
-            </div>
+            <img
+              src="/logo-light.svg"
+              alt="HomePal"
+              style={{ width: 32, height: 32, objectFit: 'contain' }}
+            />
             <div>
               <div
                 style={{

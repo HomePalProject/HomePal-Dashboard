@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useAuthStore } from '../store/auth.store';
+import { useAuthStore } from '../store/authStore';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

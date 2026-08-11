@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuthStore } from '../store/auth.store';
+import { useAuthStore } from '../store/authStore';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

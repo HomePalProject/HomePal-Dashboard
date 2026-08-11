@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '../store/auth.store';
+import { useAuthStore } from '../store/authStore';
 
 const API = import.meta.env.VITE_API_BASE_URL;
 

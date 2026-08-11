@@ -7,6 +7,8 @@ import { api } from '../services/api';
 import { AuthLayout } from '../components/auth/AuthLayout';
 import { AuthHeader } from '../components/auth/AuthHeader';
 
+import { isAxiosError } from 'axios';
+
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -28,14 +30,20 @@ export default function ForgotPassword() {
 
   const getErrorMessage = () => {
     if (!error) return 'Something went wrong. Please try again.';
-    if (!navigator.onLine || (error as any)?.code === 'ERR_NETWORK' || !(error as any)?.response) {
+    if (!navigator.onLine || (isAxiosError(error) && error.code === 'ERR_NETWORK')) {
       return 'Network Error: Unable to connect to the server. Please check your internet connection.';
     }
-    return (
-      (error as any)?.response?.data?.message ||
-      (error as any)?.response?.data?.title ||
-      'Failed to send reset email. Please try again.'
-    );
+    if (isAxiosError(error)) {
+      return (
+        error.response?.data?.message ||
+        error.response?.data?.title ||
+        'Failed to send reset email. Please try again.'
+      );
+    }
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return 'Failed to send reset email. Please try again.';
   };
 
   const handleSubmit = (e: React.SyntheticEvent) => {

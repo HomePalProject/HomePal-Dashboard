@@ -6,6 +6,8 @@ import { useAuth } from '../hooks/useAuth';
 import { AuthLayout } from '../components/auth/AuthLayout';
 import { AuthHeader } from '../components/auth/AuthHeader';
 
+import { isAxiosError } from 'axios';
+
 export default function Login() {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -14,18 +16,24 @@ export default function Login() {
 
   const getErrorMessage = () => {
     if (!error) return 'Login failed. Please try again.';
-    if (!navigator.onLine || (error as any)?.code === 'ERR_NETWORK' || !(error as any)?.response) {
+    if (!navigator.onLine || (isAxiosError(error) && error.code === 'ERR_NETWORK')) {
       return 'Network Error: Unable to connect to the server. Please check your internet connection.';
     }
-    const status = (error as any)?.response?.status;
-    if (status === 401 || status === 400) {
-      return 'Invalid credentials. Please check your email/username and password.';
+    if (isAxiosError(error)) {
+      const status = error.response?.status;
+      if (status === 401 || status === 400) {
+        return 'Invalid credentials. Please check your email/username and password.';
+      }
+      return (
+        error.response?.data?.message ||
+        error.response?.data?.title ||
+        'Login failed. Please check your credentials and try again.'
+      );
     }
-    return (
-      (error as any)?.response?.data?.message ||
-      (error as any)?.response?.data?.title ||
-      'Login failed. Please check your credentials and try again.'
-    );
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return 'Login failed. Please check your credentials and try again.';
   };
 
   const handleSubmit = (e: React.SyntheticEvent) => {

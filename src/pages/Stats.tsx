@@ -1,95 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@lib/utils';
 import { analyticsService } from '@services/analyticsService';
 import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
 import { mockStatsData } from '@constants/statsData';
+import { StatCard } from '@components/stats/StatCard';
 
 // ── Components ───────────────────────────────────────────────────────────────
-
-function StatCard({
-  title,
-  value,
-  change,
-  isCurrency = false,
-  isPercent = false,
-  icon,
-  onClick,
-}: {
-  title: string;
-  value: number;
-  change: number;
-  isCurrency?: boolean;
-  isPercent?: boolean;
-  icon: React.ReactNode;
-  onClick?: () => void;
-}) {
-  const isPositive = change > 0;
-
-  // Format values
-  const displayValue = isCurrency
-    ? `$${(value / 1000).toFixed(1)}k`
-    : isPercent
-      ? `${value}%`
-      : value.toLocaleString();
-
-  return (
-    <div
-      onClick={onClick}
-      className={cn(
-        'bg-surface rounded-xl border border-border p-6 flex flex-col gap-4',
-        onClick &&
-          'cursor-pointer transition-all duration-200 hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]'
-      )}
-    >
-      <div className="flex justify-between items-center">
-        <span className="text-[11px] font-bold text-text-secondary tracking-widest uppercase">
-          {title}
-        </span>
-        <div className="text-primary">{icon}</div>
-      </div>
-
-      <div className="text-[32px] font-extrabold text-text-primary">{displayValue}</div>
-
-      <div className="flex items-center gap-1.5 text-xs">
-        <span
-          className={cn(
-            'flex items-center gap-0.5 font-bold',
-            isPositive ? 'text-primary' : 'text-status-error'
-          )}
-        >
-          {isPositive ? (
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-            >
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-              <polyline points="17 6 23 6 23 12" />
-            </svg>
-          ) : (
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-            >
-              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
-              <polyline points="17 18 23 18 23 12" />
-            </svg>
-          )}
-          {Math.abs(change)}%
-        </span>
-        <span className="text-text-secondary font-medium">vs last month</span>
-      </div>
-    </div>
-  );
-}
 
 export default function Stats() {
   const navigate = useNavigate();
@@ -113,7 +30,7 @@ export default function Stats() {
   }, [fetchData]);
 
   if (loading || !data) {
-    return <div className="p-10 text-text-secondary font-sans">Loading analytics...</div>;
+    return <div className="p-40 text-text-secondary font-sans">Loading analytics...</div>;
   }
 
   const visionTotal =
@@ -124,19 +41,19 @@ export default function Stats() {
   const manualDeg = (data.visionHealth.manualFallbackPercentage / visionTotal) * 360;
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-6 font-sans">
+    <div className="max-w-300 mx-auto flex flex-col gap-24 font-sans">
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-[28px] font-extrabold text-text-primary tracking-tight mb-2 m-0">
+          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
             Analytics Overview
           </h1>
           <p className="text-sm text-text-secondary max-w-150 m-0">
             Platform performance and insights for current billing cycle.
           </p>
         </div>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white border-none rounded-lg text-[13px] font-semibold cursor-pointer hover:bg-primary/90 transition-colors">
+        <div className="flex gap-12 flex-wrap">
+          <button className="flex items-center gap-[8px] px-16 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer hover:bg-primary/90 transition-colors">
             <svg
               width="14"
               height="14"
@@ -151,14 +68,14 @@ export default function Stats() {
             </svg>
             Export Report
           </button>
-          <div className="px-4 py-2.5 bg-surface border border-border rounded-lg text-[13px] font-semibold text-text-primary">
+          <div className="px-16 py-2.5 bg-surface border border-border rounded-lg text-13 font-semibold text-text-primary">
             Last 30 Days
           </div>
         </div>
       </div>
 
       {/* ── Stat Cards ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-20">
         <StatCard
           title="Revenue (Current Cycle)"
           value={data.revenue.current}
@@ -223,14 +140,14 @@ export default function Stats() {
       </div>
 
       {/* ── Middle Row ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-20">
         {/* Top Supermarket Chains */}
-        <div className="bg-surface rounded-xl border border-border p-6 flex flex-col">
-          <div className="flex justify-between items-center mb-6">
+        <div className="bg-surface rounded-xl border border-border p-24 flex flex-col">
+          <div className="flex justify-between items-center mb-24">
             <h2 className="text-base font-bold text-text-primary m-0">Top Supermarket Chains</h2>
             <button
               onClick={() => navigate('/dashboard/supermarket-performance')}
-              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
+              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-[4px] hover:opacity-80 transition-opacity"
             >
               View All
               <svg
@@ -247,15 +164,15 @@ export default function Stats() {
               </svg>
             </button>
           </div>
-          <div className="flex-1 relative min-h-45 flex items-end gap-6 px-5 border-b border-border">
+          <div className="flex-1 relative min-h-45 flex items-end gap-24 px-20 border-b border-border">
             {/* Background grid lines */}
-            <div className="absolute inset-0 border-t border-b border-[#f0f0f0] top-1/3 h-1/3" />
+            <div className="absolute inset-0 border-t border-b border-[#f0f0f0] top-[4px]/3 h-[4px]/3" />
 
             {data.topSupermarketChains.map((chain, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-3 z-10">
+              <div key={i} className="flex-1 flex flex-col items-center gap-12 z-10">
                 <div
                   className={cn(
-                    'w-full max-w-10 rounded-t-sm',
+                    'w-full max-w-40 rounded-t-sm',
                     i === 0 ? 'bg-primary opacity-100' : 'bg-[#e4e4e7] opacity-60'
                   )}
                   style={{ height: `${(chain.value / 100) * 140}px` }}
@@ -263,7 +180,7 @@ export default function Stats() {
               </div>
             ))}
           </div>
-          <div className="flex gap-6 px-5 pt-3">
+          <div className="flex gap-24 px-20 pt-12">
             {data.topSupermarketChains.map((chain, i) => (
               <div
                 key={i}
@@ -276,12 +193,12 @@ export default function Stats() {
         </div>
 
         {/* Vision AI Health */}
-        <div className="bg-surface rounded-xl border border-border p-6">
-          <div className="flex justify-between items-start mb-1">
+        <div className="bg-surface rounded-xl border border-border p-24">
+          <div className="flex justify-between items-start mb-[4px]">
             <h2 className="text-base font-bold text-text-primary m-0">Vision AI Health</h2>
             <button
               onClick={() => navigate('/dashboard/vision-ai-logs')}
-              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
+              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-[4px] hover:opacity-80 transition-opacity"
             >
               View Logs
               <svg
@@ -305,7 +222,7 @@ export default function Stats() {
           <div className="flex gap-8 items-center">
             {/* Donut Chart via CSS */}
             <div
-              className="w-30 h-30 rounded-full relative flex items-center justify-center p-3"
+              className="w-30 h-30 rounded-full relative flex items-center justify-center p-12"
               style={{
                 background: `conic-gradient(var(--sys-primary) 0deg ${autoDeg}deg, #d97706 ${autoDeg}deg ${autoDeg + manualDeg}deg, var(--sys-status-error) ${autoDeg + manualDeg}deg 360deg)`,
               }}
@@ -349,7 +266,7 @@ export default function Stats() {
                     </span>
                     <span>{item.val.toFixed(1)}%</span>
                   </div>
-                  <div className="h-1 bg-[#f4f4f5] rounded-sm overflow-hidden">
+                  <div className="h-[4px] bg-[#f4f4f5] rounded-sm overflow-hidden">
                     <div
                       className="h-full rounded-sm"
                       style={{ width: `${item.val}%`, background: item.color }}
@@ -363,15 +280,15 @@ export default function Stats() {
       </div>
 
       {/* ── Bottom Row ──────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 flex-1">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-20 flex-1">
         {/* User Distribution Map */}
         <div
           onClick={() => navigate('/dashboard/geographic-demographics')}
-          className="bg-[#e9f1eb] rounded-xl border border-border p-6 flex flex-col relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] group"
+          className="bg-[#e9f1eb] rounded-xl border border-border p-24 flex flex-col relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] group"
         >
-          <div className="flex justify-between items-center z-10 mb-1">
+          <div className="flex justify-between items-center z-10 mb-[4px]">
             <h2 className="text-base font-bold text-text-primary m-0">User Distribution</h2>
-            <button className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-1">
+            <button className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-[4px]">
               View Map
               <svg
                 width="12"
@@ -399,7 +316,7 @@ export default function Stats() {
           {data.userDistribution.map((pt, i) => (
             <div
               key={i}
-              className="absolute w-3 h-3 bg-primary rounded-full border-2 border-white shadow-[0_2px_4px_rgba(0,0,0,0.2)] -translate-x-1/2 -translate-y-1/2"
+              className="absolute w-12 h-12 bg-primary rounded-full border-2 border-white shadow-[0_2px_4px_rgba(0,0,0,0.2)] -translate-x-1/2 -translate-y-1/2"
               style={{
                 left: `${pt.lng}%`,
                 top: `${pt.lat}%`,
@@ -409,13 +326,15 @@ export default function Stats() {
         </div>
 
         {/* Top Grocery Categories */}
-        <div className="bg-surface rounded-xl border border-border p-6 flex flex-col">
-          <h2 className="text-base font-bold text-text-primary m-0 mb-6">Top Grocery Categories</h2>
-          <div className="flex flex-col gap-6 flex-1 justify-center">
+        <div className="bg-surface rounded-xl border border-border p-24 flex flex-col">
+          <h2 className="text-base font-bold text-text-primary m-0 mb-24">
+            Top Grocery Categories
+          </h2>
+          <div className="flex flex-col gap-24 flex-1 justify-center">
             {data.topCategories.map((cat, i) => (
               <div key={i}>
-                <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-2">
-                  <span className="flex items-center gap-2">
+                <div className="flex justify-between text-13 font-semibold text-text-primary mb-[8px]">
+                  <span className="flex items-center gap-[8px]">
                     {i === 0 && (
                       <svg
                         width="14"

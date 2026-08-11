@@ -86,15 +86,15 @@ export default function SupermarketPerformance() {
   };
 
   if (loading || !data) {
-    return <div className="p-10 text-text-secondary font-sans">Loading analytics...</div>;
+    return <div className="p-40 text-text-secondary font-sans">Loading analytics...</div>;
   }
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-6 pb-15 font-sans relative">
+    <div className="max-w-300 mx-auto flex flex-col gap-24 pb-15 font-sans relative">
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex justify-between items-start">
         <div>
-          <div className="flex items-center gap-1.5 text-[13px] text-text-secondary mb-2 font-medium">
+          <div className="flex items-center gap-1.5 text-13 text-text-secondary mb-[8px] font-medium">
             <span>HomePal Admin</span>
             <svg
               width="12"
@@ -110,7 +110,7 @@ export default function SupermarketPerformance() {
             </svg>
             <span className="text-text-primary">Analytics</span>
           </div>
-          <h1 className="text-[28px] font-extrabold text-text-primary tracking-tight mb-2 m-0">
+          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
             Supermarket Performance
           </h1>
           <p className="text-sm text-text-secondary max-w-150 m-0">
@@ -118,12 +118,12 @@ export default function SupermarketPerformance() {
             opportunities.
           </p>
         </div>
-        <div className="flex gap-3 mt-3">
+        <div className="flex gap-12 mt-12">
           <button
             onClick={handleExportCSV}
             disabled={isExporting}
             className={cn(
-              'flex items-center gap-2 px-4 py-2.5 bg-white border border-border rounded-lg text-[13px] font-semibold text-text-primary transition-all duration-200',
+              'flex items-center gap-[8px] px-4 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold text-text-primary transition-all duration-200',
               isExporting
                 ? 'opacity-70 cursor-not-allowed'
                 : 'cursor-pointer hover:bg-surface-variant'
@@ -163,7 +163,7 @@ export default function SupermarketPerformance() {
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-primary text-white border-none rounded-lg text-[13px] font-semibold cursor-pointer transition-opacity duration-200 hover:opacity-90"
+            className="flex items-center gap-[8px] px-4 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer transition-opacity duration-200 hover:opacity-90"
           >
             <svg
               width="16"
@@ -183,11 +183,11 @@ export default function SupermarketPerformance() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-24 items-start">
         {/* ── Main Table ────────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-border flex flex-col overflow-hidden">
-          <div className="px-6 py-5 border-b border-border flex justify-between items-center">
-            <div className="flex items-center gap-2">
+          <div className="px-24 py-20 border-b border-border flex justify-between items-center">
+            <div className="flex items-center gap-[8px]">
               <svg
                 width="18"
                 height="18"
@@ -206,7 +206,7 @@ export default function SupermarketPerformance() {
                 Partner Performance Index
               </h2>
             </div>
-            <button className="bg-transparent border-none text-text-secondary text-[13px] font-semibold cursor-pointer flex items-center gap-1 hover:text-primary transition-colors">
+            <button className="bg-transparent border-none text-text-secondary text-13 font-semibold cursor-pointer flex items-center gap-[4px] hover:text-primary transition-colors">
               View All
               <svg
                 width="14"
@@ -227,22 +227,22 @@ export default function SupermarketPerformance() {
             <table className="w-full border-collapse text-left min-w-175">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary uppercase">
+                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
                     Rank
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary uppercase">
+                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
                     Partner Chain
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary uppercase">
+                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
                     Active Offers
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary uppercase">
+                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
                     User CTR
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary uppercase">
+                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
                     Ingestion Rate
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-semibold text-text-secondary uppercase text-right">
+                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase text-right">
                     Predicted Growth
                   </th>
                 </tr>
@@ -253,24 +253,24 @@ export default function SupermarketPerformance() {
                     key={partner.id}
                     className="border-b border-border transition-colors duration-200 hover:bg-surface-variant/50 cursor-pointer"
                   >
-                    <td className="px-6 py-4 text-sm font-semibold text-text-primary">
+                    <td className="px-24 py-4 text-sm font-semibold text-text-primary">
                       {partner.rank}
                     </td>
-                    <td className="px-6 py-4 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-[11px] font-bold text-text-secondary bg-white">
+                    <td className="px-24 py-4 flex items-center gap-12">
+                      <div className="w-32 h-32 rounded-full border border-border flex items-center justify-center text-[11px] font-bold text-text-secondary bg-white">
                         {partner.code}
                       </div>
                       <span className="text-sm font-semibold text-text-primary">
                         {partner.chain}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-[13px] text-text-secondary">
+                    <td className="px-24 py-4 text-13 text-text-secondary">
                       {partner.activeOffers}
                     </td>
-                    <td className="px-6 py-4 text-[13px] text-text-secondary">{partner.userCtr}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-24 py-4 text-13 text-text-secondary">{partner.userCtr}</td>
+                    <td className="px-24 py-4">
                       <span
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-[4px] rounded-full text-[11px] font-bold"
                         style={{
                           background: partner.ingestionRate.bg,
                           color: partner.ingestionRate.color,
@@ -283,8 +283,8 @@ export default function SupermarketPerformance() {
                         {partner.ingestionRate.value}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-[13px] font-semibold text-text-primary text-right">
-                      <div className="flex items-center justify-end gap-1">
+                    <td className="px-24 py-4 text-13 font-semibold text-text-primary text-right">
+                      <div className="flex items-center justify-end gap-[4px]">
                         <svg
                           width="14"
                           height="14"
@@ -309,10 +309,10 @@ export default function SupermarketPerformance() {
         </div>
 
         {/* ── Side Panels ───────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-24">
           {/* Partnership Opportunities */}
-          <div className="bg-[#fcf6f3] rounded-xl border border-[#f9d8c4] p-6">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="bg-[#fcf6f3] rounded-xl border border-[#f9d8c4] p-24">
+            <div className="flex items-center gap-[8px] mb-4">
               <svg
                 width="20"
                 height="20"
@@ -331,7 +331,7 @@ export default function SupermarketPerformance() {
                 Partnership Opportunities
               </h2>
             </div>
-            <p className="text-[13px] text-text-secondary mb-6 leading-relaxed m-0">
+            <p className="text-13 text-text-secondary mb-24 leading-relaxed m-0">
               Stores exhibiting high user search volume but suffering from low active data coverage.
             </p>
 
@@ -339,7 +339,7 @@ export default function SupermarketPerformance() {
               {/* Waitrose */}
               <div className="bg-white rounded-lg p-4 border border-border flex justify-between items-center">
                 <div>
-                  <h3 className="text-sm font-semibold text-text-primary mb-1 m-0">Waitrose</h3>
+                  <h3 className="text-sm font-semibold text-text-primary mb-[4px] m-0">Waitrose</h3>
                   <div className="flex items-center gap-1.5 text-xs text-text-secondary">
                     <svg
                       width="12"
@@ -359,7 +359,7 @@ export default function SupermarketPerformance() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[13px] font-bold text-text-primary">
+                  <div className="text-13 font-bold text-text-primary">
                     {data.opportunities.waitrose.potential}
                   </div>
                   <div className="text-[11px] text-text-secondary">Potential</div>
@@ -369,7 +369,9 @@ export default function SupermarketPerformance() {
               {/* Choithrams */}
               <div className="bg-white rounded-lg p-4 border border-border flex justify-between items-center">
                 <div>
-                  <h3 className="text-sm font-semibold text-text-primary mb-1 m-0">Choithrams</h3>
+                  <h3 className="text-sm font-semibold text-text-primary mb-[4px] m-0">
+                    Choithrams
+                  </h3>
                   <div className="flex items-center gap-1.5 text-xs text-text-secondary">
                     <svg
                       width="12"
@@ -387,7 +389,7 @@ export default function SupermarketPerformance() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[13px] font-bold text-[#d97706]">
+                  <div className="text-13 font-bold text-[#d97706]">
                     {data.opportunities.choithrams.potential}
                   </div>
                   <div className="text-[11px] text-text-secondary">Potential</div>
@@ -397,15 +399,15 @@ export default function SupermarketPerformance() {
           </div>
 
           {/* Global Conversion Funnel */}
-          <div className="bg-white rounded-xl border border-border p-6">
-            <h2 className="text-base font-bold text-text-primary text-center mb-6 m-0">
+          <div className="bg-white rounded-xl border border-border p-24">
+            <h2 className="text-base font-bold text-text-primary text-center mb-24 m-0">
               Global Conversion Funnel
             </h2>
 
-            <div className="flex flex-col gap-2 items-center">
+            <div className="flex flex-col gap-[8px] items-center">
               {/* Funnel Step 1 */}
-              <div className="w-full bg-[#e2e8f0] px-5 py-3 rounded flex justify-between items-center">
-                <div className="flex items-center gap-2 text-[13px] font-semibold text-text-primary">
+              <div className="w-full bg-[#e2e8f0] px-20 py-12 rounded flex justify-between items-center">
+                <div className="flex items-center gap-[8px] text-13 font-semibold text-text-primary">
                   <svg
                     width="16"
                     height="16"
@@ -421,7 +423,7 @@ export default function SupermarketPerformance() {
                   </svg>
                   Flyer Seen
                 </div>
-                <span className="text-[13px] font-semibold text-text-secondary">
+                <span className="text-13 font-semibold text-text-secondary">
                   {data.funnel.flyerSeen}
                 </span>
               </div>
@@ -439,8 +441,8 @@ export default function SupermarketPerformance() {
               </svg>
 
               {/* Funnel Step 2 */}
-              <div className="w-[85%] bg-[#f1f5f9] px-5 py-3 rounded flex justify-between items-center">
-                <div className="flex items-center gap-2 text-[13px] font-semibold text-text-primary">
+              <div className="w-[85%] bg-[#f1f5f9] px-20 py-12 rounded flex justify-between items-center">
+                <div className="flex items-center gap-[8px] text-13 font-semibold text-text-primary">
                   <svg
                     width="16"
                     height="16"
@@ -455,7 +457,7 @@ export default function SupermarketPerformance() {
                   </svg>
                   Product Saved
                 </div>
-                <span className="text-[13px] font-semibold text-text-secondary">
+                <span className="text-13 font-semibold text-text-secondary">
                   {data.funnel.productSaved}
                 </span>
               </div>
@@ -473,8 +475,8 @@ export default function SupermarketPerformance() {
               </svg>
 
               {/* Funnel Step 3 */}
-              <div className="w-[70%] bg-[#d1e6e0] px-5 py-3 rounded flex justify-between items-center">
-                <div className="flex items-center gap-2 text-[13px] font-semibold text-text-primary">
+              <div className="w-[70%] bg-[#d1e6e0] px-20 py-12 rounded flex justify-between items-center">
+                <div className="flex items-center gap-[8px] text-13 font-semibold text-text-primary">
                   <svg
                     width="16"
                     height="16"
@@ -491,13 +493,13 @@ export default function SupermarketPerformance() {
                   </svg>
                   Purchase Logged
                 </div>
-                <span className="text-[13px] font-bold text-text-primary">
+                <span className="text-13 font-bold text-text-primary">
                   {data.funnel.purchaseLogged}
                 </span>
               </div>
             </div>
 
-            <div className="text-center mt-6 text-[13px] text-text-secondary">
+            <div className="text-center mt-24 text-13 text-text-secondary">
               Overall Conversion Rate:{' '}
               <span className="font-bold text-text-primary">{data.funnel.conversionRate}</span>
             </div>
@@ -509,20 +511,20 @@ export default function SupermarketPerformance() {
 
       {/* New Partner Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-5">
+        <div className="fixed inset-0 z-1000 flex items-center justify-center p-20">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsModalOpen(false)}
           />
           <div className="relative bg-white rounded-2xl w-full max-w-125 p-8 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in duration-200">
-            <h2 className="text-xl font-bold text-text-primary mb-2 m-0">Add New Partner</h2>
-            <p className="text-[13px] text-text-secondary mb-6 m-0">
+            <h2 className="text-xl font-bold text-text-primary mb-[8px] m-0">Add New Partner</h2>
+            <p className="text-13 text-text-secondary mb-24 m-0">
               Enter the supermarket details to initialize integration.
             </p>
 
             <form onSubmit={handleAddPartner} className="flex flex-col gap-4">
               <div>
-                <label className="block text-[13px] font-semibold text-text-primary mb-1.5">
+                <label className="block text-13 font-semibold text-text-primary mb-1.5">
                   Supermarket Chain Name
                 </label>
                 <input
@@ -535,7 +537,7 @@ export default function SupermarketPerformance() {
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-semibold text-text-primary mb-1.5">
+                <label className="block text-13 font-semibold text-text-primary mb-1.5">
                   Website URL
                 </label>
                 <input
@@ -548,7 +550,7 @@ export default function SupermarketPerformance() {
                 />
               </div>
               <div>
-                <label className="block text-[13px] font-semibold text-text-primary mb-1.5">
+                <label className="block text-13 font-semibold text-text-primary mb-1.5">
                   Contact Email
                 </label>
                 <input
@@ -561,11 +563,11 @@ export default function SupermarketPerformance() {
                 />
               </div>
 
-              <div className="flex justify-end gap-3 mt-4">
+              <div className="flex justify-end gap-12 mt-4">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-2.5 bg-white border border-border rounded-lg text-[13px] font-semibold cursor-pointer hover:bg-surface-variant transition-colors"
+                  className="px-20 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold cursor-pointer hover:bg-surface-variant transition-colors"
                 >
                   Cancel
                 </button>
@@ -573,7 +575,7 @@ export default function SupermarketPerformance() {
                   type="submit"
                   disabled={isSubmitting}
                   className={cn(
-                    'px-5 py-2.5 bg-primary text-white border-none rounded-lg text-[13px] font-semibold flex items-center gap-2 transition-opacity',
+                    'px-20 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold flex items-center gap-[8px] transition-opacity',
                     isSubmitting
                       ? 'cursor-not-allowed opacity-75'
                       : 'cursor-pointer hover:opacity-90'
@@ -603,7 +605,7 @@ export default function SupermarketPerformance() {
       )}
 
       {toastMessage && (
-        <div className="fixed bottom-8 right-8 bg-[#111827] text-white px-6 py-3 rounded-lg text-[13px] font-medium shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center gap-2 z-[9999] animate-in slide-in-from-bottom-5 fade-in duration-300">
+        <div className="fixed bottom-8 right-8 bg-[#111827] text-white px-24 py-12 rounded-lg text-13 font-medium shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center gap-[8px] z-9999 animate-in slide-in-from-bottom-20 fade-in duration-300">
           <svg
             width="16"
             height="16"

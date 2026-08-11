@@ -126,7 +126,7 @@ export default function VisionAILogs() {
   };
 
   if (loading || !data) {
-    return <div className="p-10 text-text-secondary font-sans">Loading logs...</div>;
+    return <div className="p-40 text-text-secondary font-sans">Loading logs...</div>;
   }
 
   const filteredLogs = data.logs.filter((log) => {
@@ -142,10 +142,10 @@ export default function VisionAILogs() {
   );
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-6 pb-15 font-sans">
-      <div className="flex justify-between items-start flex-wrap gap-5">
+    <div className="max-w-300 mx-auto flex flex-col gap-24 pb-15 font-sans">
+      <div className="flex justify-between items-start flex-wrap gap-20">
         <div>
-          <div className="flex items-center gap-1.5 text-[13px] text-text-secondary mb-2 font-medium">
+          <div className="flex items-center gap-1.5 text-13 text-text-secondary mb-[8px] font-medium">
             <span>Settings</span>
             <svg
               width="12"
@@ -161,7 +161,7 @@ export default function VisionAILogs() {
             </svg>
             <span className="text-text-primary">Vision AI Ingestion</span>
           </div>
-          <h1 className="text-[28px] font-extrabold text-text-primary tracking-tight mb-2 m-0">
+          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
             Ingestion Logs & Fallback
           </h1>
           <p className="text-sm text-text-secondary max-w-150 leading-relaxed m-0">
@@ -169,10 +169,10 @@ export default function VisionAILogs() {
             override schema mismatches to train the Vision AI models.
           </p>
         </div>
-        <div className="flex gap-3 mt-3 flex-wrap">
+        <div className="flex gap-12 mt-12 flex-wrap">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-border rounded-lg text-[13px] font-semibold text-text-primary cursor-pointer transition-colors hover:bg-surface-variant shadow-sm"
+            className="flex items-center gap-[8px] px-4 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold text-text-primary cursor-pointer transition-colors hover:bg-surface-variant shadow-sm"
           >
             <svg
               width="16"
@@ -194,7 +194,7 @@ export default function VisionAILogs() {
             onClick={handleSync}
             disabled={isSyncing}
             className={cn(
-              'flex items-center gap-2 px-4 py-2.5 bg-primary text-white border-none rounded-lg text-[13px] font-semibold cursor-pointer relative shadow-sm transition-opacity',
+              'flex items-center gap-[8px] px-4 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer relative shadow-sm transition-opacity',
               isSyncing ? 'opacity-80 cursor-not-allowed' : 'hover:opacity-90'
             )}
           >
@@ -213,26 +213,26 @@ export default function VisionAILogs() {
             </svg>
             Sync Now
             {isSyncing && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-status-success rounded-full border-2 border-white" />
+              <span className="absolute top-[-4px] right-[-4px] w-2.5 h-2.5 bg-status-success rounded-full border-2 border-white" />
             )}
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-24 items-start">
         <div className="bg-white rounded-xl border border-border flex flex-col overflow-hidden">
-          <div className="px-6 py-5 border-b border-border flex justify-between items-center bg-[#faf8f3] flex-wrap gap-4">
+          <div className="px-24 py-20 border-b border-border flex justify-between items-center bg-[#faf8f3] flex-wrap gap-4">
             <h2 className="text-base font-bold text-text-primary m-0">
               Failed & Manual-Fallback Queue
             </h2>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-12">
               <select
                 value={filterError}
                 onChange={(e) => {
                   setFilterError(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-3 py-1.5 rounded-md border border-border text-[13px] text-text-secondary bg-[#fafafa] outline-none cursor-pointer focus:border-primary transition-colors"
+                className="px-12 py-1.5 rounded-md border border-border text-13 text-text-secondary bg-[#fafafa] outline-none cursor-pointer focus:border-primary transition-colors"
               >
                 <option value="ALL">All Errors</option>
                 <option value="LOW_CONFIDENCE_OCR">Low Confidence</option>
@@ -245,7 +245,7 @@ export default function VisionAILogs() {
                   setCurrentPage(1);
                 }}
                 className={cn(
-                  'px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-colors border',
+                  'px-12 py-1.5 rounded-md text-xs font-semibold cursor-pointer transition-colors border',
                   filterActionRequired
                     ? 'bg-status-error text-white border-status-error'
                     : 'bg-status-error-container text-status-error border-red-200 hover:bg-red-100'
@@ -260,22 +260,22 @@ export default function VisionAILogs() {
             <table className="w-full border-collapse text-left min-w-175">
               <thead>
                 <tr className="border-b border-border bg-white">
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
+                  <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
                     Flyer
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
+                  <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
                     Supermarket
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
+                  <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
                     Date
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
+                  <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
                     Error Code
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
+                  <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
+                  <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase tracking-widest">
                     Action
                   </th>
                 </tr>
@@ -283,7 +283,7 @@ export default function VisionAILogs() {
               <tbody>
                 {paginatedLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-10 text-center text-text-secondary text-sm">
+                    <td colSpan={6} className="px-24 py-40 text-center text-text-secondary text-sm">
                       No errors found matching your filters.
                     </td>
                   </tr>
@@ -297,7 +297,7 @@ export default function VisionAILogs() {
                         key={log.id}
                         className="border-b border-border transition-colors hover:bg-surface-variant/50"
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-24 py-4">
                           <div className="w-12 h-16 rounded-md border border-border overflow-hidden bg-surface shrink-0">
                             <img
                               src={log.flyerUrl}
@@ -306,18 +306,18 @@ export default function VisionAILogs() {
                             />
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm font-semibold text-text-primary">
+                        <td className="px-24 py-4 text-sm font-semibold text-text-primary">
                           {log.supermarket}
                         </td>
-                        <td className="px-6 py-4 text-[13px] text-text-secondary">
+                        <td className="px-24 py-4 text-13 text-text-secondary">
                           {log.date.split(',').map((part, i) => (
                             <div key={i}>{part.trim()}</div>
                           ))}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-24 py-4">
                           <span
                             className={cn(
-                              'inline-flex px-2.5 py-1 rounded-full text-[11px] font-bold tracking-[0.02em]',
+                              'inline-flex px-2.5 py-[4px] rounded-full text-[11px] font-bold tracking-[0.02em]',
                               badge.bg,
                               badge.text
                             )}
@@ -325,7 +325,7 @@ export default function VisionAILogs() {
                             {log.errorCode}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-24 py-4">
                           <span
                             className={cn(
                               'inline-flex items-center gap-1.5 text-[11px] font-bold tracking-[0.02em]',
@@ -342,11 +342,11 @@ export default function VisionAILogs() {
                             {status.label}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-24 py-4">
                           <button
                             onClick={() => handleRowAction(log)}
                             className={cn(
-                              'px-3 py-1.5 bg-white border rounded-md text-xs font-semibold cursor-pointer transition-colors hover:bg-surface-variant shadow-sm whitespace-nowrap',
+                              'px-12 py-1.5 bg-white border rounded-md text-xs font-semibold cursor-pointer transition-colors hover:bg-surface-variant shadow-sm whitespace-nowrap',
                               log.status === 'ACTION_REQUIRED'
                                 ? 'border-primary text-primary'
                                 : 'border-border text-text-secondary'
@@ -367,13 +367,13 @@ export default function VisionAILogs() {
             </table>
           </div>
 
-          <div className="px-6 py-4 flex justify-between items-center text-text-secondary text-[13px] bg-white">
+          <div className="px-24 py-4 flex justify-between items-center text-text-secondary text-13 bg-white">
             <span>
               Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredLogs.length)}-
               {Math.min(currentPage * itemsPerPage, filteredLogs.length)} of {filteredLogs.length}{' '}
               errors
             </span>
-            <div className="flex gap-2">
+            <div className="flex gap-[8px]">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
@@ -414,9 +414,9 @@ export default function VisionAILogs() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-6">
-          <div className="bg-white rounded-xl border border-border p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-col gap-24">
+          <div className="bg-white rounded-xl border border-border p-24 shadow-sm">
+            <div className="flex items-center gap-[8px] mb-4">
               <svg
                 width="20"
                 height="20"
@@ -434,11 +434,11 @@ export default function VisionAILogs() {
               </svg>
               <h2 className="text-base font-bold text-text-primary m-0">Error Insights</h2>
             </div>
-            <p className="text-[13px] text-text-secondary mb-6 leading-relaxed m-0">
+            <p className="text-13 text-text-secondary mb-24 leading-relaxed m-0">
               Breakdown of parsing failures over the last 7 days.
             </p>
 
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-20">
               {[
                 {
                   label: 'Low Confidence OCR',
@@ -457,11 +457,11 @@ export default function VisionAILogs() {
                 },
               ].map((item) => (
                 <div key={item.label}>
-                  <div className="flex justify-between text-[13px] font-semibold mb-2 text-text-primary">
+                  <div className="flex justify-between text-13 font-semibold mb-[8px] text-text-primary">
                     <span>{item.label}</span>
                     <span>{item.val}%</span>
                   </div>
-                  <div className="h-1 bg-surface rounded-full overflow-hidden">
+                  <div className="h-[4px] bg-surface rounded-full overflow-hidden">
                     <div
                       className={cn(
                         'h-full rounded-full transition-all duration-1000 ease-out',
@@ -475,9 +475,9 @@ export default function VisionAILogs() {
             </div>
           </div>
 
-          <div className="bg-primary rounded-xl p-6 text-white shadow-md">
-            <h2 className="text-base font-bold mb-3 m-0 text-white">Model Retraining</h2>
-            <p className="text-[13px] text-white/85 mb-6 leading-relaxed m-0">
+          <div className="bg-primary rounded-xl p-24 text-white shadow-md">
+            <h2 className="text-base font-bold mb-12 m-0 text-white">Model Retraining</h2>
+            <p className="text-13 text-white/85 mb-24 leading-relaxed m-0">
               You have manually resolved {data.resolvedThisWeek} schema mismatches this week. The
               Vision AI model is ready for incremental fine-tuning.
             </p>
@@ -485,7 +485,7 @@ export default function VisionAILogs() {
               onClick={handleRetrain}
               disabled={isRetraining}
               className={cn(
-                'w-full py-3 bg-white text-primary border-none rounded-lg text-[13px] font-bold cursor-pointer flex justify-center items-center gap-2 transition-colors',
+                'w-full py-12 bg-white text-primary border-none rounded-lg text-13 font-bold cursor-pointer flex justify-center items-center gap-[8px] transition-colors',
                 isRetraining ? 'opacity-80 cursor-not-allowed' : 'hover:bg-green-50'
               )}
             >
@@ -529,27 +529,27 @@ export default function VisionAILogs() {
       </div>
 
       {selectedLog && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-5">
+        <div className="fixed inset-0 z-1000 flex items-center justify-center p-20">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setSelectedLog(null)}
           />
 
           <div className="relative bg-white rounded-2xl w-[90%] max-w-225 max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
-            <div className="px-6 py-5 border-b border-border flex justify-between items-center bg-[#fafafa]">
+            <div className="px-24 py-20 border-b border-border flex justify-between items-center bg-[#fafafa]">
               <div>
                 <h2 className="text-lg font-bold text-text-primary m-0">
                   {selectedLog.status === 'RESOLVED'
                     ? 'View Extraction Details'
                     : 'Review & Override Extracted Data'}
                 </h2>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[13px] text-text-secondary">
+                <div className="flex items-center gap-[8px] mt-[4px]">
+                  <span className="text-13 text-text-secondary">
                     {selectedLog.supermarket} • {selectedLog.date}
                   </span>
                   <span
                     className={cn(
-                      'inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold tracking-[0.02em]',
+                      'inline-flex px-[8px] py-0.5 rounded-full text-[10px] font-bold tracking-[0.02em]',
                       badgeStyles[selectedLog.errorCode].bg,
                       badgeStyles[selectedLog.errorCode].text
                     )}
@@ -560,7 +560,7 @@ export default function VisionAILogs() {
               </div>
               <button
                 onClick={() => setSelectedLog(null)}
-                className="bg-transparent border-none cursor-pointer text-text-secondary p-1 hover:text-text-primary transition-colors"
+                className="bg-transparent border-none cursor-pointer text-text-secondary p-[4px] hover:text-text-primary transition-colors"
               >
                 <svg
                   width="24"
@@ -579,7 +579,7 @@ export default function VisionAILogs() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 flex-1 overflow-hidden">
-              <div className="bg-surface p-6 flex items-center justify-center overflow-hidden">
+              <div className="bg-surface p-24 flex items-center justify-center overflow-hidden">
                 <img
                   src={selectedLog.flyerUrl}
                   alt="Flyer"
@@ -587,9 +587,9 @@ export default function VisionAILogs() {
                 />
               </div>
 
-              <div className="p-6 flex flex-col overflow-y-auto">
-                <div className="mb-3 flex justify-between items-center">
-                  <span className="text-[13px] font-semibold text-text-primary">
+              <div className="p-24 flex flex-col overflow-y-auto">
+                <div className="mb-12 flex justify-between items-center">
+                  <span className="text-13 font-semibold text-text-primary">
                     Extracted JSON Output
                   </span>
                   {selectedLog.status !== 'RESOLVED' && (
@@ -604,7 +604,7 @@ export default function VisionAILogs() {
                   onChange={(e) => setModalJsonText(e.target.value)}
                   readOnly={selectedLog.status === 'RESOLVED'}
                   className={cn(
-                    'flex-1 w-full p-4 rounded-lg border border-border font-mono text-[13px] leading-relaxed text-text-primary resize-none outline-none focus:border-primary box-border',
+                    'flex-1 w-full p-4 rounded-lg border border-border font-mono text-13 leading-relaxed text-text-primary resize-none outline-none focus:border-primary box-border',
                     selectedLog.status === 'RESOLVED' ? 'bg-[#fafafa]' : 'bg-white'
                   )}
                   spellCheck={false}
@@ -612,17 +612,17 @@ export default function VisionAILogs() {
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-border flex justify-end gap-3 bg-[#fafafa]">
+            <div className="px-24 py-4 border-t border-border flex justify-end gap-12 bg-[#fafafa]">
               <button
                 onClick={() => setSelectedLog(null)}
-                className="px-5 py-2.5 bg-white border border-border rounded-lg text-[13px] font-semibold text-text-primary cursor-pointer transition-colors hover:bg-surface-variant shadow-sm"
+                className="px-20 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold text-text-primary cursor-pointer transition-colors hover:bg-surface-variant shadow-sm"
               >
                 {selectedLog.status === 'RESOLVED' ? 'Close' : 'Cancel'}
               </button>
               {selectedLog.status !== 'RESOLVED' && (
                 <button
                   onClick={handleSaveOverride}
-                  className="px-5 py-2.5 bg-primary border-none rounded-lg text-[13px] font-semibold text-white cursor-pointer flex items-center gap-2 transition-opacity hover:opacity-90 shadow-sm"
+                  className="px-20 py-2.5 bg-primary border-none rounded-lg text-13 font-semibold text-white cursor-pointer flex items-center gap-[8px] transition-opacity hover:opacity-90 shadow-sm"
                 >
                   <svg
                     width="16"
@@ -647,7 +647,7 @@ export default function VisionAILogs() {
       )}
 
       {toastMessage && (
-        <div className="fixed bottom-8 right-8 bg-[#111827] text-white px-6 py-3 rounded-lg text-[13px] font-medium shadow-xl flex items-center gap-2 z-[9999] animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-8 right-8 bg-[#111827] text-white px-24 py-12 rounded-lg text-13 font-medium shadow-xl flex items-center gap-[8px] z-9999 animate-in slide-in-from-bottom-20">
           <svg
             width="16"
             height="16"

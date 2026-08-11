@@ -73,7 +73,7 @@ export default function PnLDeepDive() {
   };
 
   if (loading || !data) {
-    return <div className="p-10 text-text-secondary">Loading analytics...</div>;
+    return <div className="p-40 text-text-secondary">Loading analytics...</div>;
   }
 
   // Generate SVG path for a smooth curve (Spline interpolation approximation)
@@ -118,7 +118,7 @@ export default function PnLDeepDive() {
   const getProviderIcon = (icon: string) => {
     if (icon === 'openai')
       return (
-        <div className="w-6 h-6 bg-[#10a37f] rounded-sm flex items-center justify-center text-white">
+        <div className="w-24 h-24 bg-[#10a37f] rounded-sm flex items-center justify-center text-white">
           <svg
             width="14"
             height="14"
@@ -133,7 +133,7 @@ export default function PnLDeepDive() {
       );
     if (icon === 'aws')
       return (
-        <div className="w-6 h-6 bg-[#ff9900] rounded-sm flex items-center justify-center text-white">
+        <div className="w-24 h-24 bg-[#ff9900] rounded-sm flex items-center justify-center text-white">
           <svg
             width="14"
             height="14"
@@ -148,7 +148,7 @@ export default function PnLDeepDive() {
       );
     if (icon === 'pinecone')
       return (
-        <div className="w-6 h-6 bg-[#f43f5e] rounded-sm flex items-center justify-center text-white">
+        <div className="w-24 h-24 bg-[#f43f5e] rounded-sm flex items-center justify-center text-white">
           <svg
             width="14"
             height="14"
@@ -161,26 +161,26 @@ export default function PnLDeepDive() {
           </svg>
         </div>
       );
-    return <div className="w-6 h-6 bg-[#cbd5e1] rounded-sm" />;
+    return <div className="w-24 h-24 bg-[#cbd5e1] rounded-sm" />;
   };
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-6 pb-15 font-sans">
+    <div className="max-w-300 mx-auto flex flex-col gap-24 pb-15 font-sans">
       {/* ── Header ── */}
       <div className="flex justify-between items-start">
         <div>
-          <div className="flex items-center gap-1.5 text-[13px] text-text-secondary mb-2 font-medium tracking-wider uppercase">
+          <div className="flex items-center gap-1.5 text-13 text-text-secondary mb-[8px] font-medium tracking-wider uppercase">
             <span>Financial Operations</span>
           </div>
-          <h1 className="text-[28px] font-extrabold text-text-primary tracking-tight mb-2">
+          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px]">
             P&L Deep-Dive
           </h1>
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-12 items-center">
           <select
             value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value)}
-            className="px-4 py-2 pr-8 rounded-sm border border-border text-[13px] text-text-primary bg-surface outline-none cursor-pointer appearance-none"
+            className="px-4 py-[8px] pr-8 rounded-sm border border-border text-13 text-text-primary bg-surface outline-none cursor-pointer appearance-none"
             style={{
               backgroundImage:
                 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
@@ -197,13 +197,13 @@ export default function PnLDeepDive() {
             onClick={handleExportCSV}
             disabled={isExporting}
             className={cn(
-              'flex items-center gap-2 px-4 py-2.5 bg-primary border-none rounded-sm text-[13px] font-semibold text-white cursor-pointer transition-opacity duration-200 hover:opacity-90',
+              'flex items-center gap-[8px] px-4 py-2.5 bg-primary border-none rounded-sm text-13 font-semibold text-white cursor-pointer transition-opacity duration-200 hover:opacity-90',
               isExporting && 'opacity-70 cursor-not-allowed'
             )}
           >
             {isExporting ? (
               <svg
-                className="animate-spin w-4 h-4"
+                className="animate-spin w-16 h-16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -241,10 +241,10 @@ export default function PnLDeepDive() {
       )}
 
       {/* ── Top KPI Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-20">
         {/* MRR */}
-        <div className="bg-surface rounded-md border border-border p-6 relative overflow-hidden">
-          <div className="absolute right-6 top-6 opacity-10">
+        <div className="bg-surface rounded-md border border-border p-24 relative overflow-hidden">
+          <div className="absolute right-24 top-24 opacity-10">
             <svg
               width="48"
               height="48"
@@ -258,13 +258,13 @@ export default function PnLDeepDive() {
               <path d="M6 12h.01M18 12h.01" />
             </svg>
           </div>
-          <div className="flex items-center gap-2 text-[11px] font-bold text-text-secondary uppercase mb-4">
+          <div className="flex items-center gap-[8px] text-[11px] font-bold text-text-secondary uppercase mb-4">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             Monthly Recurring Revenue
           </div>
-          <div className="text-[32px] font-extrabold text-text-primary mb-4">{data.mrr.value}</div>
-          <div className="flex items-center gap-2 text-xs">
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-status-success-container text-status-success rounded-full font-bold">
+          <div className="text-32 font-extrabold text-text-primary mb-4">{data.mrr.value}</div>
+          <div className="flex items-center gap-[8px] text-xs">
+            <span className="inline-flex items-center gap-[4px] px-[8px] py-[4px] bg-status-success-container text-status-success rounded-full font-bold">
               <svg
                 width="12"
                 height="12"
@@ -283,14 +283,12 @@ export default function PnLDeepDive() {
         </div>
 
         {/* AI Costs */}
-        <div className="bg-surface rounded-md border border-border p-6">
+        <div className="bg-surface rounded-md border border-border p-24">
           <div className="text-[11px] font-bold text-text-secondary uppercase mb-4">
             AI Infrastructure Costs
           </div>
-          <div className="text-[32px] font-extrabold text-text-primary mb-4">
-            {data.aiCosts.value}
-          </div>
-          <div className="flex items-center gap-2 text-xs text-status-error font-semibold">
+          <div className="text-32 font-extrabold text-text-primary mb-4">{data.aiCosts.value}</div>
+          <div className="flex items-center gap-[8px] text-xs text-status-error font-semibold">
             <svg
               width="14"
               height="14"
@@ -308,20 +306,20 @@ export default function PnLDeepDive() {
         </div>
 
         {/* Net Margin (Solid Green) */}
-        <div className="bg-primary rounded-md p-6 flex flex-col justify-center text-white">
-          <div className="text-[11px] font-bold uppercase mb-3 opacity-90 tracking-wider">
+        <div className="bg-primary rounded-md p-24 flex flex-col justify-center text-white">
+          <div className="text-[11px] font-bold uppercase mb-12 opacity-90 tracking-wider">
             Net Margin
           </div>
-          <div className="text-[32px] font-extrabold">{data.netMargin.value}</div>
+          <div className="text-32 font-extrabold">{data.netMargin.value}</div>
         </div>
 
         {/* CAC */}
-        <div className="bg-surface rounded-md border border-border p-6">
+        <div className="bg-surface rounded-md border border-border p-24">
           <div className="text-[11px] font-bold text-text-secondary uppercase mb-4">
             Customer Acq. Cost
           </div>
-          <div className="text-[32px] font-extrabold text-text-primary mb-4">{data.cac.value}</div>
-          <div className="flex items-center gap-2 text-[13px] text-text-secondary">
+          <div className="text-32 font-extrabold text-text-primary mb-4">{data.cac.value}</div>
+          <div className="flex items-center gap-[8px] text-13 text-text-secondary">
             Target: {data.cac.target}
             <div className="w-4.5 h-4.5 rounded-full border border-status-success flex items-center justify-center ml-auto">
               <svg
@@ -344,18 +342,18 @@ export default function PnLDeepDive() {
       <div className="bg-surface rounded-md border border-border p-8">
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h2 className="text-lg font-bold text-text-primary mb-1">
+            <h2 className="text-lg font-bold text-text-primary mb-[4px]">
               Revenue vs. Operational Costs
             </h2>
-            <p className="text-[13px] text-text-secondary">12-Month Historical Trend Analysis</p>
+            <p className="text-13 text-text-secondary">12-Month Historical Trend Analysis</p>
           </div>
           <div className="flex gap-4">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
-              <span className="w-3 h-3 rounded-sm bg-primary" />
+              <span className="w-12 h-12 rounded-sm bg-primary" />
               Revenue
             </div>
             <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
-              <span className="w-3 h-3 rounded-sm bg-[#f59e0b]" />
+              <span className="w-12 h-12 rounded-sm bg-[#f59e0b]" />
               Costs
             </div>
           </div>
@@ -376,7 +374,7 @@ export default function PnLDeepDive() {
             <div className="absolute inset-0 border-b border-surface-variant top-0" />
             <div className="absolute inset-0 border-b border-surface-variant top-[33.33%]" />
             <div className="absolute inset-0 border-b border-surface-variant top-[66.66%]" />
-            <div className="absolute inset-0 border-b border-surface-variant top-[100%]" />
+            <div className="absolute inset-0 border-b border-surface-variant top-full" />
 
             {/* SVG Chart */}
             <svg
@@ -433,9 +431,9 @@ export default function PnLDeepDive() {
 
       {/* ── Table ── */}
       <div className="bg-surface rounded-md border border-border overflow-hidden">
-        <div className="p-6 border-b border-border flex justify-between items-center">
+        <div className="p-24 border-b border-border flex justify-between items-center">
           <h2 className="text-lg font-bold text-text-primary">Infrastructure Billing Ledger</h2>
-          <button className="bg-transparent border-none text-text-secondary text-[13px] font-semibold cursor-pointer flex items-center gap-1 hover:text-text-primary transition-colors">
+          <button className="bg-transparent border-none text-text-secondary text-13 font-semibold cursor-pointer flex items-center gap-[4px] hover:text-text-primary transition-colors">
             View All
             <svg
               width="14"
@@ -456,19 +454,19 @@ export default function PnLDeepDive() {
           <table className="w-full border-collapse text-left min-w-175">
             <thead>
               <tr className="bg-surface-variant/30 border-b border-border">
-                <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
                   Service Provider
                 </th>
-                <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
                   Category
                 </th>
-                <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
                   Usage / Volume
                 </th>
-                <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
                   Cost
                 </th>
-                <th className="px-6 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
                   Status
                 </th>
               </tr>
@@ -482,21 +480,21 @@ export default function PnLDeepDive() {
                     onClick={() => handleRowClick(row)}
                     className="border-b border-border cursor-pointer transition-colors hover:bg-surface-variant/50"
                   >
-                    <td className="px-6 py-5 flex items-center gap-3">
+                    <td className="px-24 py-20 flex items-center gap-12">
                       {getProviderIcon(row.providerIcon)}
                       <span className="text-sm font-semibold text-text-primary">
                         {row.provider}
                       </span>
                     </td>
-                    <td className="px-6 py-5 text-[13px] text-text-secondary">{row.category}</td>
-                    <td className="px-6 py-5 text-[13px] text-text-secondary">{row.usage}</td>
-                    <td className="px-6 py-5 text-sm font-semibold text-text-primary">
+                    <td className="px-24 py-20 text-13 text-text-secondary">{row.category}</td>
+                    <td className="px-24 py-20 text-13 text-text-secondary">{row.usage}</td>
+                    <td className="px-24 py-20 text-sm font-semibold text-text-primary">
                       {row.cost}
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-24 py-20">
                       <span
                         className={cn(
-                          'inline-flex px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wide',
+                          'inline-flex px-2.5 py-[4px] rounded-full text-[11px] font-bold tracking-wide',
                           sStyle.bg,
                           sStyle.text
                         )}
@@ -514,7 +512,7 @@ export default function PnLDeepDive() {
 
       {/* ── Invoice Modal ── */}
       {selectedInvoice && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-1000 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -524,21 +522,21 @@ export default function PnLDeepDive() {
           {/* Modal Content */}
           <div className="relative bg-surface rounded-lg w-full max-w-125 shadow-2xl animate-[slideUp_0.3s_ease-out] overflow-hidden">
             {/* Header */}
-            <div className="p-6 sm:px-8 sm:py-6 border-b border-dashed border-border bg-surface-variant/30 flex justify-between items-start">
+            <div className="p-24 sm:px-8 sm:py-24 border-b border-dashed border-border bg-surface-variant/30 flex justify-between items-start">
               <div className="flex items-center gap-4">
                 {getProviderIcon(selectedInvoice.providerIcon)}
                 <div>
-                  <h2 className="text-xl font-extrabold text-text-primary mb-1">
+                  <h2 className="text-xl font-extrabold text-text-primary mb-[4px]">
                     {selectedInvoice.provider}
                   </h2>
-                  <div className="text-[13px] text-text-secondary font-medium">
+                  <div className="text-13 text-text-secondary font-medium">
                     Invoice #INV-{selectedInvoice.id}08492
                   </div>
                 </div>
               </div>
               <span
                 className={cn(
-                  'inline-flex px-3 py-1.5 rounded-full text-xs font-bold tracking-wide',
+                  'inline-flex px-12 py-1.5 rounded-full text-xs font-bold tracking-wide',
                   statusStyles[selectedInvoice.status].bg,
                   statusStyles[selectedInvoice.status].text
                 )}
@@ -548,16 +546,16 @@ export default function PnLDeepDive() {
             </div>
 
             {/* Body */}
-            <div className="p-6 sm:p-8">
-              <div className="flex justify-between mb-6">
+            <div className="p-24 sm:p-8">
+              <div className="flex justify-between mb-24">
                 <div>
-                  <div className="text-xs text-text-secondary font-semibold uppercase mb-1">
+                  <div className="text-xs text-text-secondary font-semibold uppercase mb-[4px]">
                     Date of Issue
                   </div>
                   <div className="text-sm font-semibold text-text-primary">Oct 24, 2026</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-text-secondary font-semibold uppercase mb-1">
+                  <div className="text-xs text-text-secondary font-semibold uppercase mb-[4px]">
                     Billing Period
                   </div>
                   <div className="text-sm font-semibold text-text-primary">
@@ -566,8 +564,8 @@ export default function PnLDeepDive() {
                 </div>
               </div>
 
-              <div className="bg-surface-variant/30 rounded-md p-5 mb-6 border border-border">
-                <div className="flex justify-between border-b border-border pb-3 mb-3">
+              <div className="bg-surface-variant/30 rounded-md p-20 mb-24 border border-border">
+                <div className="flex justify-between border-b border-border pb-12 mb-12">
                   <span className="text-sm text-text-secondary font-medium">Category</span>
                   <span className="text-sm font-semibold text-text-primary">
                     {selectedInvoice.category}
@@ -581,17 +579,17 @@ export default function PnLDeepDive() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center px-5 py-4 bg-text-primary text-white rounded-md">
+              <div className="flex justify-between items-center px-20 py-4 bg-text-primary text-white rounded-md">
                 <span className="text-sm font-semibold">Total Amount</span>
                 <span className="text-2xl font-extrabold">{selectedInvoice.cost}</span>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="px-8 py-5 border-t border-border flex justify-end bg-surface-variant/20">
+            <div className="px-8 py-20 border-t border-border flex justify-end bg-surface-variant/20">
               <button
                 onClick={() => setSelectedInvoice(null)}
-                className="px-5 py-2.5 bg-surface border border-border rounded-sm text-[13px] font-semibold cursor-pointer text-text-primary transition-colors hover:bg-surface-variant"
+                className="px-20 py-2.5 bg-surface border border-border rounded-sm text-13 font-semibold cursor-pointer text-text-primary transition-colors hover:bg-surface-variant"
               >
                 Close
               </button>
@@ -601,9 +599,9 @@ export default function PnLDeepDive() {
       )}
 
       {toastMessage && (
-        <div className="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-3 rounded-sm text-[13px] font-medium shadow-lg flex items-center gap-2 z-[9999] animate-[slideUp_0.3s_ease-out]">
+        <div className="fixed bottom-8 right-8 bg-gray-900 text-white px-24 py-12 rounded-sm text-13 font-medium shadow-lg flex items-center gap-[8px] z-9999 animate-[slideUp_0.3s_ease-out]">
           <svg
-            className="w-4 h-4 text-status-success"
+            className="w-16 h-16 text-status-success"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

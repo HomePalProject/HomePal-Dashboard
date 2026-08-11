@@ -61,7 +61,7 @@ export function Header({ onMenuClick }: HeaderProps) {
         <div className="relative">
           <button
             onClick={() => setProfileMenuOpen((v) => !v)}
-            className="flex items-center gap-8 pl-12 pr-2.5 py-4 rounded-full border border-border bg-surface cursor-pointer hover:bg-surface-variant transition-colors"
+            className="flex items-center gap-8 ps-12 pe-2.5 py-4 rounded-full border border-border bg-surface cursor-pointer hover:bg-surface-variant transition-colors"
           >
             <span className="text-12 font-medium text-text-primary hidden sm:block">
               {user?.roles?.[0] || 'Admin'} Profile
@@ -74,18 +74,18 @@ export function Header({ onMenuClick }: HeaderProps) {
           {profileMenuOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setProfileMenuOpen(false)} />
-              <div className="absolute right-0 top-full mt-6 w-40 bg-surface border border-border rounded-[10px] shadow-[0_8px_24px_rgba(45,42,38,0.1)] z-20 overflow-hidden py-4">
+              <div className="absolute right-0 top-16 mt-24 min-w-[160px] bg-surface border border-border rounded-[10px] shadow-[0_8px_24px_rgba(45,42,38,0.1)] z-20 overflow-hidden py-4">
                 <NavLink
                   to="/dashboard/profile"
                   onClick={() => setProfileMenuOpen(false)}
-                  className="block px-16 py-2.25 text-[13px] text-text-primary no-underline hover:bg-surface-variant"
+                  className="block px-12 py-2.5 text-13 text-text-primary no-underline hover:bg-surface-variant"
                 >
                   View Profile
                 </NavLink>
                 <div className="border-t border-border my-4" />
                 <button
                   onClick={handleLogout}
-                  className="block w-full px-16 py-2.25 text-[13px] text-status-error bg-transparent border-none cursor-pointer text-left hover:bg-status-error-container/30"
+                  className="block w-full px-12 py-2.5 text-13 text-status-error bg-transparent border-none cursor-pointer text-left hover:bg-status-error-container/30"
                 >
                   Sign Out
                 </button>

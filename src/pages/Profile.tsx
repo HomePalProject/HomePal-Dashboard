@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { cn } from '@lib/utils';
+import { Toggle } from '@components/ui/Toggle';
 import { adminService } from '@services/adminService';
 import type { AdminUser, CreateAdminRequest } from '@typeDefs/adminTypes';
 
@@ -132,7 +133,7 @@ export default function Profile() {
       {/* ── Page Title & Action Header ── */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-[32px] font-extrabold text-[#2d2a26] tracking-tight m-0">
+          <h1 className="text-32 font-extrabold text-[#2d2a26] tracking-tight m-0">
             Admin & System Settings
           </h1>
           <p className="text-sm text-[#7a7571] mt-1.5 mb-0">
@@ -142,7 +143,7 @@ export default function Profile() {
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-[#2a4a3e] text-white text-sm font-bold px-5 py-2.5 rounded-lg border-none cursor-pointer flex items-center gap-2 shadow-[0_4px_14px_rgba(42,74,62,0.2)] transition-all duration-150 hover:bg-[#1f372e]"
+          className="bg-[#2a4a3e] text-white text-sm font-bold px-20 py-2.5 rounded-lg border-none cursor-pointer flex items-center gap-[8px] shadow-[0_4px_14px_rgba(42,74,62,0.2)] transition-all duration-150 hover:bg-[#1f372e]"
         >
           <svg
             width="18"
@@ -164,14 +165,14 @@ export default function Profile() {
       {/* ── Section 1: Admin Directory Table ── */}
       <div className="bg-white rounded-2xl border border-[#e4e0da] shadow-[0_2px_12px_rgba(45,42,38,0.04)] overflow-hidden">
         {/* Table Header Info */}
-        <div className="px-6 py-5 border-b border-[#f0ece6] flex justify-between items-center">
+        <div className="px-24 py-20 border-b border-[#f0ece6] flex justify-between items-center">
           <div>
             <div className="text-lg font-bold text-[#2d2a26]">System Administrators Directory</div>
-            <div className="text-[13px] text-[#a8a39d] mt-0.5">
+            <div className="text-13 text-[#a8a39d] mt-0.5">
               Active administrators with access to the HomePal Executive Panel.
             </div>
           </div>
-          <span className="text-xs font-bold bg-[#dceee8] text-[#2a4a3e] px-3 py-1 rounded-full">
+          <span className="text-xs font-bold bg-[#dceee8] text-[#2a4a3e] px-12 py-[4px] rounded-full">
             {admins.length} Total Admins
           </span>
         </div>
@@ -181,11 +182,11 @@ export default function Profile() {
           <table className="w-full border-collapse text-left min-w-200">
             <thead>
               <tr className="bg-[#faf8f3] border-b border-[#e4e0da] text-[11px] font-extrabold text-[#7a7571] uppercase tracking-wider">
-                <th className="px-6 py-3.5">Admin User</th>
-                <th className="px-6 py-3.5">Role</th>
-                <th className="px-6 py-3.5">Status</th>
-                <th className="px-6 py-3.5">Toggle Access</th>
-                <th className="px-6 py-3.5 text-right">Actions</th>
+                <th className="px-24 py-3.5">Admin User</th>
+                <th className="px-24 py-3.5">Role</th>
+                <th className="px-24 py-3.5">Status</th>
+                <th className="px-24 py-3.5">Toggle Access</th>
+                <th className="px-24 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -200,11 +201,11 @@ export default function Profile() {
                     className="border-b border-[#f4f2ee] transition-colors duration-120 hover:bg-surface-variant/30"
                   >
                     {/* User Info */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
+                    <td className="px-24 py-4">
+                      <div className="flex items-center gap-12">
                         <div
                           className={cn(
-                            'w-9 h-9 rounded-lg text-[13px] font-bold flex items-center justify-center',
+                            'w-9 h-9 rounded-lg text-13 font-bold flex items-center justify-center',
                             isSuper ? 'bg-[#2a4a3e] text-white' : 'bg-[#e4e0da] text-[#5a5652]'
                           )}
                         >
@@ -218,10 +219,10 @@ export default function Profile() {
                     </td>
 
                     {/* Role Badge */}
-                    <td className="px-6 py-4">
+                    <td className="px-24 py-4">
                       <span
                         className={cn(
-                          'text-[11px] font-bold px-2.5 py-1 rounded-full',
+                          'text-[11px] font-bold px-2.5 py-[4px] rounded-full',
                           isSuper
                             ? 'bg-[#2a4a3e] text-white'
                             : adm.role === 'System Admin'
@@ -234,17 +235,17 @@ export default function Profile() {
                     </td>
 
                     {/* Status Badge */}
-                    <td className="px-6 py-4">
+                    <td className="px-24 py-4">
                       <div className="flex items-center gap-1.5">
                         <span
                           className={cn(
-                            'w-2 h-2 rounded-full',
+                            'w-[8px] h-[8px] rounded-full',
                             isActive ? 'bg-status-success' : 'bg-status-error'
                           )}
                         />
                         <span
                           className={cn(
-                            'text-[13px] font-semibold',
+                            'text-13 font-semibold',
                             isActive ? 'text-status-success' : 'text-status-error'
                           )}
                         >
@@ -254,31 +255,21 @@ export default function Profile() {
                     </td>
 
                     {/* Toggle Switch */}
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleToggleStatus(adm.id)}
+                    <td className="px-24 py-4">
+                      <Toggle
+                        checked={isActive}
+                        onChange={() => handleToggleStatus(adm.id)}
                         title={isActive ? 'Click to Suspend' : 'Click to Activate'}
-                        className={cn(
-                          'w-11 h-6 rounded-full border-none cursor-pointer relative p-0.5 transition-colors duration-200',
-                          isActive ? 'bg-[#2a4a3e]' : 'bg-[#d1d5db]'
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            'block w-5 h-5 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.2)] transition-transform duration-200',
-                            isActive ? 'translate-x-5' : 'translate-x-0'
-                          )}
-                        />
-                      </button>
+                      />
                     </td>
 
                     {/* Action Buttons */}
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-24 py-4 text-right">
+                      <div className="flex items-center justify-end gap-[8px]">
                         <button
                           onClick={() => handleResetPassword(adm.username)}
                           title="Reset Password"
-                          className="bg-[#f4f2ee] border border-[#e4e0da] rounded-lg px-3 py-1.5 text-xs font-semibold text-[#2d2a26] cursor-pointer transition-colors hover:bg-[#e4e0da]"
+                          className="bg-[#f4f2ee] border border-[#e4e0da] rounded-lg px-12 py-1.5 text-xs font-semibold text-[#2d2a26] cursor-pointer transition-colors hover:bg-[#e4e0da]"
                         >
                           Reset Pass
                         </button>
@@ -300,9 +291,9 @@ export default function Profile() {
       </div>
 
       {/* ── Section 2: Platform Controls & Maintenance Mode ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
         {/* Mobile App Maintenance Mode Control */}
-        <div className="bg-white rounded-2xl border border-[#e4e0da] shadow-[0_2px_12px_rgba(45,42,38,0.04)] p-6 flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-[#e4e0da] shadow-[0_2px_12px_rgba(45,42,38,0.04)] p-24 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-2.5">
@@ -338,23 +329,14 @@ export default function Profile() {
               </div>
 
               {/* Maintenance Toggle */}
-              <button
-                onClick={() => setMaintenanceMode((v) => !v)}
-                className={cn(
-                  'w-12 h-6.5 rounded-full border-none cursor-pointer p-0.75 transition-colors duration-200',
-                  maintenanceMode ? 'bg-status-error' : 'bg-[#d1d5db]'
-                )}
-              >
-                <span
-                  className={cn(
-                    'block w-5 h-5 rounded-full bg-white transition-transform duration-200',
-                    maintenanceMode ? 'translate-x-5.5' : 'translate-x-0'
-                  )}
-                />
-              </button>
+              <Toggle
+                checked={maintenanceMode}
+                onChange={setMaintenanceMode}
+                title={maintenanceMode ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
+              />
             </div>
 
-            <p className="text-[13px] text-[#5a5652] mt-4 leading-relaxed">
+            <p className="text-13 text-[#5a5652] mt-4 leading-relaxed">
               Enabling Maintenance Mode displays a{' '}
               <strong>"System under scheduled maintenance"</strong> screen on the Mobile Application
               for clients. The Admin Panel remains operational.
@@ -365,7 +347,7 @@ export default function Profile() {
             <span className="text-xs font-semibold text-[#7a7571]">Current Mobile App Status:</span>
             <span
               className={cn(
-                'text-xs font-extrabold px-2.5 py-1 rounded-full',
+                'text-xs font-extrabold px-2.5 py-[4px] rounded-full',
                 maintenanceMode
                   ? 'text-status-error bg-status-error-container'
                   : 'text-status-success bg-status-success-container'
@@ -377,7 +359,7 @@ export default function Profile() {
         </div>
 
         {/* Security Policies */}
-        <div className="bg-white rounded-2xl border border-[#e4e0da] shadow-[0_2px_12px_rgba(45,42,38,0.04)] p-6 flex flex-col justify-between">
+        <div className="bg-white rounded-2xl border border-[#e4e0da] shadow-[0_2px_12px_rgba(45,42,38,0.04)] p-24 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
               <div className="w-9 h-9 rounded-lg bg-[#f4f2ee] text-[#2a4a3e] flex items-center justify-center">
@@ -408,7 +390,7 @@ export default function Profile() {
               <select
                 value={sessionTimeout}
                 onChange={(e) => setSessionTimeout(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-[#e4e0da] text-[13px] text-[#2d2a26] bg-[#fcfbf9] outline-none cursor-pointer"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-[#e4e0da] text-13 text-[#2d2a26] bg-[#fcfbf9] outline-none cursor-pointer"
               >
                 <option value="15">15 Minutes (High Security)</option>
                 <option value="30">30 Minutes (Recommended)</option>
@@ -420,7 +402,7 @@ export default function Profile() {
             {/* Strict Audit Logging */}
             <div className="flex justify-between items-center pt-2.5">
               <div>
-                <div className="text-[13px] font-semibold text-[#2d2a26]">
+                <div className="text-13 font-semibold text-[#2d2a26]">
                   Strict Security Audit Logs
                 </div>
                 <div className="text-[11px] text-[#a8a39d]">
@@ -430,14 +412,14 @@ export default function Profile() {
               <button
                 onClick={() => setStrictAuditLogs((v) => !v)}
                 className={cn(
-                  'w-11 h-6 rounded-full border-none cursor-pointer p-0.5',
+                  'w-11h-24 rounded-full border-none cursor-pointer p-0.5',
                   strictAuditLogs ? 'bg-[#2a4a3e]' : 'bg-[#d1d5db]'
                 )}
               >
                 <span
                   className={cn(
-                    'block w-5 h-5 rounded-full bg-white transition-transform duration-200',
-                    strictAuditLogs ? 'translate-x-5' : 'translate-x-0'
+                    'block w-20 h-20 rounded-full bg-white transition-transform duration-200',
+                    strictAuditLogs ? 'translate-x-20' : 'translate-x-0'
                   )}
                 />
               </button>
@@ -454,12 +436,12 @@ export default function Profile() {
 
       {/* ── Modal: Add New Admin Account ── */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-5">
+        <div className="fixed inset-0 bg-black/50 z-100 flex items-center justify-center p-20">
           <div className="bg-white rounded-2xl w-full max-w-115 p-7 shadow-[0_20px_40px_rgba(0,0,0,0.2)] relative">
             {/* Close Button */}
             <button
               onClick={() => setShowAddModal(false)}
-              className="absolute top-5 right-5 bg-transparent border-none text-xl text-[#a8a39d] cursor-pointer hover:text-text-primary"
+              className="absolute top-20 right-20 bg-transparent border-none text-xl text-[#a8a39d] cursor-pointer hover:text-text-primary"
             >
               ✕
             </button>
@@ -467,12 +449,12 @@ export default function Profile() {
             <h3 className="text-xl font-bold text-[#2d2a26] m-0 mb-1.5">
               Create New Admin Account
             </h3>
-            <p className="text-[13px] text-[#7a7571] m-0 mb-5">
+            <p className="text-13 text-[#7a7571] m-0 mb-20">
               Assign credentials and role level for the new administrator.
             </p>
 
             {modalFeedback && (
-              <div className="px-3 py-2 rounded-lg bg-status-error-container text-status-error text-xs mb-4">
+              <div className="px-12 py-[8px] rounded-lg bg-status-error-container text-status-error text-xs mb-4">
                 {modalFeedback}
               </div>
             )}
@@ -530,7 +512,7 @@ export default function Profile() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2.5 mt-3">
+              <div className="flex gap-2.5 mt-12">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}

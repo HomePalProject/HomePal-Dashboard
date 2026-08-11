@@ -1,4 +1,4 @@
-import { PnLDeepDiveData } from '@typeDefs/pnlTypes';
+import type { PnLDeepDiveData } from '@typeDefs/pnlTypes';
 
 export const MOCK_PNL_DATA: PnLDeepDiveData = {
   mrr: { value: '$1.24M', change: '+12.4%' },

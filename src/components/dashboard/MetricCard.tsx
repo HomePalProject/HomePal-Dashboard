@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '@components/Card';
-import { Badge } from '@components/Badge';
+import { Card } from '@components/ui/Card';
+import { Badge } from '@components/ui/Badge';
 import { cn } from '@lib/utils';
 
 interface MetricCardProps {
@@ -33,14 +33,14 @@ export function MetricCard({
     <Card
       className={cn(
         'h-full flex flex-col justify-between transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)]',
-        vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10',
+        vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-40',
         dark ? 'bg-primary border-none shadow-none text-white' : 'bg-surface'
       )}
     >
       <div className="flex justify-between items-start">
         <div
           className={cn(
-            'w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0',
+            'w-40 h-40 rounded-[10px] flex items-center justify-center shrink-0',
             dark ? 'bg-white/15 text-white' : 'bg-surface-variant text-primary'
           )}
         >
@@ -69,7 +69,7 @@ export function MetricCard({
         </div>
         {note && (
           <div
-            className={`text-[10px] italic mt-6 leading-[1.4] ${dark ? 'text-white/40' : 'text-text-disabled/70'}`}
+            className={`text-[10px] italic mt-24 leading-[1.4] ${dark ? 'text-white/40' : 'text-text-disabled/70'}`}
           >
             {note}
           </div>

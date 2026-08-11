@@ -78,35 +78,34 @@ export default function GeographicDemographics() {
   };
 
   if (loading || !data) {
-    return <div className="p-10 text-text-secondary">Loading geographic data...</div>;
+    return <div className="p-40 text-text-secondary">Loading geographic data...</div>;
   }
 
   const cairoCenter: [number, number] = [30.02, 31.2];
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-6 pb-15">
-      {/* ── Header ── */}
+    <div className="max-w-300 mx-auto flex flex-col gap-24 pb-15">
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-typography-h2 text-text-primary tracking-tight mb-2">
+          <h1 className="text-typography-h2 text-text-primary tracking-tight mb-[8px]">
             Geographic Demographics
           </h1>
           <p className="text-typography-bodysmall text-text-secondary max-w-2xl">
             Comprehensive household data analysis across central districts.
           </p>
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-12 items-center">
           <button
             onClick={handleExportCSV}
             disabled={isExporting}
             className={cn(
-              'flex items-center gap-2 px-4 py-2.5 bg-surface border border-border rounded-sm text-[13px] font-semibold text-text-primary cursor-pointer transition-all duration-200 hover:bg-surface-variant',
+              'flex items-center gap-[8px] px-4 py-2.5 bg-surface border border-border rounded-sm text-13 font-semibold text-text-primary cursor-pointer transition-all duration-200 hover:bg-surface-variant',
               isExporting && 'opacity-70 cursor-not-allowed'
             )}
           >
             {isExporting ? (
               <svg
-                className="animate-spin w-4 h-4"
+                className="animate-spin w-16 h-16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -124,13 +123,13 @@ export default function GeographicDemographics() {
             onClick={handleUpdateData}
             disabled={isUpdating}
             className={cn(
-              'flex items-center gap-2 px-4 py-2.5 bg-primary border-none rounded-sm text-[13px] font-semibold text-white cursor-pointer transition-all duration-200 hover:opacity-90',
+              'flex items-center gap-[8px] px-4 py-2.5 bg-primary border-none rounded-sm text-13 font-semibold text-white cursor-pointer transition-all duration-200 hover:opacity-90',
               isUpdating && 'opacity-70 cursor-not-allowed'
             )}
           >
             {isUpdating ? (
               <svg
-                className="animate-spin w-4 h-4"
+                className="animate-spin w-16 h-16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -153,33 +152,31 @@ export default function GeographicDemographics() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
-        {/* ── Main Map Area ── */}
-        <div className="bg-surface rounded-md border border-border p-6 relative">
-          <div className="flex justify-between items-start mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-24 items-start">
+        <div className="bg-surface rounded-md border border-border p-24 relative">
+          <div className="flex justify-between items-start mb-24">
             <div>
-              <h2 className="text-base font-bold text-text-primary mb-1">
+              <h2 className="text-base font-bold text-text-primary mb-[4px]">
                 Regional Distribution Map (Egypt)
               </h2>
-              <p className="text-[13px] text-text-secondary">
+              <p className="text-13 text-text-secondary">
                 Household density heat-mapping by district.
               </p>
             </div>
             <div className="flex items-center gap-1.5 text-xs font-semibold text-text-primary">
-              <span className="w-2 h-2 rounded-full bg-primary"></span>
+              <span className="w-[8px] h-[8px] rounded-full bg-primary"></span>
               Live Data
             </div>
           </div>
 
           <div className="relative w-full h-112.5 rounded-sm overflow-hidden border border-border z-0">
-            {/* Map Legend */}
-            <div className="absolute left-4 bottom-6 bg-surface/90 px-4 py-3 rounded-sm shadow-md z-[1000] backdrop-blur-sm">
-              <div className="text-[11px] font-bold text-text-secondary mb-2 uppercase">
+            <div className="absolute left-4 bottom-24 bg-surface/90 px-4 py-12 rounded-sm shadow-md z-1000 backdrop-blur-sm">
+              <div className="text-[11px] font-bold text-text-secondary mb-[8px] uppercase">
                 Density Intensity
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-[4px]">
                 <span className="text-[11px] text-text-secondary">Low</span>
-                <div className="w-15 h-2 bg-gradient-to-r from-green-300 to-green-800 rounded-sm" />
+                <div className="w-15 h-[8px] bg-linear-to-r from-green-300 to-green-800 rounded-sm" />
                 <span className="text-[11px] text-text-secondary">High</span>
               </div>
             </div>
@@ -202,11 +199,11 @@ export default function GeographicDemographics() {
                   }}
                 >
                   <Tooltip sticky>
-                    <div className="px-2 py-1 min-w-45">
-                      <div className="text-base font-bold text-text-primary mb-1 text-center font-sans">
+                    <div className="px-[8px] py-[4px] min-w-45">
+                      <div className="text-base font-bold text-text-primary mb-[4px] text-center font-sans">
                         {district.name}
                       </div>
-                      <div className="text-[13px] font-bold text-primary text-center mb-3 bg-primary-container p-1 rounded-sm font-sans">
+                      <div className="text-13 font-bold text-primary text-center mb-12 bg-primary-container p-[4px] rounded-sm font-sans">
                         {district.growth} New Households
                       </div>
                       <div className="flex flex-col gap-1.5 text-xs font-sans">
@@ -235,15 +232,13 @@ export default function GeographicDemographics() {
           </div>
         </div>
 
-        {/* ── Side Panels ── */}
-        <div className="flex flex-col gap-6">
-          {/* Avg Monthly Budget */}
-          <div className="bg-surface rounded-md border border-border p-6">
+        <div className="flex flex-col gap-24">
+          <div className="bg-surface rounded-md border border-border p-24">
             <div className="flex justify-between items-start mb-4">
               <div className="text-sm font-bold text-text-primary">Avg. Monthly Budget</div>
               <div className="text-text-secondary">
                 <svg
-                  className="w-5 h-5"
+                  className="w-20 h-20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -255,25 +250,24 @@ export default function GeographicDemographics() {
                 </svg>
               </div>
             </div>
-            <div className="flex items-baseline gap-2 mb-6">
+            <div className="flex items-baseline gap-[8px] mb-24">
               <span className="text-4xl font-extrabold text-primary">{data.budget.value}</span>
-              <span className="text-[13px] text-text-secondary">/ household</span>
+              <span className="text-13 text-text-secondary">/ household</span>
             </div>
-            <div className="flex justify-between items-center text-[13px] font-semibold text-text-secondary">
+            <div className="flex justify-between items-center text-13 font-semibold text-text-secondary">
               <span>{data.budget.region}</span>
               <span className="text-status-success">{data.budget.change}</span>
             </div>
           </div>
 
-          {/* Top Grocery Category */}
-          <div className="bg-surface rounded-md border border-border p-6 flex-1 relative overflow-hidden">
-            <h2 className="text-sm font-bold text-text-primary mb-1">Top Grocery Category</h2>
-            <p className="text-xs text-text-secondary mb-6">By volume in Northern Region</p>
+          <div className="bg-surface rounded-md border border-border p-24 flex-1 relative overflow-hidden">
+            <h2 className="text-sm font-bold text-text-primary mb-[4px]">Top Grocery Category</h2>
+            <p className="text-xs text-text-secondary mb-24">By volume in Northern Region</p>
 
-            <div className="flex flex-col gap-6 relative z-10">
+            <div className="flex flex-col gap-24 relative z-10">
               {data.topCategories.map((cat, i) => (
                 <div key={i}>
-                  <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-2">
+                  <div className="flex justify-between text-13 font-semibold text-text-primary mb-[8px]">
                     <span>{cat.name}</span>
                     <span className="text-text-secondary">{cat.percentage}%</span>
                   </div>
@@ -287,8 +281,7 @@ export default function GeographicDemographics() {
               ))}
             </div>
 
-            {/* Faint shopping cart icon in background */}
-            <div className="absolute bottom-5 right-5 opacity-5 pointer-events-none z-0">
+            <div className="absolute bottom-20 right-20 opacity-5 pointer-events-none z-0">
               <svg
                 className="w-25 h-25"
                 viewBox="0 0 24 24"
@@ -305,20 +298,17 @@ export default function GeographicDemographics() {
         </div>
       </div>
 
-      {/* ── Bottom Section ── */}
       <div className="bg-surface rounded-md border border-border p-8">
-        <div className="flex justify-between items-center mb-10">
+        <div className="flex justify-between items-center mb-40">
           <h2 className="text-base font-bold text-text-primary">Household Size Distribution</h2>
-          <div className="px-3 py-1.5 rounded-full border border-border text-xs font-semibold text-text-secondary">
+          <div className="px-12 py-1.5 rounded-full border border-border text-xs font-semibold text-text-secondary">
             2026 Data
           </div>
         </div>
 
-        {/* Bar Chart (Histogram) */}
-        <div className="flex items-end justify-between h-50 px-2 sm:px-10 gap-2 sm:gap-5">
+        <div className="flex items-end justify-between h-50 px-[8px] sm:sm:px-40 gap-[8px] sm:gap-20">
           {data.householdSize.map((item, i) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-4">
-              {/* Bar */}
               <div
                 className={cn(
                   'w-full max-w-20 rounded-t-sm relative transition-all duration-300',
@@ -328,17 +318,16 @@ export default function GeographicDemographics() {
               >
                 <div
                   className={cn(
-                    'absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold',
+                    'absolute -top-24 left-1/2 -translate-x-1/2 text-xs font-bold',
                     i === 2 ? 'text-primary' : 'text-text-secondary'
                   )}
                 >
                   {item.value}%
                 </div>
               </div>
-              {/* Label */}
               <div
                 className={cn(
-                  'text-[13px] text-center',
+                  'text-13 text-center',
                   i === 2 ? 'font-bold text-primary' : 'font-medium text-text-secondary'
                 )}
               >
@@ -350,9 +339,9 @@ export default function GeographicDemographics() {
       </div>
 
       {toastMessage && (
-        <div className="fixed bottom-8 right-8 bg-gray-900 text-white px-6 py-3 rounded-sm text-[13px] font-medium shadow-lg flex items-center gap-2 z-[9999] animate-[slideUp_0.3s_ease-out]">
+        <div className="fixed bottom-8 right-8 bg-gray-900 text-white px-24 py-12 rounded-sm text-13 font-medium shadow-lg flex items-center gap-[8px] z-9999 animate-[slideUp_0.3s_ease-out]">
           <svg
-            className="w-4 h-4 text-status-success"
+            className="w-16 h-16 text-status-success"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

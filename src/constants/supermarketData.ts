@@ -1,4 +1,4 @@
-import { SupermarketPerformanceData } from '@typeDefs/supermarketTypes';
+import type { SupermarketPerformanceData } from '@typeDefs/supermarketTypes';
 
 export const mockSupermarketPerformanceData: SupermarketPerformanceData = {
   partners: [

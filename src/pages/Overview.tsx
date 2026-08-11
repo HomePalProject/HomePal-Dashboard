@@ -3,18 +3,13 @@ import { Link } from 'react-router-dom';
 import { useAuthStore } from '@store/authStore';
 import { MetricCard } from '@components/dashboard/MetricCard';
 import { SystemHealthCard } from '@components/dashboard/SystemHealthCard';
-import { Card, CardHeader, CardContent } from '@components/Card';
+import { Card, CardHeader, CardContent } from '@components/ui/Card';
 
 import { analyticsService } from '@services/analyticsService';
 import api from '@services/api';
 import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
 
-function getHour(): 'morning' | 'afternoon' | 'evening' {
-  const h = new Date().getHours();
-  if (h < 12) return 'morning';
-  if (h < 18) return 'afternoon';
-  return 'evening';
-}
+import { getHour } from '@lib/formatters';
 
 const SYSTEM_PULSE = [
   {
@@ -101,10 +96,10 @@ export default function Overview() {
   );
 
   return (
-    <div className="flex flex-col gap-28">
+    <div className="flex flex-col gap-16">
       {/* Greeting */}
       <div>
-        <h1 className="text-[32px] md:text-[40px] font-extrabold text-text-primary tracking-tight leading-tight m-0">
+        <h1 className="text-32 md:text-[40px] font-extrabold text-text-primary tracking-tight leading-tight m-0">
           {greeting}
         </h1>
         <p className="text-[15px] text-text-secondary mt-8 m-0">
@@ -151,13 +146,11 @@ export default function Overview() {
               <div className="text-18 font-bold text-text-primary leading-none">
                 Aggregated Analytics
               </div>
-              <div className="text-[13px] text-text-disabled mt-4">
-                Privacy-safe platform metrics.
-              </div>
+              <div className="text-13 text-text-disabled mt-4">Privacy-safe platform metrics.</div>
             </div>
             <Link
               to="/dashboard/households"
-              className="text-12 font-bold tracking-[0.06em] uppercase text-primary bg-primary-container px-14 py-6 rounded-md no-underline hover:bg-primary-container/80 transition-colors"
+              className="text-12 font-bold tracking-[0.06em] uppercase text-primary bg-primary-container px-56 py-24 rounded-md no-underline hover:bg-primary-container/80 transition-colors"
             >
               Full Report
             </Link>
@@ -216,10 +209,8 @@ export default function Overview() {
                       }`}
                     />
                     <div>
-                      <div className="text-[13px] font-semibold text-text-primary">
-                        {item.title}
-                      </div>
-                      <div className="text-12 text-text-disabled mt-2">{item.desc}</div>
+                      <div className="text-13 font-semibold text-text-primary">{item.title}</div>
+                      <div className="text-12 text-text-disabled mt-[8px]">{item.desc}</div>
                       <div className="text-[11px] text-text-disabled/70 mt-4 uppercase tracking-[0.04em] font-semibold">
                         {item.time}
                       </div>
@@ -229,7 +220,7 @@ export default function Overview() {
               ))}
             </div>
           </CardContent>
-          <div className="border-t border-surface-variant py-14 mt-auto">
+          <div className="border-t border-surface-variant py-20 mt-auto">
             <button className="w-full bg-transparent border-none text-[11px] font-bold tracking-[0.1em] uppercase text-text-disabled cursor-pointer text-center transition-colors hover:text-primary">
               Audit Full Logs
             </button>

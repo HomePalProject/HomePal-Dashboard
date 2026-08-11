@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@store/authStore';
-import { Card } from '@components/Card';
+import { Card } from '@components/ui/Card';
 import { api } from '@services/api';
 
 interface SystemHealthCardProps {
@@ -37,7 +37,7 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
   return (
     <Card
       className={`h-full flex flex-col items-center justify-center text-center bg-primary border-none shadow-none transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-40'
       }`}
     >
       <div className="text-[10px] font-bold tracking-[0.12em] text-white/55 uppercase mb-16">
@@ -55,7 +55,7 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
           }`}
         />
         <span
-          className={`absolute w-10 h-10 rounded-full transition-all duration-400 ${
+          className={`absolute w-40 h-40 rounded-full transition-all duration-400 ${
             isChecking
               ? 'bg-white/50 shadow-[0_0_0_3px_rgba(255,255,255,0.15)]'
               : isOnline

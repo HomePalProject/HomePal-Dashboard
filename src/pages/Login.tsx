@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { InputField } from '@components/InputField';
-import { Button } from '@components/Button';
+import { InputField } from '@components/ui/InputField';
+import { Button } from '@components/ui/Button';
 import { useAuth } from '@hooks/useAuth';
 import { AuthLayout } from '@components/auth/AuthLayout';
 import { AuthHeader } from '@components/auth/AuthHeader';
@@ -45,7 +45,7 @@ export default function Login() {
     <AuthLayout>
       <AuthHeader title="Hi, Welcome Back!" subtitle="Sign in to your admin account." />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-20">
         <InputField
           label="Email or Username"
           type="text"
@@ -111,7 +111,7 @@ export default function Login() {
           <div className="flex justify-end">
             <Link
               to="/forgot-password"
-              className="text-[13px] font-medium text-primary hover:text-primary-active transition-colors"
+              className="text-13 font-medium text-primary hover:text-primary-active transition-colors"
             >
               Forgot password?
             </Link>
@@ -119,12 +119,12 @@ export default function Login() {
         </div>
 
         {isError && (
-          <div className="p-3 bg-status-error-container text-status-error rounded-lg text-14 font-medium border border-status-error/20">
+          <div className="p-12 bg-status-error-container text-status-error rounded-lg text-14 font-medium border border-status-error/20">
             {getErrorMessage()}
           </div>
         )}
 
-        <div className="pt-2">
+        <div className="pt-[8px]">
           <Button type="submit" fullWidth isLoading={isPending}>
             Sign In
           </Button>

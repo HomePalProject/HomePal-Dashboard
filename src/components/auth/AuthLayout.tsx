@@ -16,7 +16,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         </div>
 
         <div className="hidden md:block w-full text-center mt-8">
-          <p className="text-13 text-text-disabled">
+          <p className="text-[13px] text-text-disabled">
             &copy; 2024-{new Date().getFullYear()} HomePal Inc. All rights reserved.
           </p>
         </div>

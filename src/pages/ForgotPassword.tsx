@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { InputField } from '../components/InputField';
-import { Button } from '../components/Button';
-import { api } from '../services/api';
-import { AuthLayout } from '../components/auth/AuthLayout';
-import { AuthHeader } from '../components/auth/AuthHeader';
-
-import { isAxiosError } from 'axios';
+import { InputField } from '@components/InputField';
+import { Button } from '@components/Button';
+import { api } from '@services/api';
+import { AuthLayout } from '@components/auth/AuthLayout';
+import { AuthHeader } from '@components/auth/AuthHeader';
+import { getErrorMessage } from '@lib/utils';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -27,24 +26,6 @@ export default function ForgotPassword() {
       setSubmitted(true);
     },
   });
-
-  const getErrorMessage = () => {
-    if (!error) return 'Something went wrong. Please try again.';
-    if (!navigator.onLine || (isAxiosError(error) && error.code === 'ERR_NETWORK')) {
-      return 'Network Error: Unable to connect to the server. Please check your internet connection.';
-    }
-    if (isAxiosError(error)) {
-      return (
-        error.response?.data?.message ||
-        error.response?.data?.title ||
-        'Failed to send reset email. Please try again.'
-      );
-    }
-    if (error instanceof Error) {
-      return error.message;
-    }
-    return 'Failed to send reset email. Please try again.';
-  };
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -108,7 +89,7 @@ export default function ForgotPassword() {
 
             {isError && (
               <div className="p-3 bg-status-error-container text-status-error rounded-lg text-14 font-medium border border-status-error/20">
-                {getErrorMessage()}
+                {getErrorMessage(error, 'Failed to send reset email. Please try again.')}
               </div>
             )}
 

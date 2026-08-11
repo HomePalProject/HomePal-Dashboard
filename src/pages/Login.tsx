@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { InputField } from '../components/InputField';
-import { Button } from '../components/Button';
-import { useAuth } from '../hooks/useAuth';
-import { AuthLayout } from '../components/auth/AuthLayout';
-import { AuthHeader } from '../components/auth/AuthHeader';
+import { InputField } from '@components/InputField';
+import { Button } from '@components/Button';
+import { useAuth } from '@hooks/useAuth';
+import { AuthLayout } from '@components/auth/AuthLayout';
+import { AuthHeader } from '@components/auth/AuthHeader';
 
 import { isAxiosError } from 'axios';
 
@@ -111,7 +111,7 @@ export default function Login() {
           <div className="flex justify-end">
             <Link
               to="/forgot-password"
-              className="text-13 font-medium text-primary hover:text-primary-active transition-colors"
+              className="text-[13px] font-medium text-primary hover:text-primary-active transition-colors"
             >
               Forgot password?
             </Link>

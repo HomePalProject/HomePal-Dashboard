@@ -13,7 +13,7 @@ export function MockDashboardCard() {
         { label: 'Active Households', width: 'w-20' },
         { label: 'Members', width: 'w-12' },
         { label: 'Pantry Items', width: 'w-32' },
-        { label: 'Shopping Lists', width: 'w-[100px]' },
+        { label: 'Shopping Lists', width: 'w-25' },
       ].map((row) => (
         <div
           key={row.label}

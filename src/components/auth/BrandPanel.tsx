@@ -1,4 +1,4 @@
-import bgImg from '../../assets/login-bg.webp';
+import bgImg from '@assets/login-bg.webp';
 import { MockDashboardCard } from './MockDashboardCard';
 
 export function BrandPanel() {
@@ -14,7 +14,7 @@ export function BrandPanel() {
       <div className="z-10 h-10"></div>
 
       <div className="z-10 max-w-xl mx-auto text-left flex flex-col items-start">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/10 border border-surface/20 text-13 font-medium text-surface/80 mb-6">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface/10 border border-surface/20 text-[13px] font-medium text-surface/80 mb-6">
           <span className="w-2 h-2 rounded-full bg-accent shrink-0"></span>
           Household Management, Simplified
         </div>
@@ -31,7 +31,7 @@ export function BrandPanel() {
         <MockDashboardCard />
       </div>
 
-      <div className="z-10 flex items-center justify-between text-13 text-surface/50 w-full max-w-xl mx-auto">
+      <div className="z-10 flex items-center justify-between text-[13px] text-surface/50 w-full max-w-xl mx-auto">
         <span>&copy; {new Date().getFullYear()} HomePal Inc.</span>
         <span className="flex items-center gap-2 font-medium">
           <span className="w-2 h-2 rounded-full bg-status-success"></span>

@@ -61,7 +61,7 @@ export function TableHead({
   return (
     <th
       className={cn(
-        'h-12 px-24 align-middle text-12 font-bold uppercase tracking-[0.08em] text-text-disabled whitespace-nowrap',
+        'h-48 px-24 align-middle text-12 font-bold uppercase tracking-[0.08em] text-text-disabled whitespace-nowrap',
         className
       )}
       {...props}
@@ -78,7 +78,10 @@ export function TableCell({
 }: React.TdHTMLAttributes<HTMLTableCellElement>) {
   return (
     <td
-      className={cn('p-24 align-middle text-14 text-text-secondary whitespace-nowrap', className)}
+      className={cn(
+        'px-24 py-16 align-middle text-14 text-text-secondary whitespace-nowrap',
+        className
+      )}
       {...props}
     >
       {children}

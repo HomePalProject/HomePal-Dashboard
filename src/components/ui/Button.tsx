@@ -16,7 +16,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center font-bold rounded-md transition-colors min-h-11 px-24 py-12 text-16 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+    'inline-flex items-center justify-center font-bold rounded-md transition-colors min-h-[44px] px-24 py-12 text-[16px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
   const variantClasses = {
     primary: 'bg-primary text-text-inverse hover:bg-primary-active focus-visible:ring-primary',

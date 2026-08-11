@@ -1,7 +1,7 @@
-import type { User } from '../store/authStore';
-import type { ApiResponse } from '../types/apiTypes';
-import type { LoginCredentials, LoginResponseData } from '../types/authTypes';
-import { api } from './api';
+import type { User } from '@store/authStore';
+import type { ApiResponse } from '@typeDefs/apiTypes';
+import type { LoginCredentials, LoginResponseData } from '@typeDefs/authTypes';
+import { api } from '@services/api';
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<{ token: string; user: User }> {
@@ -20,7 +20,7 @@ export const authService = {
       email: meData?.email || credentials.emailOrUsername || '',
       username: meData?.username || meData?.email || '',
       fullName: meData?.fullName || meData?.username || 'Admin User',
-      role: meData?.roles?.[0] || 'Admin',
+      roles: meData?.roles || ['Admin'],
     };
 
     return { token, user };

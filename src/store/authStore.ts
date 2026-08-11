@@ -6,7 +6,7 @@ export interface User {
   email: string;
   username: string;
   fullName: string;
-  role: string;
+  roles?: string[];
 }
 
 interface AuthState {

@@ -10,24 +10,24 @@ export default function Profile() {
       id: '1',
       username: 'admin_root',
       email: 'admin@homepal.system',
-      role: 'Super Admin',
-      status: 'Active',
+      roles: ['Super Admin'],
+      isActive: true,
       createdAt: '2024-01-15',
     },
     {
       id: '2',
       username: 'system_ops',
       email: 'ops@homepal.system',
-      role: 'System Admin',
-      status: 'Active',
+      roles: ['System Admin'],
+      isActive: true,
       createdAt: '2024-03-10',
     },
     {
       id: '3',
       username: 'support_lead',
       email: 'support@homepal.system',
-      role: 'Content Moderator',
-      status: 'Active',
+      roles: ['Content Moderator'],
+      isActive: true,
       createdAt: '2024-05-22',
     },
   ]);
@@ -47,9 +47,7 @@ export default function Profile() {
 
   const handleToggleStatus = (id: string) => {
     setAdmins((prev) =>
-      prev.map((adm) =>
-        adm.id === id ? { ...adm, status: adm.status === 'Active' ? 'Suspended' : 'Active' } : adm
-      )
+      prev.map((adm) => (adm.id === id ? { ...adm, isActive: !adm.isActive } : adm))
     );
   };
 
@@ -101,8 +99,8 @@ export default function Profile() {
         id: Date.now().toString(),
         username: newUsername,
         email: `${newUsername}@homepal.system`,
-        role: newRole,
-        status: 'Active',
+        roles: [newRole],
+        isActive: true,
         createdAt: new Date().toISOString().split('T')[0],
       };
 
@@ -115,8 +113,8 @@ export default function Profile() {
         id: Date.now().toString(),
         username: newUsername,
         email: `${newUsername}@homepal.system`,
-        role: newRole,
-        status: 'Active',
+        roles: [newRole],
+        isActive: true,
         createdAt: new Date().toISOString().split('T')[0],
       };
       setAdmins((prev) => [...prev, createdAdmin]);
@@ -192,8 +190,8 @@ export default function Profile() {
             <tbody>
               {admins.map((adm) => {
                 const initials = adm.username.slice(0, 2).toUpperCase();
-                const isSuper = adm.role === 'Super Admin';
-                const isActive = adm.status === 'Active';
+                const isSuper = adm.roles?.includes('Super Admin');
+                const isActive = adm.isActive;
 
                 return (
                   <tr
@@ -225,12 +223,12 @@ export default function Profile() {
                           'text-[11px] font-bold px-2.5 py-[4px] rounded-full',
                           isSuper
                             ? 'bg-[#2a4a3e] text-white'
-                            : adm.role === 'System Admin'
+                            : adm.roles?.includes('System Admin')
                               ? 'bg-[#dceee8] text-[#2a4a3e]'
                               : 'bg-[#f4f2ee] text-[#5a5652]'
                         )}
                       >
-                        {adm.role}
+                        {adm.roles?.[0] || 'User'}
                       </span>
                     </td>
 
@@ -249,7 +247,7 @@ export default function Profile() {
                             isActive ? 'text-status-success' : 'text-status-error'
                           )}
                         >
-                          {adm.status}
+                          {isActive ? 'Active' : 'Suspended'}
                         </span>
                       </div>
                     </td>

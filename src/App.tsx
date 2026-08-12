@@ -15,6 +15,7 @@ const VisionAILogs = lazy(() => import('./pages/VisionAILogs'));
 const SupermarketPerformance = lazy(() => import('./pages/SupermarketPerformance'));
 const PnLDeepDive = lazy(() => import('./pages/PnLDeepDive'));
 const GeographicDemographics = lazy(() => import('./pages/GeographicDemographics'));
+const UserManagement = lazy(() => import('./pages/UserManagement'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -54,6 +55,7 @@ function App() {
             <Route path="pnl-deep-dive" element={<PnLDeepDive />} />
             <Route path="geographic-demographics" element={<GeographicDemographics />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="users" element={<UserManagement />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />

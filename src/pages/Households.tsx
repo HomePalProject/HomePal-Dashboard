@@ -1,83 +1,26 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '../store/auth.store';
-
-const API = import.meta.env.VITE_API_BASE_URL;
-
-// ── Types ────────────────────────────────────────────────────────────────────
-
-interface HouseholdsSummaryData {
-  totalHouseholds: number;
-  activeHouseholds: number;
-  avgHouseholdSize: number;
-  avgHouseholdIncome: string;
-  growthRate: string;
-  topRegions: { name: string; count: number; percentage: number }[];
-  sizeDistribution: { size: string; count: number }[];
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-async function apiFetch<T>(
-  path: string,
-  token: string | null,
-  options?: RequestInit
-): Promise<{ data: T | null; error: string | null }> {
-  try {
-    const res = await fetch(`${API}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(options?.headers ?? {}),
-      },
-    });
-    const json: any = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      return { data: null, error: json?.message ?? `Request failed (${res.status})` };
-    }
-    const data = json?.data !== undefined ? json.data : (json as T);
-    return { data, error: null };
-  } catch {
-    return { data: null, error: 'Network error. Please try again.' };
-  }
-}
-
-// ── Main Page ─────────────────────────────────────────────────────────────────
+import { MOCK_HOUSEHOLDS_DATA } from '@constants/householdsData';
+import { getErrorMessage } from '@lib/utils';
+import { analyticsService } from '@services/analyticsService';
+import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function Households() {
-  const token = useAuthStore((s) => s.token);
   const [data, setData] = useState<HouseholdsSummaryData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    const res = await apiFetch<HouseholdsSummaryData>('/api/analytics/households-summary', token);
-
-    if (res.data) {
-      setData(res.data);
-    } else {
-      // MOCK DATA FALLBACK (Aggregated Privacy-Safe Data)
-      setData({
-        totalHouseholds: 12450,
-        activeHouseholds: 11800,
-        avgHouseholdSize: 3.4,
-        avgHouseholdIncome: '$4,250',
-        growthRate: '+12.4%',
-        topRegions: [
-          { name: 'New Cairo', count: 4200, percentage: 35 },
-          { name: 'Sheikh Zayed', count: 3100, percentage: 26 },
-          { name: 'Nasr City', count: 2400, percentage: 20 },
-          { name: 'Heliopolis', count: 1800, percentage: 15 },
-          { name: 'Others', count: 300, percentage: 4 },
-        ],
-        sizeDistribution: [
-          { size: '1 Person', count: 1800 },
-          { size: '2 People', count: 3500 },
-          { size: '3-4 People', count: 5200 },
-          { size: '5+ People', count: 1300 },
-        ],
-      });
+    try {
+      setError(null);
+      const result = await analyticsService.getHouseholdsSummary();
+      setData(result || MOCK_HOUSEHOLDS_DATA);
+    } catch (err) {
+      const msg = getErrorMessage(err);
+      setError(msg);
+      // Fallback to mock data
+      setData(MOCK_HOUSEHOLDS_DATA);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchData().then(() => setLoading(false));
@@ -85,188 +28,91 @@ export default function Households() {
 
   if (loading || !data) {
     return (
-      <div style={{ padding: 40, color: '#a8a39d' }}>Loading aggregated household data...</div>
+      <div className="p-40 text-text-disabled font-sans">Loading aggregated household data...</div>
     );
   }
 
   return (
-    <div
-      style={{
-        maxWidth: 1000,
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 24,
-        paddingBottom: 60,
-      }}
-    >
-      {/* ── Header ──────────────────────────────────────────────────────── */}
+    <div className="max-w-250 mx-auto flex flex-col gap-24 pb-15 font-sans">
+      {/* ── Header ── */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <h1
-            style={{
-              fontSize: 28,
-              fontWeight: 800,
-              color: '#2d2a26',
-              letterSpacing: '-0.02em',
-              margin: 0,
-            }}
-          >
+        <div className="flex items-center gap-[8px] mb-[8px]">
+          <h1 className="text-typography-h2 text-text-primary tracking-tight m-0">
             Households Analytics
           </h1>
-          <span
-            style={{
-              background: '#dceee8',
-              color: '#356859',
-              fontSize: 11,
-              fontWeight: 700,
-              padding: '4px 8px',
-              borderRadius: 12,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
+          <span className="bg-primary-container text-primary text-[11px] font-bold px-[8px] py-[4px] rounded-full uppercase tracking-wider">
             Privacy Safe
           </span>
         </div>
-        <p style={{ fontSize: 14, color: '#a8a39d', maxWidth: 600, margin: 0 }}>
+        <p className="text-typography-bodysmall text-text-secondary max-w-150 m-0">
           Aggregated platform metrics. Personally Identifiable Information (PII) is intentionally
           restricted from this dashboard to ensure data privacy.
         </p>
       </div>
 
-      {/* ── Top Metrics ─────────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 20,
-        }}
-      >
-        <div
-          style={{
-            background: '#fff',
-            padding: 24,
-            borderRadius: 16,
-            border: '1px solid #f0ece6',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-          }}
-        >
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#a8a39d', marginBottom: 8 }}>
-            Total Registered
-          </div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#2d2a26' }}>
+      {error && (
+        <div className="p-4 text-sm text-status-error bg-status-error-container rounded-sm border border-status-error/20">
+          {error} (Showing fallback data)
+        </div>
+      )}
+
+      {/* ── Top Metrics ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-20">
+        <div className="bg-surface p-24 rounded-md border border-border shadow-sm">
+          <div className="text-13 font-semibold text-text-disabled mb-[8px]">Total Registered</div>
+          <div className="text-32 font-extrabold text-text-primary">
             {data.totalHouseholds.toLocaleString()}
           </div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#356859', marginTop: 4 }}>
-            {data.growthRate} YoY
-          </div>
+          <div className="text-xs font-semibold text-primary mt-[4px]">{data.growthRate} YoY</div>
         </div>
 
-        <div
-          style={{
-            background: '#fff',
-            padding: 24,
-            borderRadius: 16,
-            border: '1px solid #f0ece6',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-          }}
-        >
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#a8a39d', marginBottom: 8 }}>
-            Active This Month
-          </div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#2d2a26' }}>
+        <div className="bg-surface p-24 rounded-md border border-border shadow-sm">
+          <div className="text-13 font-semibold text-text-disabled mb-[8px]">Active This Month</div>
+          <div className="text-32 font-extrabold text-text-primary">
             {data.activeHouseholds.toLocaleString()}
           </div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#6d6862', marginTop: 4 }}>
+          <div className="text-xs font-semibold text-text-secondary mt-[4px]">
             94% Activity Rate
           </div>
         </div>
 
-        <div
-          style={{
-            background: '#fff',
-            padding: 24,
-            borderRadius: 16,
-            border: '1px solid #f0ece6',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-          }}
-        >
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#a8a39d', marginBottom: 8 }}>
+        <div className="bg-surface p-24 rounded-md border border-border shadow-sm">
+          <div className="text-13 font-semibold text-text-disabled mb-[8px]">
             Avg Household Size
           </div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#2d2a26' }}>
-            {data.avgHouseholdSize}
-          </div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#6d6862', marginTop: 4 }}>
+          <div className="text-32 font-extrabold text-text-primary">{data.avgHouseholdSize}</div>
+          <div className="text-xs font-semibold text-text-secondary mt-[4px]">
             Members / Household
           </div>
         </div>
 
-        <div
-          style={{
-            background: '#fff',
-            padding: 24,
-            borderRadius: 16,
-            border: '1px solid #f0ece6',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-          }}
-        >
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#a8a39d', marginBottom: 8 }}>
+        <div className="bg-surface p-24 rounded-md border border-border shadow-sm">
+          <div className="text-13 font-semibold text-text-disabled mb-[8px]">
             Avg Monthly Income
           </div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#2d2a26' }}>
-            {data.avgHouseholdIncome}
-          </div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#6d6862', marginTop: 4 }}>
-            Self-reported
-          </div>
+          <div className="text-32 font-extrabold text-text-primary">{data.avgHouseholdIncome}</div>
+          <div className="text-xs font-semibold text-text-secondary mt-[4px]">Self-reported</div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-        {/* ── Top Regions ───────────────────────────────────────────────── */}
-        <div
-          style={{
-            background: '#fff',
-            padding: 24,
-            borderRadius: 16,
-            border: '1px solid #f0ece6',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-          }}
-        >
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#2d2a26', margin: '0 0 24px' }}>
-            Adoption by Region
-          </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
+        {/* ── Top Regions ── */}
+        <div className="bg-surface p-24 rounded-md border border-border shadow-sm">
+          <h2 className="text-base font-bold text-text-primary mb-24">Adoption by Region</h2>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div className="flex flex-col gap-20">
             {data.topRegions.map((region, i) => (
               <div key={i}>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: '#2d2a26',
-                    marginBottom: 8,
-                  }}
-                >
+                <div className="flex justify-between text-13 font-semibold text-text-primary mb-[8px]">
                   <span>{region.name}</span>
-                  <span style={{ color: '#6d6862' }}>
+                  <span className="text-text-secondary">
                     {region.count.toLocaleString()} ({region.percentage}%)
                   </span>
                 </div>
-                <div
-                  style={{ height: 6, background: '#f4f2ee', borderRadius: 3, overflow: 'hidden' }}
-                >
+                <div className="h-1.5 bg-surface-variant rounded-sm overflow-hidden">
                   <div
-                    style={{
-                      height: '100%',
-                      width: `${region.percentage}%`,
-                      background: '#356859',
-                      borderRadius: 3,
-                    }}
+                    className="h-full bg-primary rounded-sm transition-all duration-500 ease-out"
+                    style={{ width: `${region.percentage}%` }}
                   />
                 </div>
               </div>
@@ -274,54 +120,26 @@ export default function Households() {
           </div>
         </div>
 
-        {/* ── Size Distribution ─────────────────────────────────────────── */}
-        <div
-          style={{
-            background: '#fff',
-            padding: 24,
-            borderRadius: 16,
-            border: '1px solid #f0ece6',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-          }}
-        >
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#2d2a26', margin: '0 0 24px' }}>
+        {/* ── Size Distribution ── */}
+        <div className="bg-surface p-24 rounded-md border border-border shadow-sm">
+          <h2 className="text-base font-bold text-text-primary mb-24">
             Household Size Demographics
           </h2>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div className="flex flex-col gap-20">
             {data.sizeDistribution.map((item, i) => {
               const max = Math.max(...data.sizeDistribution.map((d) => d.count));
               const pct = Math.round((item.count / max) * 100);
               return (
                 <div key={i}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: '#2d2a26',
-                      marginBottom: 8,
-                    }}
-                  >
+                  <div className="flex justify-between text-13 font-semibold text-text-primary mb-[8px]">
                     <span>{item.size}</span>
-                    <span style={{ color: '#6d6862' }}>{item.count.toLocaleString()}</span>
+                    <span className="text-text-secondary">{item.count.toLocaleString()}</span>
                   </div>
-                  <div
-                    style={{
-                      height: 6,
-                      background: '#f4f2ee',
-                      borderRadius: 3,
-                      overflow: 'hidden',
-                    }}
-                  >
+                  <div className="h-1.5 bg-surface-variant rounded-sm overflow-hidden">
                     <div
-                      style={{
-                        height: '100%',
-                        width: `${pct}%`,
-                        background: '#d99a3d',
-                        borderRadius: 3,
-                      }}
+                      className="h-full bg-accent rounded-sm transition-all duration-500 ease-out"
+                      style={{ width: `${pct}%` }}
                     />
                   </div>
                 </div>

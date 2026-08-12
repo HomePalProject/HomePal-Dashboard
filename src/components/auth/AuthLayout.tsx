@@ -10,7 +10,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
     <div className="min-h-screen flex flex-col md:flex-row bg-surface">
       <BrandPanel />
 
-      <div className="flex-1 flex flex-col p-7 sm:p-10 md:p-16 relative">
+      <div className="flex-1 flex flex-col p-7 sm:p-40 md:p-16 relative">
         <div className="flex-1 flex flex-col justify-center items-center w-full">
           <div className="w-full max-w-sm flex flex-col justify-center">{children}</div>
         </div>

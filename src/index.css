@@ -239,3 +239,42 @@
   font-weight: 600;
   line-height: 20px;
 }
+
+@keyframes hp-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(110, 220, 140, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(110, 220, 140, 0.08);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.leaflet-container {
+  background: var(--sys-background);
+  font-family: var(--font-family-cairo);
+  z-index: 0;
+}
+.leaflet-tooltip {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+  display: none;
+}

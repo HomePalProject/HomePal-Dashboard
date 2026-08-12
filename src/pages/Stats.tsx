@@ -1,217 +1,36 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/auth.store';
-
-const API = import.meta.env.VITE_API_BASE_URL;
-
-// ── Types ────────────────────────────────────────────────────────────────────
-
-interface AnalyticsData {
-  revenue: { current: number; changePercentage: number };
-  serverCosts: { current: number; changePercentage: number };
-  netMargin: { current: number; changePercentage: number };
-  topSupermarketChains: { name: string; value: number }[];
-  visionHealth: {
-    autoParsedPercentage: number;
-    manualFallbackPercentage: number;
-    failedPercentage: number;
-  };
-  userDistribution: { region: string; households: number; lat: number; lng: number }[];
-  topCategories: { name: string; percentage: number }[];
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-async function apiFetch<T>(
-  path: string,
-  token: string | null,
-  options?: RequestInit
-): Promise<{ data: T | null; error: string | null }> {
-  try {
-    const res = await fetch(`${API}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(options?.headers ?? {}),
-      },
-    });
-    const json: any = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      return { data: null, error: json?.message ?? `Request failed (${res.status})` };
-    }
-    const data = json?.data !== undefined ? json.data : (json as T);
-    return { data, error: null };
-  } catch {
-    return { data: null, error: 'Network error. Please try again.' };
-  }
-}
+import { cn } from '@lib/utils';
+import { analyticsService } from '@services/analyticsService';
+import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
+import { mockStatsData } from '@constants/statsData';
+import { StatCard } from '@components/stats/StatCard';
 
 // ── Components ───────────────────────────────────────────────────────────────
 
-function StatCard({
-  title,
-  value,
-  change,
-  isCurrency = false,
-  isPercent = false,
-  icon,
-  onClick,
-}: {
-  title: string;
-  value: number;
-  change: number;
-  isCurrency?: boolean;
-  isPercent?: boolean;
-  icon: React.ReactNode;
-  onClick?: () => void;
-}) {
-  const isPositive = change > 0;
-
-  // Format values
-  const displayValue = isCurrency
-    ? `$${(value / 1000).toFixed(1)}k`
-    : isPercent
-      ? `${value}%`
-      : value.toLocaleString();
-
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: '#fff',
-        borderRadius: 12,
-        border: '1px solid var(--sys-border)',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-        cursor: onClick ? 'pointer' : 'default',
-        transition: onClick ? 'all 0.2s' : 'none',
-      }}
-      onMouseEnter={
-        onClick
-          ? (e) => (e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)')
-          : undefined
-      }
-      onMouseLeave={onClick ? (e) => (e.currentTarget.style.boxShadow = 'none') : undefined}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: 'var(--sys-text-secondary)',
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-          }}
-        >
-          {title}
-        </span>
-        <div style={{ color: 'var(--sys-primary)' }}>{icon}</div>
-      </div>
-
-      <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--sys-text-primary)' }}>
-        {displayValue}
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
-        <span
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            color: isPositive ? 'var(--sys-primary)' : 'var(--sys-status-error)',
-            fontWeight: 700,
-          }}
-        >
-          {isPositive ? (
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-            >
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-              <polyline points="17 6 23 6 23 12" />
-            </svg>
-          ) : (
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-            >
-              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" />
-              <polyline points="17 18 23 18 23 12" />
-            </svg>
-          )}
-          {Math.abs(change)}%
-        </span>
-        <span style={{ color: 'var(--sys-text-secondary)', fontWeight: 500 }}>vs last month</span>
-      </div>
-    </div>
-  );
-}
-
 export default function Stats() {
-  const token = useAuthStore((s) => s.token);
   const navigate = useNavigate();
-  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [data, setData] = useState<AnalyticsOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const res = await apiFetch<AnalyticsData>('/api/analytics/overview', token);
-
-    if (res.data) {
-      setData(res.data);
-    } else {
-      // MOCK DATA FALLBACK (Matching Screenshot)
-      setData({
-        revenue: { current: 245800, changePercentage: 12.5 },
-        serverCosts: { current: 42100, changePercentage: 3.2 },
-        netMargin: { current: 38.4, changePercentage: 1.8 },
-        topSupermarketChains: [
-          { name: 'Chain A', value: 100 },
-          { name: 'Chain B', value: 75 },
-          { name: 'Chain C', value: 50 },
-          { name: 'Chain D', value: 30 },
-          { name: 'Chain E', value: 20 },
-        ],
-        visionHealth: {
-          autoParsedPercentage: 94.2,
-          manualFallbackPercentage: 4.5,
-          failedPercentage: 1.3,
-        },
-        userDistribution: [
-          { region: 'North', households: 1, lat: 20, lng: 30 },
-          { region: 'South', households: 1, lat: 60, lng: 70 },
-          { region: 'West', households: 1, lat: 45, lng: 20 },
-        ],
-        topCategories: [
-          { name: 'Fresh Produce', percentage: 32 },
-          { name: 'Dairy & Eggs', percentage: 24 },
-          { name: 'Meat & Seafood', percentage: 18 },
-          { name: 'Pantry Staples', percentage: 15 },
-        ],
-      });
+    try {
+      const res = await analyticsService.getOverview();
+      setData(res);
+    } catch {
+      setData(mockStatsData);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, [token]);
+  }, []);
 
   useEffect(() => {
-    fetchData();
+    void fetchData();
   }, [fetchData]);
 
   if (loading || !data) {
-    return (
-      <div style={{ padding: 40, color: 'var(--sys-text-secondary)' }}>Loading analytics...</div>
-    );
+    return <div className="p-40 text-text-secondary font-sans">Loading analytics...</div>;
   }
 
   const visionTotal =
@@ -222,49 +41,19 @@ export default function Stats() {
   const manualDeg = (data.visionHealth.manualFallbackPercentage / visionTotal) * 360;
 
   return (
-    <div
-      style={{
-        maxWidth: 1200,
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 24,
-      }}
-    >
+    <div className="max-w-300 mx-auto flex flex-col gap-24 font-sans">
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="flex justify-between items-start">
         <div>
-          <h1
-            style={{
-              fontSize: 28,
-              fontWeight: 800,
-              color: 'var(--sys-text-primary)',
-              letterSpacing: '-0.02em',
-              marginBottom: 8,
-            }}
-          >
+          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
             Analytics Overview
           </h1>
-          <p style={{ fontSize: 14, color: 'var(--sys-text-secondary)', maxWidth: 600 }}>
+          <p className="text-sm text-text-secondary max-w-150 m-0">
             Platform performance and insights for current billing cycle.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 12 }}>
-          <button
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 16px',
-              background: 'var(--sys-primary)',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              color: '#fff',
-              cursor: 'pointer',
-            }}
-          >
+        <div className="flex gap-12 flex-wrap">
+          <button className="flex items-center gap-[8px] px-16 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer hover:bg-primary/90 transition-colors">
             <svg
               width="14"
               height="14"
@@ -279,24 +68,14 @@ export default function Stats() {
             </svg>
             Export Report
           </button>
-          <div
-            style={{
-              padding: '10px 16px',
-              background: '#fff',
-              border: '1px solid var(--sys-border)',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--sys-text-primary)',
-            }}
-          >
+          <div className="px-16 py-2.5 bg-surface border border-border rounded-lg text-13 font-semibold text-text-primary">
             Last 30 Days
           </div>
         </div>
       </div>
 
       {/* ── Stat Cards ──────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-20">
         <StatCard
           title="Revenue (Current Cycle)"
           value={data.revenue.current}
@@ -361,42 +140,14 @@ export default function Stats() {
       </div>
 
       {/* ── Middle Row ──────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 20 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-20">
         {/* Top Supermarket Chains */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid var(--sys-border)',
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 24,
-            }}
-          >
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--sys-text-primary)' }}>
-              Top Supermarket Chains
-            </h2>
+        <div className="bg-surface rounded-xl border border-border p-24 flex flex-col">
+          <div className="flex justify-between items-center mb-24">
+            <h2 className="text-base font-bold text-text-primary m-0">Top Supermarket Chains</h2>
             <button
               onClick={() => navigate('/dashboard/supermarket-performance')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--sys-primary)',
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
+              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-[4px] hover:opacity-80 transition-opacity"
             >
               View All
               <svg
@@ -413,66 +164,27 @@ export default function Stats() {
               </svg>
             </button>
           </div>
-          <div
-            style={{
-              flex: 1,
-              position: 'relative',
-              minHeight: 180,
-              display: 'flex',
-              alignItems: 'flex-end',
-              gap: 24,
-              padding: '0 20px',
-              borderBottom: '1px solid var(--sys-border)',
-            }}
-          >
+          <div className="flex-1 relative min-h-45 flex items-end gap-24 px-20 border-b border-border">
             {/* Background grid lines */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                borderTop: '1px solid #f0f0f0',
-                borderBottom: '1px solid #f0f0f0',
-                top: '33%',
-                height: '33%',
-              }}
-            />
+            <div className="absolute inset-0 border-t border-b border-[#f0f0f0] top-[4px]/3 h-[4px]/3" />
 
             {data.topSupermarketChains.map((chain, i) => (
-              <div
-                key={i}
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: 12,
-                  zIndex: 1,
-                }}
-              >
+              <div key={i} className="flex-1 flex flex-col items-center gap-12 z-10">
                 <div
-                  style={{
-                    width: '100%',
-                    maxWidth: 40,
-                    background: i === 0 ? 'var(--sys-primary)' : '#e4e4e7',
-                    height: `${(chain.value / 100) * 140}px`,
-                    borderRadius: '4px 4px 0 0',
-                    opacity: i === 0 ? 1 : 0.6,
-                  }}
+                  className={cn(
+                    'w-full max-w-40 rounded-t-sm',
+                    i === 0 ? 'bg-primary opacity-100' : 'bg-[#e4e4e7] opacity-60'
+                  )}
+                  style={{ height: `${(chain.value / 100) * 140}px` }}
                 />
               </div>
             ))}
           </div>
-          <div style={{ display: 'flex', gap: 24, padding: '12px 20px 0' }}>
+          <div className="flex gap-24 px-20 pt-12">
             {data.topSupermarketChains.map((chain, i) => (
               <div
                 key={i}
-                style={{
-                  flex: 1,
-                  textAlign: 'center',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: 'var(--sys-text-primary)',
-                }}
+                className="flex-1 text-center text-[11px] font-semibold text-text-primary"
               >
                 {chain.name}
               </div>
@@ -481,38 +193,12 @@ export default function Stats() {
         </div>
 
         {/* Vision AI Health */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid var(--sys-border)',
-            padding: '24px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              marginBottom: 4,
-            }}
-          >
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--sys-text-primary)' }}>
-              Vision AI Health
-            </h2>
+        <div className="bg-surface rounded-xl border border-border p-24">
+          <div className="flex justify-between items-start mb-[4px]">
+            <h2 className="text-base font-bold text-text-primary m-0">Vision AI Health</h2>
             <button
               onClick={() => navigate('/dashboard/vision-ai-logs')}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--sys-primary)',
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
+              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-[4px] hover:opacity-80 transition-opacity"
             >
               View Logs
               <svg
@@ -529,54 +215,29 @@ export default function Stats() {
               </svg>
             </button>
           </div>
-          <p style={{ fontSize: 12, color: 'var(--sys-text-secondary)', marginBottom: 32 }}>
+          <p className="text-xs text-text-secondary mb-8 mt-0">
             Receipt parsing accuracy & fallback rates.
           </p>
 
-          <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+          <div className="flex gap-8 items-center">
             {/* Donut Chart via CSS */}
             <div
+              className="w-30 h-30 rounded-full relative flex items-center justify-center p-12"
               style={{
-                width: 120,
-                height: 120,
-                borderRadius: '50%',
                 background: `conic-gradient(var(--sys-primary) 0deg ${autoDeg}deg, #d97706 ${autoDeg}deg ${autoDeg + manualDeg}deg, var(--sys-status-error) ${autoDeg + manualDeg}deg 360deg)`,
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyItems: 'center',
-                padding: 12,
               }}
             >
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  background: '#fff',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <span style={{ fontSize: 24, fontWeight: 800, color: 'var(--sys-text-primary)' }}>
+              <div className="w-full h-full bg-surface rounded-full flex flex-col items-center justify-center">
+                <span className="text-2xl font-extrabold text-text-primary">
                   {Math.round(data.visionHealth.autoParsedPercentage)}%
                 </span>
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 600,
-                    color: 'var(--sys-text-secondary)',
-                    textTransform: 'uppercase',
-                  }}
-                >
+                <span className="text-[10px] font-semibold text-text-secondary uppercase">
                   Success
                 </span>
               </div>
             </div>
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="flex-1 flex flex-col gap-4">
               {[
                 {
                   label: 'Auto-Parsed',
@@ -595,45 +256,20 @@ export default function Stats() {
                 },
               ].map((item) => (
                 <div key={item.label}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      marginBottom: 6,
-                    }}
-                  >
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        color: 'var(--sys-text-primary)',
-                      }}
-                    >
+                  <div className="flex justify-between text-xs font-semibold mb-1.5">
+                    <span className="flex items-center gap-1.5 text-text-primary">
                       <span
-                        style={{ width: 6, height: 6, borderRadius: '50%', background: item.color }}
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ background: item.color }}
                       />
                       {item.label}
                     </span>
                     <span>{item.val.toFixed(1)}%</span>
                   </div>
-                  <div
-                    style={{
-                      height: 4,
-                      background: '#f4f4f5',
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                    }}
-                  >
+                  <div className="h-[4px] bg-[#f4f4f5] rounded-sm overflow-hidden">
                     <div
-                      style={{
-                        height: '100%',
-                        width: `${item.val}%`,
-                        background: item.color,
-                        borderRadius: 2,
-                      }}
+                      className="h-full rounded-sm"
+                      style={{ width: `${item.val}%`, background: item.color }}
                     />
                   </div>
                 </div>
@@ -644,52 +280,15 @@ export default function Stats() {
       </div>
 
       {/* ── Bottom Row ──────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, flex: 1 }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-20 flex-1">
         {/* User Distribution Map */}
         <div
           onClick={() => navigate('/dashboard/geographic-demographics')}
-          style={{
-            background: '#e9f1eb',
-            borderRadius: 12,
-            border: '1px solid var(--sys-border)',
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'relative',
-            overflow: 'hidden',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)')
-          }
-          onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
+          className="bg-[#e9f1eb] rounded-xl border border-border p-24 flex flex-col relative overflow-hidden cursor-pointer transition-all duration-200 hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] group"
         >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              zIndex: 1,
-              marginBottom: 4,
-            }}
-          >
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--sys-text-primary)' }}>
-              User Distribution
-            </h2>
-            <button
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--sys-primary)',
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
+          <div className="flex justify-between items-center z-10 mb-[4px]">
+            <h2 className="text-base font-bold text-text-primary m-0">User Distribution</h2>
+            <button className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-[4px]">
               View Map
               <svg
                 width="12"
@@ -705,12 +304,10 @@ export default function Stats() {
               </svg>
             </button>
           </div>
-          <p style={{ fontSize: 12, color: 'var(--sys-text-secondary)', zIndex: 1 }}>
-            Active households by region.
-          </p>
+          <p className="text-xs text-text-secondary z-10 mt-0">Active households by region.</p>
 
           {/* Abstract map representation */}
-          <div style={{ position: 'absolute', inset: 0, opacity: 0.5 }}>
+          <div className="absolute inset-0 opacity-50 pointer-events-none">
             <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
               <path d="M20,80 Q40,40 60,70 T90,20 L100,100 L0,100 Z" fill="#d1e0d7" opacity="0.5" />
               <path d="M10,90 Q30,60 50,80 T80,30 L100,100 L0,100 Z" fill="#d1e0d7" opacity="0.3" />
@@ -719,65 +316,25 @@ export default function Stats() {
           {data.userDistribution.map((pt, i) => (
             <div
               key={i}
+              className="absolute w-12 h-12 bg-primary rounded-full border-2 border-white shadow-[0_2px_4px_rgba(0,0,0,0.2)] -translate-x-1/2 -translate-y-1/2"
               style={{
-                position: 'absolute',
                 left: `${pt.lng}%`,
                 top: `${pt.lat}%`,
-                width: 12,
-                height: 12,
-                background: 'var(--sys-primary)',
-                borderRadius: '50%',
-                transform: 'translate(-50%, -50%)',
-                border: '2px solid #fff',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
               }}
             />
           ))}
         </div>
 
         {/* Top Grocery Categories */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid var(--sys-border)',
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <h2
-            style={{
-              fontSize: 16,
-              fontWeight: 700,
-              color: 'var(--sys-text-primary)',
-              marginBottom: 24,
-            }}
-          >
+        <div className="bg-surface rounded-xl border border-border p-24 flex flex-col">
+          <h2 className="text-base font-bold text-text-primary m-0 mb-24">
             Top Grocery Categories
           </h2>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 24,
-              flex: 1,
-              justifyContent: 'center',
-            }}
-          >
+          <div className="flex flex-col gap-24 flex-1 justify-center">
             {data.topCategories.map((cat, i) => (
               <div key={i}>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: 'var(--sys-text-primary)',
-                    marginBottom: 8,
-                  }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div className="flex justify-between text-13 font-semibold text-text-primary mb-[8px]">
+                  <span className="flex items-center gap-[8px]">
                     {i === 0 && (
                       <svg
                         width="14"
@@ -837,18 +394,12 @@ export default function Stats() {
                     )}
                     {cat.name}
                   </span>
-                  <span style={{ color: 'var(--sys-text-secondary)' }}>{cat.percentage}%</span>
+                  <span className="text-text-secondary">{cat.percentage}%</span>
                 </div>
-                <div
-                  style={{ height: 6, background: '#f4f4f5', borderRadius: 3, overflow: 'hidden' }}
-                >
+                <div className="h-1.5 bg-[#f4f4f5] rounded-[3px] overflow-hidden">
                   <div
-                    style={{
-                      height: '100%',
-                      width: `${cat.percentage}%`,
-                      background: 'var(--sys-primary)',
-                      borderRadius: 3,
-                    }}
+                    className="h-full bg-primary rounded-[3px]"
+                    style={{ width: `${cat.percentage}%` }}
                   />
                 </div>
               </div>

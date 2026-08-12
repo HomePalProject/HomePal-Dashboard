@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { InputField } from '../components/InputField';
-import { Button } from '../components/Button';
-import { useAuth } from '../hooks/useAuth';
-import { AuthLayout } from '../components/auth/AuthLayout';
-import { AuthHeader } from '../components/auth/AuthHeader';
+import { InputField } from '@components/ui/InputField';
+import { Button } from '@components/ui/Button';
+import { useAuth } from '@hooks/useAuth';
+import { AuthLayout } from '@components/auth/AuthLayout';
+import { AuthHeader } from '@components/auth/AuthHeader';
+
+import { isAxiosError } from 'axios';
 
 export default function Login() {
   const [identifier, setIdentifier] = useState('');
@@ -14,18 +16,24 @@ export default function Login() {
 
   const getErrorMessage = () => {
     if (!error) return 'Login failed. Please try again.';
-    if (!navigator.onLine || (error as any)?.code === 'ERR_NETWORK' || !(error as any)?.response) {
+    if (!navigator.onLine || (isAxiosError(error) && error.code === 'ERR_NETWORK')) {
       return 'Network Error: Unable to connect to the server. Please check your internet connection.';
     }
-    const status = (error as any)?.response?.status;
-    if (status === 401 || status === 400) {
-      return 'Invalid credentials. Please check your email/username and password.';
+    if (isAxiosError(error)) {
+      const status = error.response?.status;
+      if (status === 401 || status === 400) {
+        return 'Invalid credentials. Please check your email/username and password.';
+      }
+      return (
+        error.response?.data?.message ||
+        error.response?.data?.title ||
+        'Login failed. Please check your credentials and try again.'
+      );
     }
-    return (
-      (error as any)?.response?.data?.message ||
-      (error as any)?.response?.data?.title ||
-      'Login failed. Please check your credentials and try again.'
-    );
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return 'Login failed. Please check your credentials and try again.';
   };
 
   const handleSubmit = (e: React.SyntheticEvent) => {
@@ -37,7 +45,7 @@ export default function Login() {
     <AuthLayout>
       <AuthHeader title="Hi, Welcome Back!" subtitle="Sign in to your admin account." />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-20">
         <InputField
           label="Email or Username"
           type="text"
@@ -111,12 +119,12 @@ export default function Login() {
         </div>
 
         {isError && (
-          <div className="p-3 bg-status-error-container text-status-error rounded-lg text-14 font-medium border border-status-error/20">
+          <div className="p-12 bg-status-error-container text-status-error rounded-lg text-14 font-medium border border-status-error/20">
             {getErrorMessage()}
           </div>
         )}
 
-        <div className="pt-2">
+        <div className="pt-[8px]">
           <Button type="submit" fullWidth isLoading={isPending}>
             Sign In
           </Button>

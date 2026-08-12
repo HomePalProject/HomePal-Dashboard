@@ -1,67 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useAuthStore } from '../store/auth.store';
-
-const API = import.meta.env.VITE_API_BASE_URL;
-
-// ── Types ────────────────────────────────────────────────────────────────────
-
-interface BillingLedgerRow {
-  id: string;
-  provider: string;
-  providerIcon: string;
-  category: string;
-  usage: string;
-  cost: string;
-  status: 'PAID' | 'PENDING';
-}
-
-interface PnLDeepDiveData {
-  mrr: { value: string; change: string };
-  aiCosts: { value: string; overage: string };
-  netMargin: { value: string };
-  cac: { value: string; target: string };
-  chartData: { revenue: number[]; costs: number[] }; // Mock values for the 12 months
-  billingLedger: BillingLedgerRow[];
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-async function apiFetch<T>(
-  path: string,
-  token: string | null,
-  options?: RequestInit
-): Promise<{ data: T | null; error: string | null }> {
-  try {
-    const res = await fetch(`${API}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(options?.headers ?? {}),
-      },
-    });
-    const json: any = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      return { data: null, error: json?.message ?? `Request failed (${res.status})` };
-    }
-    const data = json?.data !== undefined ? json.data : (json as T);
-    return { data, error: null };
-  } catch {
-    return { data: null, error: 'Network error. Please try again.' };
-  }
-}
-
-// ── Components ───────────────────────────────────────────────────────────────
+import { cn, getErrorMessage } from '@lib/utils';
+import { analyticsService } from '@services/analyticsService';
+import type { PnLDeepDiveData, BillingLedgerRow } from '@typeDefs/pnlTypes';
+import { MOCK_PNL_DATA } from '@constants/pnlData';
 
 const statusStyles = {
-  PAID: { bg: '#d1fae5', color: '#10b981' },
-  PENDING: { bg: '#fee2e2', color: '#ef4444' },
+  PAID: { bg: 'bg-status-success-container', text: 'text-status-success' },
+  PENDING: { bg: 'bg-status-error-container', text: 'text-status-error' },
 };
 
 export default function PnLDeepDive() {
-  const token = useAuthStore((s) => s.token);
   const [data, setData] = useState<PnLDeepDiveData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const [isExporting, setIsExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -76,54 +27,18 @@ export default function PnLDeepDive() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const res = await apiFetch<PnLDeepDiveData>('/api/analytics/pnl-deep-dive', token);
-
-    if (res.data) {
-      setData(res.data);
-    } else {
-      // MOCK DATA FALLBACK
-      setData({
-        mrr: { value: '$1.24M', change: '+12.4%' },
-        aiCosts: { value: '$248K', overage: '+5.2% Overage' },
-        netMargin: { value: '28.4%' },
-        cac: { value: '$412.00', target: '$450' },
-        chartData: {
-          revenue: [20, 25, 32, 45, 55, 62, 70, 80, 95, 110, 120, 130],
-          costs: [10, 12, 14, 18, 22, 30, 32, 28, 25, 20, 50, 45], // Spline path estimation
-        },
-        billingLedger: [
-          {
-            id: '1',
-            provider: 'OpenAI API',
-            providerIcon: 'openai',
-            category: 'LLM Inference',
-            usage: '42.5M Tokens',
-            cost: '$8,450.00',
-            status: 'PAID',
-          },
-          {
-            id: '2',
-            provider: 'AWS Compute',
-            providerIcon: 'aws',
-            category: 'EC2 Instances',
-            usage: '1,240 Hours',
-            cost: '$3,120.50',
-            status: 'PAID',
-          },
-          {
-            id: '3',
-            provider: 'Pinecone DB',
-            providerIcon: 'pinecone',
-            category: 'Vector Storage',
-            usage: '200GB (Overage)',
-            cost: '$1,450.00',
-            status: 'PENDING',
-          },
-        ],
-      });
+    try {
+      setError(null);
+      const result = await analyticsService.getPnLDeepDive();
+      setData(result || MOCK_PNL_DATA);
+    } catch (err) {
+      const msg = getErrorMessage(err);
+      setError(msg);
+      setData(MOCK_PNL_DATA);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -158,14 +73,10 @@ export default function PnLDeepDive() {
   };
 
   if (loading || !data) {
-    return (
-      <div style={{ padding: 40, color: 'var(--sys-text-secondary)' }}>Loading analytics...</div>
-    );
+    return <div className="p-40 text-text-secondary">Loading analytics...</div>;
   }
 
   // Generate SVG path for a smooth curve (Spline interpolation approximation)
-  // X values from 0 to 900
-  // Y values from 250 down to 0
   const maxVal = 150; // Using 150 as max range for chart
   const months = [
     'Jan',
@@ -207,18 +118,7 @@ export default function PnLDeepDive() {
   const getProviderIcon = (icon: string) => {
     if (icon === 'openai')
       return (
-        <div
-          style={{
-            width: 24,
-            height: 24,
-            background: '#10a37f',
-            borderRadius: 4,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-          }}
-        >
+        <div className="w-24 h-24 bg-[#10a37f] rounded-sm flex items-center justify-center text-white">
           <svg
             width="14"
             height="14"
@@ -233,18 +133,7 @@ export default function PnLDeepDive() {
       );
     if (icon === 'aws')
       return (
-        <div
-          style={{
-            width: 24,
-            height: 24,
-            background: '#ff9900',
-            borderRadius: 4,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-          }}
-        >
+        <div className="w-24 h-24 bg-[#ff9900] rounded-sm flex items-center justify-center text-white">
           <svg
             width="14"
             height="14"
@@ -259,18 +148,7 @@ export default function PnLDeepDive() {
       );
     if (icon === 'pinecone')
       return (
-        <div
-          style={{
-            width: 24,
-            height: 24,
-            background: '#f43f5e',
-            borderRadius: 4,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-          }}
-        >
+        <div className="w-24 h-24 bg-[#f43f5e] rounded-sm flex items-center justify-center text-white">
           <svg
             width="14"
             height="14"
@@ -283,64 +161,27 @@ export default function PnLDeepDive() {
           </svg>
         </div>
       );
-    return <div style={{ width: 24, height: 24, background: '#cbd5e1', borderRadius: 4 }} />;
+    return <div className="w-24 h-24 bg-[#cbd5e1] rounded-sm" />;
   };
 
   return (
-    <div
-      style={{
-        maxWidth: 1200,
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 24,
-        paddingBottom: 60,
-      }}
-    >
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div className="max-w-300 mx-auto flex flex-col gap-24 pb-15 font-sans">
+      {/* ── Header ── */}
+      <div className="flex justify-between items-start">
         <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 13,
-              color: 'var(--sys-text-secondary)',
-              marginBottom: 8,
-              fontWeight: 500,
-              letterSpacing: '0.05em',
-              textTransform: 'uppercase',
-            }}
-          >
+          <div className="flex items-center gap-1.5 text-13 text-text-secondary mb-[8px] font-medium tracking-wider uppercase">
             <span>Financial Operations</span>
           </div>
-          <h1
-            style={{
-              fontSize: 28,
-              fontWeight: 800,
-              color: 'var(--sys-text-primary)',
-              letterSpacing: '-0.02em',
-              marginBottom: 8,
-            }}
-          >
+          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px]">
             P&L Deep-Dive
           </h1>
         </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div className="flex gap-12 items-center">
           <select
             value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value)}
+            className="px-4 py-[8px] pr-8 rounded-sm border border-border text-13 text-text-primary bg-surface outline-none cursor-pointer appearance-none"
             style={{
-              padding: '8px 32px 8px 16px',
-              borderRadius: 8,
-              border: '1px solid var(--sys-border)',
-              fontSize: 13,
-              color: 'var(--sys-text-primary)',
-              background: '#fff',
-              outline: 'none',
-              cursor: 'pointer',
-              appearance: 'none',
               backgroundImage:
                 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
               backgroundRepeat: 'no-repeat',
@@ -355,33 +196,14 @@ export default function PnLDeepDive() {
           <button
             onClick={handleExportCSV}
             disabled={isExporting}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 16px',
-              background: 'var(--sys-primary)',
-              border: 'none',
-              borderRadius: 8,
-              fontSize: 13,
-              fontWeight: 600,
-              color: '#fff',
-              cursor: isExporting ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
-              opacity: isExporting ? 0.7 : 1,
-            }}
-            onMouseEnter={(e) => {
-              if (!isExporting) e.currentTarget.style.opacity = '0.9';
-            }}
-            onMouseLeave={(e) => {
-              if (!isExporting) e.currentTarget.style.opacity = '1';
-            }}
+            className={cn(
+              'flex items-center gap-[8px] px-4 py-2.5 bg-primary border-none rounded-sm text-13 font-semibold text-white cursor-pointer transition-opacity duration-200 hover:opacity-90',
+              isExporting && 'opacity-70 cursor-not-allowed'
+            )}
           >
             {isExporting ? (
               <svg
-                style={{ animation: 'spin 1s linear infinite' }}
-                width="16"
-                height="16"
+                className="animate-spin w-16 h-16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -412,20 +234,17 @@ export default function PnLDeepDive() {
         </div>
       </div>
 
-      {/* ── Top KPI Cards ─────────────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto 1fr', gap: 20 }}>
+      {error && (
+        <div className="p-4 text-sm text-status-error bg-status-error-container rounded-sm border border-status-error/20">
+          {error} (Showing fallback data)
+        </div>
+      )}
+
+      {/* ── Top KPI Cards ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-20">
         {/* MRR */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid var(--sys-border)',
-            padding: '24px',
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          <div style={{ position: 'absolute', right: 24, top: 24, opacity: 0.1 }}>
+        <div className="bg-surface rounded-md border border-border p-24 relative overflow-hidden">
+          <div className="absolute right-24 top-24 opacity-10">
             <svg
               width="48"
               height="48"
@@ -439,46 +258,13 @@ export default function PnLDeepDive() {
               <path d="M6 12h.01M18 12h.01" />
             </svg>
           </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 11,
-              fontWeight: 700,
-              color: 'var(--sys-text-secondary)',
-              textTransform: 'uppercase',
-              marginBottom: 16,
-            }}
-          >
-            <span
-              style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--sys-primary)' }}
-            />
+          <div className="flex items-center gap-[8px] text-[11px] font-bold text-text-secondary uppercase mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             Monthly Recurring Revenue
           </div>
-          <div
-            style={{
-              fontSize: 32,
-              fontWeight: 800,
-              color: 'var(--sys-text-primary)',
-              marginBottom: 16,
-            }}
-          >
-            {data.mrr.value}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 4,
-                padding: '4px 8px',
-                background: '#d1fae5',
-                color: '#10b981',
-                borderRadius: 12,
-                fontWeight: 700,
-              }}
-            >
+          <div className="text-32 font-extrabold text-text-primary mb-4">{data.mrr.value}</div>
+          <div className="flex items-center gap-[8px] text-xs">
+            <span className="inline-flex items-center gap-[4px] px-[8px] py-[4px] bg-status-success-container text-status-success rounded-full font-bold">
               <svg
                 width="12"
                 height="12"
@@ -492,52 +278,17 @@ export default function PnLDeepDive() {
               </svg>
               {data.mrr.change}
             </span>
-            <span style={{ color: 'var(--sys-text-secondary)', fontWeight: 500 }}>
-              vs last month
-            </span>
+            <span className="text-text-secondary font-medium">vs last month</span>
           </div>
         </div>
 
         {/* AI Costs */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid var(--sys-border)',
-            padding: '24px',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: 'var(--sys-text-secondary)',
-              textTransform: 'uppercase',
-              marginBottom: 16,
-            }}
-          >
+        <div className="bg-surface rounded-md border border-border p-24">
+          <div className="text-[11px] font-bold text-text-secondary uppercase mb-4">
             AI Infrastructure Costs
           </div>
-          <div
-            style={{
-              fontSize: 32,
-              fontWeight: 800,
-              color: 'var(--sys-text-primary)',
-              marginBottom: 16,
-            }}
-          >
-            {data.aiCosts.value}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 12,
-              color: '#ef4444',
-              fontWeight: 600,
-            }}
-          >
+          <div className="text-32 font-extrabold text-text-primary mb-4">{data.aiCosts.value}</div>
+          <div className="flex items-center gap-[8px] text-xs text-status-error font-semibold">
             <svg
               width="14"
               height="14"
@@ -555,91 +306,29 @@ export default function PnLDeepDive() {
         </div>
 
         {/* Net Margin (Solid Green) */}
-        <div
-          style={{
-            background: 'var(--sys-primary)',
-            borderRadius: 12,
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            color: '#fff',
-            minWidth: 160,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              marginBottom: 12,
-              opacity: 0.9,
-              letterSpacing: '0.05em',
-            }}
-          >
+        <div className="bg-primary rounded-md p-24 flex flex-col justify-center text-white">
+          <div className="text-[11px] font-bold uppercase mb-12 opacity-90 tracking-wider">
             Net Margin
           </div>
-          <div style={{ fontSize: 32, fontWeight: 800 }}>{data.netMargin.value}</div>
+          <div className="text-32 font-extrabold">{data.netMargin.value}</div>
         </div>
 
         {/* CAC */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 12,
-            border: '1px solid var(--sys-border)',
-            padding: '24px',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: 'var(--sys-text-secondary)',
-              textTransform: 'uppercase',
-              marginBottom: 16,
-            }}
-          >
+        <div className="bg-surface rounded-md border border-border p-24">
+          <div className="text-[11px] font-bold text-text-secondary uppercase mb-4">
             Customer Acq. Cost
           </div>
-          <div
-            style={{
-              fontSize: 32,
-              fontWeight: 800,
-              color: 'var(--sys-text-primary)',
-              marginBottom: 16,
-            }}
-          >
-            {data.cac.value}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 13,
-              color: 'var(--sys-text-secondary)',
-            }}
-          >
+          <div className="text-32 font-extrabold text-text-primary mb-4">{data.cac.value}</div>
+          <div className="flex items-center gap-[8px] text-13 text-text-secondary">
             Target: {data.cac.target}
-            <div
-              style={{
-                width: 18,
-                height: 18,
-                borderRadius: '50%',
-                border: '1px solid #10b981',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: 'auto',
-              }}
-            >
+            <div className="w-4.5 h-4.5 rounded-full border border-status-success flex items-center justify-center ml-auto">
               <svg
                 width="10"
                 height="10"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#10b981"
+                stroke="currentColor"
+                className="text-status-success"
                 strokeWidth="3"
               >
                 <polyline points="20 6 9 17 4 12" />
@@ -649,128 +338,47 @@ export default function PnLDeepDive() {
         </div>
       </div>
 
-      {/* ── Chart ───────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          background: '#fff',
-          borderRadius: 12,
-          border: '1px solid var(--sys-border)',
-          padding: '32px',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            marginBottom: 32,
-          }}
-        >
+      {/* ── Chart ── */}
+      <div className="bg-surface rounded-md border border-border p-8">
+        <div className="flex justify-between items-start mb-8">
           <div>
-            <h2
-              style={{
-                fontSize: 18,
-                fontWeight: 700,
-                color: 'var(--sys-text-primary)',
-                marginBottom: 4,
-              }}
-            >
+            <h2 className="text-lg font-bold text-text-primary mb-[4px]">
               Revenue vs. Operational Costs
             </h2>
-            <p style={{ fontSize: 13, color: 'var(--sys-text-secondary)' }}>
-              12-Month Historical Trend Analysis
-            </p>
+            <p className="text-13 text-text-secondary">12-Month Historical Trend Analysis</p>
           </div>
-          <div style={{ display: 'flex', gap: 16 }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: 12,
-                fontWeight: 600,
-                color: 'var(--sys-text-secondary)',
-              }}
-            >
-              <span
-                style={{ width: 12, height: 12, borderRadius: 2, background: 'var(--sys-primary)' }}
-              />
+          <div className="flex gap-4">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
+              <span className="w-12 h-12 rounded-sm bg-primary" />
               Revenue
             </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: 12,
-                fontWeight: 600,
-                color: 'var(--sys-text-secondary)',
-              }}
-            >
-              <span style={{ width: 12, height: 12, borderRadius: 2, background: '#f59e0b' }} />
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
+              <span className="w-12 h-12 rounded-sm bg-[#f59e0b]" />
               Costs
             </div>
           </div>
         </div>
 
         {/* Custom SVG Line Chart */}
-        <div style={{ position: 'relative', height: 280, width: '100%' }}>
+        <div className="relative h-70 w-full">
           {/* Y-Axis Labels */}
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 30,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              color: 'var(--sys-text-secondary)',
-              fontSize: 11,
-              fontWeight: 500,
-              paddingRight: 16,
-              borderRight: '1px solid #f4f4f5',
-            }}
-          >
+          <div className="absolute left-0 top-0 bottom-7.5 flex flex-col justify-between text-text-secondary text-[11px] font-medium pr-4 border-r border-surface-variant">
             <span>$1.5M</span>
             <span>$1.0M</span>
             <span>$0.5M</span>
             <span>$0</span>
           </div>
 
-          <div style={{ marginLeft: 50, height: 250, position: 'relative' }}>
+          <div className="ml-12.5 h-62.5 relative">
             {/* Grid lines */}
-            <div
-              style={{ position: 'absolute', inset: 0, borderBottom: '1px solid #f4f4f5', top: 0 }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                borderBottom: '1px solid #f4f4f5',
-                top: '33.33%',
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                borderBottom: '1px solid #f4f4f5',
-                top: '66.66%',
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                borderBottom: '1px solid #f4f4f5',
-                top: '100%',
-              }}
-            />
+            <div className="absolute inset-0 border-b border-surface-variant top-0" />
+            <div className="absolute inset-0 border-b border-surface-variant top-[33.33%]" />
+            <div className="absolute inset-0 border-b border-surface-variant top-[66.66%]" />
+            <div className="absolute inset-0 border-b border-surface-variant top-full" />
 
             {/* SVG Chart */}
             <svg
-              style={{ width: '100%', height: '100%', overflow: 'visible' }}
+              className="w-full h-full overflow-visible"
               preserveAspectRatio="none"
               viewBox="0 0 900 250"
             >
@@ -813,17 +421,7 @@ export default function PnLDeepDive() {
           </div>
 
           {/* X-Axis Labels */}
-          <div
-            style={{
-              marginLeft: 50,
-              display: 'flex',
-              justifyContent: 'space-between',
-              paddingTop: 16,
-              color: 'var(--sys-text-secondary)',
-              fontSize: 11,
-              fontWeight: 500,
-            }}
-          >
+          <div className="ml-12.5 flex justify-between pt-4 text-text-secondary text-[11px] font-medium">
             {months.map((m) => (
               <span key={m}>{m}</span>
             ))}
@@ -831,40 +429,11 @@ export default function PnLDeepDive() {
         </div>
       </div>
 
-      {/* ── Table ───────────────────────────────────────────────────────── */}
-      <div
-        style={{
-          background: '#fff',
-          borderRadius: 12,
-          border: '1px solid var(--sys-border)',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            padding: '24px',
-            borderBottom: '1px solid var(--sys-border)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--sys-text-primary)' }}>
-            Infrastructure Billing Ledger
-          </h2>
-          <button
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--sys-text-secondary)',
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
+      {/* ── Table ── */}
+      <div className="bg-surface rounded-md border border-border overflow-hidden">
+        <div className="p-24 border-b border-border flex justify-between items-center">
+          <h2 className="text-lg font-bold text-text-primary">Infrastructure Billing Ledger</h2>
+          <button className="bg-transparent border-none text-text-secondary text-13 font-semibold cursor-pointer flex items-center gap-[4px] hover:text-text-primary transition-colors">
             View All
             <svg
               width="14"
@@ -881,340 +450,146 @@ export default function PnLDeepDive() {
           </button>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-            <tr style={{ background: '#fdf8f4', borderBottom: '1px solid var(--sys-border)' }}>
-              <th
-                style={{
-                  padding: '16px 24px',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: 'var(--sys-text-secondary)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Service Provider
-              </th>
-              <th
-                style={{
-                  padding: '16px 24px',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: 'var(--sys-text-secondary)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Category
-              </th>
-              <th
-                style={{
-                  padding: '16px 24px',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: 'var(--sys-text-secondary)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Usage / Volume
-              </th>
-              <th
-                style={{
-                  padding: '16px 24px',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: 'var(--sys-text-secondary)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Cost
-              </th>
-              <th
-                style={{
-                  padding: '16px 24px',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: 'var(--sys-text-secondary)',
-                  textTransform: 'uppercase',
-                }}
-              >
-                Status
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.billingLedger.map((row) => {
-              const statusStyle = statusStyles[row.status];
-              return (
-                <tr
-                  key={row.id}
-                  onClick={() => handleRowClick(row)}
-                  style={{
-                    borderBottom: '1px solid var(--sys-border)',
-                    transition: 'background 0.2s',
-                    cursor: 'pointer',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#fafafa')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
-                >
-                  <td
-                    style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 12 }}
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left min-w-175">
+            <thead>
+              <tr className="bg-surface-variant/30 border-b border-border">
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                  Service Provider
+                </th>
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                  Category
+                </th>
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                  Usage / Volume
+                </th>
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                  Cost
+                </th>
+                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.billingLedger.map((row) => {
+                const sStyle = statusStyles[row.status];
+                return (
+                  <tr
+                    key={row.id}
+                    onClick={() => handleRowClick(row)}
+                    className="border-b border-border cursor-pointer transition-colors hover:bg-surface-variant/50"
                   >
-                    {getProviderIcon(row.providerIcon)}
-                    <span
-                      style={{ fontSize: 14, fontWeight: 600, color: 'var(--sys-text-primary)' }}
-                    >
-                      {row.provider}
-                    </span>
-                  </td>
-                  <td
-                    style={{
-                      padding: '20px 24px',
-                      fontSize: 13,
-                      color: 'var(--sys-text-secondary)',
-                    }}
-                  >
-                    {row.category}
-                  </td>
-                  <td
-                    style={{
-                      padding: '20px 24px',
-                      fontSize: 13,
-                      color: 'var(--sys-text-secondary)',
-                    }}
-                  >
-                    {row.usage}
-                  </td>
-                  <td
-                    style={{
-                      padding: '20px 24px',
-                      fontSize: 14,
-                      fontWeight: 600,
-                      color: 'var(--sys-text-primary)',
-                    }}
-                  >
-                    {row.cost}
-                  </td>
-                  <td style={{ padding: '20px 24px' }}>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        padding: '4px 10px',
-                        background: statusStyle.bg,
-                        color: statusStyle.color,
-                        borderRadius: 16,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: '0.02em',
-                      }}
-                    >
-                      {row.status}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    <td className="px-24 py-20 flex items-center gap-12">
+                      {getProviderIcon(row.providerIcon)}
+                      <span className="text-sm font-semibold text-text-primary">
+                        {row.provider}
+                      </span>
+                    </td>
+                    <td className="px-24 py-20 text-13 text-text-secondary">{row.category}</td>
+                    <td className="px-24 py-20 text-13 text-text-secondary">{row.usage}</td>
+                    <td className="px-24 py-20 text-sm font-semibold text-text-primary">
+                      {row.cost}
+                    </td>
+                    <td className="px-24 py-20">
+                      <span
+                        className={cn(
+                          'inline-flex px-2.5 py-[4px] rounded-full text-[11px] font-bold tracking-wide',
+                          sStyle.bg,
+                          sStyle.text
+                        )}
+                      >
+                        {row.status}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* ── Invoice Modal ───────────────────────────────────────────────── */}
+      {/* ── Invoice Modal ── */}
       {selectedInvoice && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
+        <div className="fixed inset-0 z-1000 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'rgba(0,0,0,0.6)',
-              backdropFilter: 'blur(4px)',
-            }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setSelectedInvoice(null)}
           />
 
           {/* Modal Content */}
-          <div
-            className="print-modal"
-            style={{
-              position: 'relative',
-              background: '#fff',
-              borderRadius: 16,
-              width: '90%',
-              maxWidth: 500,
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              animation: 'slideUp 0.3s ease-out',
-              overflow: 'hidden',
-            }}
-          >
+          <div className="relative bg-surface rounded-lg w-full max-w-125 shadow-2xl animate-[slideUp_0.3s_ease-out] overflow-hidden">
             {/* Header */}
-            <div
-              style={{
-                padding: '24px 32px',
-                borderBottom: '1px dashed var(--sys-border)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                background: '#fdf8f4',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div className="p-24 sm:px-8 sm:py-24 border-b border-dashed border-border bg-surface-variant/30 flex justify-between items-start">
+              <div className="flex items-center gap-4">
                 {getProviderIcon(selectedInvoice.providerIcon)}
                 <div>
-                  <h2
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 800,
-                      color: 'var(--sys-text-primary)',
-                      marginBottom: 4,
-                    }}
-                  >
+                  <h2 className="text-xl font-extrabold text-text-primary mb-[4px]">
                     {selectedInvoice.provider}
                   </h2>
-                  <div
-                    style={{ fontSize: 13, color: 'var(--sys-text-secondary)', fontWeight: 500 }}
-                  >
+                  <div className="text-13 text-text-secondary font-medium">
                     Invoice #INV-{selectedInvoice.id}08492
                   </div>
                 </div>
               </div>
               <span
-                style={{
-                  display: 'inline-flex',
-                  padding: '6px 12px',
-                  background: statusStyles[selectedInvoice.status].bg,
-                  color: statusStyles[selectedInvoice.status].color,
-                  borderRadius: 16,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  letterSpacing: '0.02em',
-                }}
+                className={cn(
+                  'inline-flex px-12 py-1.5 rounded-full text-xs font-bold tracking-wide',
+                  statusStyles[selectedInvoice.status].bg,
+                  statusStyles[selectedInvoice.status].text
+                )}
               >
                 {selectedInvoice.status}
               </span>
             </div>
 
             {/* Body */}
-            <div style={{ padding: '32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
+            <div className="p-24 sm:p-8">
+              <div className="flex justify-between mb-24">
                 <div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: 'var(--sys-text-secondary)',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                      marginBottom: 4,
-                    }}
-                  >
+                  <div className="text-xs text-text-secondary font-semibold uppercase mb-[4px]">
                     Date of Issue
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--sys-text-primary)' }}>
-                    Oct 24, 2026
-                  </div>
+                  <div className="text-sm font-semibold text-text-primary">Oct 24, 2026</div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: 'var(--sys-text-secondary)',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                      marginBottom: 4,
-                    }}
-                  >
+                <div className="text-right">
+                  <div className="text-xs text-text-secondary font-semibold uppercase mb-[4px]">
                     Billing Period
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--sys-text-primary)' }}>
+                  <div className="text-sm font-semibold text-text-primary">
                     Sep 1 - Sep 30, 2026
                   </div>
                 </div>
               </div>
 
-              <div
-                style={{
-                  background: '#f8fafc',
-                  borderRadius: 8,
-                  padding: 20,
-                  marginBottom: 24,
-                  border: '1px solid var(--sys-border)',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    borderBottom: '1px solid #e2e8f0',
-                    paddingBottom: 12,
-                    marginBottom: 12,
-                  }}
-                >
-                  <span
-                    style={{ fontSize: 14, color: 'var(--sys-text-secondary)', fontWeight: 500 }}
-                  >
-                    Category
-                  </span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--sys-text-primary)' }}>
+              <div className="bg-surface-variant/30 rounded-md p-20 mb-24 border border-border">
+                <div className="flex justify-between border-b border-border pb-12 mb-12">
+                  <span className="text-sm text-text-secondary font-medium">Category</span>
+                  <span className="text-sm font-semibold text-text-primary">
                     {selectedInvoice.category}
                   </span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span
-                    style={{ fontSize: 14, color: 'var(--sys-text-secondary)', fontWeight: 500 }}
-                  >
-                    Usage / Volume
-                  </span>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--sys-text-primary)' }}>
+                <div className="flex justify-between">
+                  <span className="text-sm text-text-secondary font-medium">Usage / Volume</span>
+                  <span className="text-sm font-semibold text-text-primary">
                     {selectedInvoice.usage}
                   </span>
                 </div>
               </div>
 
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '16px 20px',
-                  background: 'var(--sys-text-primary)',
-                  color: '#fff',
-                  borderRadius: 8,
-                }}
-              >
-                <span style={{ fontSize: 14, fontWeight: 600 }}>Total Amount</span>
-                <span style={{ fontSize: 24, fontWeight: 800 }}>{selectedInvoice.cost}</span>
+              <div className="flex justify-between items-center px-20 py-4 bg-text-primary text-white rounded-md">
+                <span className="text-sm font-semibold">Total Amount</span>
+                <span className="text-2xl font-extrabold">{selectedInvoice.cost}</span>
               </div>
             </div>
 
             {/* Footer */}
-            <div
-              style={{
-                padding: '20px 32px',
-                borderTop: '1px solid var(--sys-border)',
-                display: 'flex',
-                justifyContent: 'flex-end',
-                background: '#fafafa',
-              }}
-            >
+            <div className="px-8 py-20 border-t border-border flex justify-end bg-surface-variant/20">
               <button
                 onClick={() => setSelectedInvoice(null)}
-                style={{
-                  padding: '10px 20px',
-                  background: '#fff',
-                  border: '1px solid var(--sys-border)',
-                  borderRadius: 8,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  color: 'var(--sys-text-primary)',
-                }}
+                className="px-20 py-2.5 bg-surface border border-border rounded-sm text-13 font-semibold cursor-pointer text-text-primary transition-colors hover:bg-surface-variant"
               >
                 Close
               </button>
@@ -1224,31 +599,12 @@ export default function PnLDeepDive() {
       )}
 
       {toastMessage && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 32,
-            right: 32,
-            background: '#111827',
-            color: '#fff',
-            padding: '12px 24px',
-            borderRadius: 8,
-            fontSize: 13,
-            fontWeight: 500,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            zIndex: 9999,
-            animation: 'slideUp 0.3s ease-out',
-          }}
-        >
+        <div className="fixed bottom-8 right-8 bg-gray-900 text-white px-24 py-12 rounded-sm text-13 font-medium shadow-lg flex items-center gap-[8px] z-9999 animate-[slideUp_0.3s_ease-out]">
           <svg
-            width="16"
-            height="16"
+            className="w-16 h-16 text-status-success"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#10b981"
+            stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -1259,17 +615,6 @@ export default function PnLDeepDive() {
           {toastMessage}
         </div>
       )}
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes slideUp {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }

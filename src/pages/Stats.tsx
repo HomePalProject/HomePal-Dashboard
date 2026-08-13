@@ -166,7 +166,6 @@ export default function Stats() {
           </div>
           <div className="flex-1 relative min-h-45 flex items-end gap-24 px-20 border-b border-border">
             {/* Background grid lines */}
-            <div className="absolute inset-0 border-t border-b border-[#f0f0f0] top-[4px]/3 h-[4px]/3" />
 
             {data.topSupermarketChains.map((chain, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-12 z-10">

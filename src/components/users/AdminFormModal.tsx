@@ -3,7 +3,7 @@ import { Modal } from '@components/ui/Modal';
 import { ModalActions } from '@components/ui/ModalActions';
 import { cn } from '@lib/utils';
 import type { CreateAdminRequest } from '@typeDefs/adminTypes';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 interface AdminFormModalProps {
   onSave: (data: CreateAdminRequest) => Promise<string | null>;
@@ -12,7 +12,6 @@ interface AdminFormModalProps {
 
 export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
   const [username, setUsername] = useState('');
-  const [role, setRole] = useState('Admin');
   const [password, setPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +53,7 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
   return (
     <Modal title="Create New Admin Account" onClose={onClose} isOpen={true} maxWidth="max-w-lg">
       <p className="text-sm text-text-secondary mb-20 -mt-4">
-        Assign credentials and role level for the new administrator.
+        Assign credentials for the new administrator.
       </p>
       <form onSubmit={handleSubmit}>
         <Field label="Admin Username" required>
@@ -66,16 +65,6 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
             className="w-full px-12 py-2.5 rounded-lg border border-border text-sm outline-none bg-surface text-text-primary focus:border-primary box-border"
             required
           />
-        </Field>
-
-        <Field label="Assign Role" required>
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className="w-full px-12 py-2.5 rounded-lg border border-border text-sm outline-none bg-surface text-text-primary focus:border-primary box-border appearance-none cursor-pointer"
-          >
-            <option value="Admin">Admin</option>
-          </select>
         </Field>
 
         <Field label="Initial Password" required>

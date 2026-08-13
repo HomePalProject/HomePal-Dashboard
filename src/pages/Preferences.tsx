@@ -358,6 +358,8 @@ export default function Preferences() {
       )}
       {deleteTarget && (
         <ConfirmDialog
+          title="Confirm Delete"
+          confirmLabel="Delete"
           message={
             deleteTarget.type === 'preference'
               ? `Are you sure you want to delete "${deleteTarget.item.name}"? This cannot be undone.`

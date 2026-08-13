@@ -306,7 +306,7 @@ export default function GeographicDemographics() {
           </div>
         </div>
 
-        <div className="flex items-end justify-between h-50 px-[8px] sm:sm:px-40 gap-[8px] sm:gap-20">
+        <div className="flex items-end justify-between h-50 px-[8px] sm:px-40 gap-[8px] sm:gap-20">
           {data.householdSize.map((item, i) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-4">
               <div

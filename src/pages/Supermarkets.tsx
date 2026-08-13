@@ -407,6 +407,8 @@ export default function Supermarkets() {
 
       {deleteTarget && (
         <ConfirmDialog
+          title="Confirm Delete"
+          confirmLabel="Delete"
           message={`Are you sure you want to delete ${deleteTarget.name}? This action cannot be undone.`}
           loading={deleting}
           onConfirm={handleDelete}

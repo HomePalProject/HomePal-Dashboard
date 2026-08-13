@@ -160,6 +160,8 @@ export default function UserManagement() {
 
       {deleteTarget && (
         <ConfirmDialog
+          title="Deactivate Admin Access"
+          confirmLabel="Deactivate"
           message={`Are you sure you want to deactivate access for @${deleteTarget.username || deleteTarget.fullName}?`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

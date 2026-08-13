@@ -1,3 +1,5 @@
 export PATH="/c/Program Files/nodejs:$PATH"
+export PATH="$APPDATA/nvm/current:$PATH"
+export PATH="$PROGRAMFILES/nodejs:$PATH"
 npx lint-staged
 node scripts/validate-branch-name.js

@@ -150,10 +150,10 @@ export default function Preferences() {
     : ['Category Name', 'Description', 'Actions'];
 
   return (
-    <div className="py-8 sm:px-40 max-w-275 mx-auto font-sans">
-      <div className="flex items-start justify-between mb-7">
+    <div className="w-full py-8 font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-7 gap-16">
         <div>
-          <h1 className="text-28 font-bold text-text-primary m-0">System Preferences</h1>
+          <h1 className="text-24 sm:text-28 font-bold text-text-primary m-0">System Preferences</h1>
           <p className="text-sm text-text-secondary mt-1.5 mb-0">
             Configure the intelligent logic and global categorizations for the HomePal ecosystem.
           </p>
@@ -246,7 +246,7 @@ export default function Preferences() {
         </div>
       )}
 
-      <div className="bg-surface rounded-xl border border-border overflow-hidden">
+      <div className="bg-surface rounded-xl border border-border overflow-x-auto">
         <div className={cn('grid px-20 py-12 border-b border-border bg-surface-variant', cols)}>
           {headers.map((h) => (
             <span

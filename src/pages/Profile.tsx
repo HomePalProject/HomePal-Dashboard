@@ -8,11 +8,11 @@ export default function Profile() {
   const [strictAuditLogs, setStrictAuditLogs] = useState(true);
 
   return (
-    <div className="max-w-275 mx-auto flex flex-col gap-7 font-sans">
+    <div className="w-full flex flex-col gap-7 font-sans">
       {/* ── Page Title & Action Header ── */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-32 font-extrabold text-[#2d2a26] tracking-tight m-0">
+          <h1 className="text-24 sm:text-32 font-extrabold text-[#2d2a26] tracking-tight m-0">
             Admin & System Settings
           </h1>
           <p className="text-sm text-[#7a7571] mt-1.5 mb-0">
@@ -140,20 +140,11 @@ export default function Profile() {
                   Log every admin action with IP address and username
                 </div>
               </div>
-              <button
-                onClick={() => setStrictAuditLogs((v) => !v)}
-                className={cn(
-                  'w-11h-24 rounded-full border-none cursor-pointer p-0.5',
-                  strictAuditLogs ? 'bg-[#2a4a3e]' : 'bg-[#d1d5db]'
-                )}
-              >
-                <span
-                  className={cn(
-                    'block w-20 h-20 rounded-full bg-white transition-transform duration-200',
-                    strictAuditLogs ? 'translate-x-20' : 'translate-x-0'
-                  )}
-                />
-              </button>
+              <Toggle
+                checked={strictAuditLogs}
+                onChange={setStrictAuditLogs}
+                title="Strict Security Audit Logs"
+              />
             </div>
           </div>
 

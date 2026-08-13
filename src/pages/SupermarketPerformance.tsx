@@ -90,9 +90,9 @@ export default function SupermarketPerformance() {
   }
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-24 pb-15 font-sans relative">
+    <div className="w-full flex flex-col gap-24 pb-15 font-sans relative">
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-16">
         <div>
           <div className="flex items-center gap-1.5 text-13 text-text-secondary mb-[8px] font-medium">
             <span>HomePal Admin</span>
@@ -110,7 +110,7 @@ export default function SupermarketPerformance() {
             </svg>
             <span className="text-text-primary">Analytics</span>
           </div>
-          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
+          <h1 className="text-22 sm:text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
             Supermarket Performance
           </h1>
           <p className="text-sm text-text-secondary max-w-150 m-0">
@@ -118,12 +118,12 @@ export default function SupermarketPerformance() {
             opportunities.
           </p>
         </div>
-        <div className="flex gap-12 mt-12">
+        <div className="flex gap-12 sm:mt-0 flex-wrap items-center">
           <button
             onClick={handleExportCSV}
             disabled={isExporting}
             className={cn(
-              'flex items-center gap-[8px] px-4 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold text-text-primary transition-all duration-200',
+              'flex items-center gap-[8px] px-16 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold text-text-primary transition-all duration-200 shrink-0 shadow-sm',
               isExporting
                 ? 'opacity-70 cursor-not-allowed'
                 : 'cursor-pointer hover:bg-surface-variant'
@@ -163,7 +163,7 @@ export default function SupermarketPerformance() {
           </button>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-[8px] px-4 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer transition-opacity duration-200 hover:opacity-90"
+            className="flex items-center gap-[8px] px-16 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer transition-opacity duration-200 hover:opacity-90 shrink-0 shadow-sm"
           >
             <svg
               width="16"

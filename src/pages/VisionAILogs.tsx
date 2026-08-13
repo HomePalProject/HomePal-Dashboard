@@ -142,8 +142,8 @@ export default function VisionAILogs() {
   );
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-24 pb-15 font-sans">
-      <div className="flex justify-between items-start flex-wrap gap-20">
+    <div className="w-full flex flex-col gap-24 pb-15 font-sans">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-20">
         <div>
           <div className="flex items-center gap-1.5 text-13 text-text-secondary mb-[8px] font-medium">
             <span>Settings</span>
@@ -161,7 +161,7 @@ export default function VisionAILogs() {
             </svg>
             <span className="text-text-primary">Vision AI Ingestion</span>
           </div>
-          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
+          <h1 className="text-22 sm:text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
             Ingestion Logs & Fallback
           </h1>
           <p className="text-sm text-text-secondary max-w-150 leading-relaxed m-0">
@@ -169,10 +169,10 @@ export default function VisionAILogs() {
             override schema mismatches to train the Vision AI models.
           </p>
         </div>
-        <div className="flex gap-12 mt-12 flex-wrap">
+        <div className="flex gap-12 sm:mt-0 flex-wrap items-center">
           <button
             onClick={handleExportCSV}
-            className="flex items-center gap-[8px] px-4 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold text-text-primary cursor-pointer transition-colors hover:bg-surface-variant shadow-sm"
+            className="flex items-center gap-[8px] px-16 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold text-text-primary cursor-pointer transition-colors hover:bg-surface-variant shadow-sm shrink-0"
           >
             <svg
               width="16"
@@ -194,7 +194,7 @@ export default function VisionAILogs() {
             onClick={handleSync}
             disabled={isSyncing}
             className={cn(
-              'flex items-center gap-[8px] px-4 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer relative shadow-sm transition-opacity',
+              'flex items-center gap-[8px] px-16 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer relative shadow-sm transition-opacity shrink-0',
               isSyncing ? 'opacity-80 cursor-not-allowed' : 'hover:opacity-90'
             )}
           >
@@ -485,8 +485,8 @@ export default function VisionAILogs() {
               onClick={handleRetrain}
               disabled={isRetraining}
               className={cn(
-                'w-full py-12 bg-white text-primary border-none rounded-lg text-13 font-bold cursor-pointer flex justify-center items-center gap-[8px] transition-colors',
-                isRetraining ? 'opacity-80 cursor-not-allowed' : 'hover:bg-green-50'
+                'w-full py-12 bg-white text-[#2a4a3e] border-none rounded-lg text-14 font-extrabold cursor-pointer flex justify-center items-center gap-[8px] transition-colors shadow-md',
+                isRetraining ? 'opacity-80 cursor-not-allowed' : 'hover:bg-emerald-50'
               )}
             >
               {isRetraining ? (

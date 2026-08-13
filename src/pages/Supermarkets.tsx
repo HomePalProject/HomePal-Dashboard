@@ -96,11 +96,11 @@ export default function Supermarkets() {
   };
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-8 font-sans pb-15">
+    <div className="w-full flex flex-col gap-8 font-sans pb-15 px-4 sm:px-0">
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex justify-between items-start flex-wrap gap-20">
         <div>
-          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
+          <h1 className="text-22 sm:text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
             Offers & Supermarkets Management
           </h1>
           <p className="text-sm text-text-secondary max-w-150 leading-relaxed m-0">

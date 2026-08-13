@@ -108,9 +108,9 @@ export default function Overview() {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_220px] gap-16 min-h-70">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_220px] gap-16 min-h-70">
         {/* Large household card */}
-        <div className="md:row-span-2">
+        <div className="sm:row-span-2">
           <MetricCard
             icon={HouseIcon}
             value={summaryData?.totalHouseholds.toLocaleString() ?? '—'}
@@ -122,7 +122,7 @@ export default function Overview() {
         </div>
 
         {/* Categories card */}
-        <div className="md:row-span-2">
+        <div className="sm:row-span-2">
           <MetricCard
             icon={TagIcon}
             value={categoriesCount}
@@ -132,7 +132,7 @@ export default function Overview() {
         </div>
 
         {/* System Health card */}
-        <div className="md:col-span-2 lg:col-span-1 lg:row-span-2">
+        <div className="sm:col-span-2 lg:col-span-1 lg:row-span-2">
           <SystemHealthCard delay={160} />
         </div>
       </div>
@@ -150,7 +150,7 @@ export default function Overview() {
             </div>
             <Link
               to="/dashboard/households"
-              className="text-12 font-bold tracking-[0.06em] uppercase text-primary bg-primary-container px-56 py-24 rounded-md no-underline hover:bg-primary-container/80 transition-colors"
+              className="text-12 font-bold tracking-[0.06em] uppercase text-primary bg-primary-container px-16 sm:px-56 py-24 rounded-md no-underline hover:bg-primary-container/80 transition-colors whitespace-nowrap"
             >
               Full Report
             </Link>

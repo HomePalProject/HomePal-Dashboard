@@ -84,22 +84,22 @@ export default function GeographicDemographics() {
   const cairoCenter: [number, number] = [30.02, 31.2];
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-24 pb-15">
-      <div className="flex justify-between items-start">
+    <div className="w-full flex flex-col gap-24 pb-15">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-16">
         <div>
-          <h1 className="text-typography-h2 text-text-primary tracking-tight mb-[8px]">
+          <h1 className="text-22 sm:text-[28px] text-text-primary tracking-tight mb-[8px]">
             Geographic Demographics
           </h1>
           <p className="text-typography-bodysmall text-text-secondary max-w-2xl">
             Comprehensive household data analysis across central districts.
           </p>
         </div>
-        <div className="flex gap-12 items-center">
+        <div className="flex gap-12 items-center flex-wrap">
           <button
             onClick={handleExportCSV}
             disabled={isExporting}
             className={cn(
-              'flex items-center gap-[8px] px-4 py-2.5 bg-surface border border-border rounded-sm text-13 font-semibold text-text-primary cursor-pointer transition-all duration-200 hover:bg-surface-variant',
+              'flex items-center gap-[8px] px-16 py-2.5 bg-surface border border-border rounded-lg text-13 font-semibold text-text-primary cursor-pointer transition-all duration-200 hover:bg-surface-variant shrink-0 shadow-sm',
               isExporting && 'opacity-70 cursor-not-allowed'
             )}
           >
@@ -123,7 +123,7 @@ export default function GeographicDemographics() {
             onClick={handleUpdateData}
             disabled={isUpdating}
             className={cn(
-              'flex items-center gap-[8px] px-4 py-2.5 bg-primary border-none rounded-sm text-13 font-semibold text-white cursor-pointer transition-all duration-200 hover:opacity-90',
+              'flex items-center gap-[8px] px-16 py-2.5 bg-primary border-none rounded-lg text-13 font-semibold text-white cursor-pointer transition-all duration-200 hover:opacity-90 shrink-0 shadow-sm',
               isUpdating && 'opacity-70 cursor-not-allowed'
             )}
           >
@@ -169,7 +169,7 @@ export default function GeographicDemographics() {
             </div>
           </div>
 
-          <div className="relative w-full h-112.5 rounded-sm overflow-hidden border border-border z-0">
+          <div className="relative w-full h-72 sm:h-112.5 rounded-sm overflow-hidden border border-border z-0">
             <div className="absolute left-4 bottom-24 bg-surface/90 px-4 py-12 rounded-sm shadow-md z-1000 backdrop-blur-sm">
               <div className="text-[11px] font-bold text-text-secondary mb-[8px] uppercase">
                 Density Intensity

@@ -22,9 +22,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isAuthEndpoint =
-      error.config?.url?.includes('/api/auth/login') ||
-      error.config?.url?.includes('/api/auth/register');
+    const url = String(error.config?.url ?? '').toLowerCase();
+    const isAuthEndpoint = url.includes('/api/auth/login') || url.includes('/api/auth/register');
     if (error.response?.status === 401 && !isAuthEndpoint) {
       useAuthStore.getState().logout();
     }

@@ -50,8 +50,8 @@ export function Modal({
         )}
       >
         {title && (
-          <div className="flex items-center justify-between px-24 py-20 border-b border-border shrink-0">
-            <h2 className="text-20 font-bold text-text-primary">{title}</h2>
+          <div className="flex items-center justify-between px-16 py-16 sm:px-24 sm:py-20 border-b border-border shrink-0">
+            <h2 className="text-16 sm:text-20 font-bold text-text-primary">{title}</h2>
             <button
               onClick={onClose}
               className="p-8 -mr-8 text-text-disabled hover:text-text-primary transition-colors rounded-full hover:bg-surface-variant"
@@ -72,7 +72,7 @@ export function Modal({
             </button>
           </div>
         )}
-        <div className="overflow-y-auto p-24">{children}</div>
+        <div className="overflow-y-auto p-16 sm:p-24">{children}</div>
       </div>
     </div>
   );

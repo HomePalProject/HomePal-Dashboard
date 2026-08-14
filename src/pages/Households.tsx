@@ -33,11 +33,11 @@ export default function Households() {
   }
 
   return (
-    <div className="max-w-250 mx-auto flex flex-col gap-24 pb-15 font-sans">
+    <div className="w-full flex flex-col gap-24 pb-15 font-sans">
       {/* ── Header ── */}
       <div>
-        <div className="flex items-center gap-[8px] mb-[8px]">
-          <h1 className="text-typography-h2 text-text-primary tracking-tight m-0">
+        <div className="flex items-center gap-[8px] mb-[8px] flex-wrap">
+          <h1 className="text-22 sm:text-28 font-extrabold text-text-primary tracking-tight m-0">
             Households Analytics
           </h1>
           <span className="bg-primary-container text-primary text-[11px] font-bold px-[8px] py-[4px] rounded-full uppercase tracking-wider">

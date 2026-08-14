@@ -23,7 +23,7 @@ export function AuthHeader({ title, subtitle }: AuthHeaderProps) {
         </div>
       </div>
 
-      <h2 className="text-typography-h2 text-text-primary mb-1,5">{title}</h2>
+      <h2 className="text-typography-h2 text-text-primary mb-1.5">{title}</h2>
       <p className="text-typography-body text-text-secondary">{subtitle}</p>
     </div>
   );

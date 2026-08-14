@@ -103,9 +103,9 @@ export default function UserManagement() {
 
   return (
     <div className="flex flex-col gap-24">
-      <div className="flex flex-wrap items-start justify-between gap-16">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-16">
         <div>
-          <h1 className="text-32 font-extrabold text-text-primary tracking-tight m-0">
+          <h1 className="text-24 sm:text-32 font-extrabold text-text-primary tracking-tight m-0">
             User Management
           </h1>
           <p className="text-sm text-text-secondary mt-4 mb-0">
@@ -160,6 +160,8 @@ export default function UserManagement() {
 
       {deleteTarget && (
         <ConfirmDialog
+          title="Deactivate Admin Access"
+          confirmLabel="Deactivate"
           message={`Are you sure you want to deactivate access for @${deleteTarget.username || deleteTarget.fullName}?`}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

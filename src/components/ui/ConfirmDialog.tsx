@@ -2,18 +2,22 @@ import { cn } from '@lib/utils';
 import { Modal } from './Modal';
 
 export function ConfirmDialog({
+  title = 'Confirm Action',
   message,
+  confirmLabel = 'Confirm',
   onConfirm,
   onCancel,
   loading,
 }: {
+  title?: string;
   message: string;
+  confirmLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
   loading: boolean;
 }) {
   return (
-    <Modal title="Confirm Delete" onClose={onCancel} isOpen={true}>
+    <Modal title={title} onClose={onCancel} isOpen={true}>
       <p className="text-text-secondary text-sm mb-24 m-0">{message}</p>
       <div className="flex justify-end gap-12">
         <button
@@ -30,7 +34,7 @@ export function ConfirmDialog({
             loading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:opacity-90'
           )}
         >
-          {loading ? 'Deleting…' : 'Delete'}
+          {loading ? 'Processing…' : confirmLabel}
         </button>
       </div>
     </Modal>

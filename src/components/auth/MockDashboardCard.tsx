@@ -29,7 +29,7 @@ export function MockDashboardCard() {
 
       <div className="mt-4 pt-4 border-t border-border/20 flex gap-[8px]">
         <div className="h-2.5 w-full rounded-full bg-primary-container/40 animate-pulse"></div>
-        <div className="h-2.5 w-[12px]/4 rounded-full bg-surface-variant animate-pulse"></div>
+        <div className="h-2.5 w-1/2 rounded-full bg-surface-variant animate-pulse"></div>
       </div>
     </div>
   );

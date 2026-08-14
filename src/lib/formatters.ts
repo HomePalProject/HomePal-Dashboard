@@ -1,4 +1,4 @@
-export function getLocalString(val: any): string {
+export function getLocalString(val: unknown): string {
   if (!val) return '—';
   if (typeof val === 'string') return val;
   if (Array.isArray(val) && val.length > 0) return val[0].value || '—';

@@ -41,11 +41,11 @@ export default function Stats() {
   const manualDeg = (data.visionHealth.manualFallbackPercentage / visionTotal) * 360;
 
   return (
-    <div className="max-w-300 mx-auto flex flex-col gap-24 font-sans">
+    <div className="w-full flex flex-col gap-24 font-sans">
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-16">
         <div>
-          <h1 className="text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
+          <h1 className="text-24 sm:text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
             Analytics Overview
           </h1>
           <p className="text-sm text-text-secondary max-w-150 m-0">
@@ -166,7 +166,6 @@ export default function Stats() {
           </div>
           <div className="flex-1 relative min-h-45 flex items-end gap-24 px-20 border-b border-border">
             {/* Background grid lines */}
-            <div className="absolute inset-0 border-t border-b border-[#f0f0f0] top-[4px]/3 h-[4px]/3" />
 
             {data.topSupermarketChains.map((chain, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-12 z-10">

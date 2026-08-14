@@ -19,6 +19,7 @@ const UserManagement = lazy(() => import('./pages/UserManagement'));
 const ScrapingPipeline = lazy(() => import('./pages/ScrapingPipeline'));
 const ProductCategories = lazy(() => import('./pages/ProductCategories'));
 const OffersHub = lazy(() => import('./pages/OffersHub'));
+const MeasuringUnits = lazy(() => import('./pages/MeasuringUnits'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -62,6 +63,7 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="scraping-pipeline" element={<ScrapingPipeline />} />
+            <Route path="measuring-units" element={<MeasuringUnits />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />

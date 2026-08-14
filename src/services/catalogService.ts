@@ -57,7 +57,7 @@ export const catalogService = {
     pageSize?: number;
   }): Promise<Offer[]> => {
     const response = await api.get('/api/offers', {
-      params: { onlyVerified: false, pageSize: 100, ...params },
+      params: { onlyVerified: false, pageSize: 1000, ...params },
     });
     const data = response.data?.data;
     // Handle paginated response: { data: { items: [...] } }

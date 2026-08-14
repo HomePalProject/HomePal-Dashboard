@@ -1,12 +1,40 @@
 export function getLocalString(val: unknown): string {
   if (!val) return '—';
   if (typeof val === 'string') return val;
-  if (Array.isArray(val) && val.length > 0) return val[0].value || '—';
+  if (Array.isArray(val) && val.length > 0) {
+    const item = val[0];
+    if (typeof item === 'string') return item;
+    if (typeof item === 'object' && item !== null) {
+      if ('value' in item && typeof (item as any).value === 'string')
+        return (item as any).value || '—';
+      if ('name' in item && typeof (item as any).name === 'string')
+        return (item as any).name || '—';
+      if ('title' in item && typeof (item as any).title === 'string')
+        return (item as any).title || '—';
+    }
+    return '—';
+  }
+  if (typeof val === 'object' && val !== null) {
+    if ('value' in val && typeof (val as any).value === 'string') return (val as any).value;
+    if ('name' in val && typeof (val as any).name === 'string') return (val as any).name;
+    if ('title' in val && typeof (val as any).title === 'string') return (val as any).title;
+    if ('en' in val && typeof (val as any).en === 'string') return (val as any).en;
+  }
   return '—';
 }
 
 export function toLocalized(str: string) {
-  return [{ languageCode: 'en', value: str.trim() }];
+  return [{ culture: 'en-US', languageCode: 'en-US', value: str.trim() }];
+}
+
+export function getImageUrl(path?: string | null): string | null {
+  if (!path) return null;
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://homepal.runasp.net';
+  return `${baseUrl}${cleanPath}`;
 }
 
 export function getCategoryColor(name: string): { bg: string; text: string } {
@@ -27,4 +55,19 @@ export function getHour(): 'morning' | 'afternoon' | 'evening' {
   if (h < 12) return 'morning';
   if (h < 18) return 'afternoon';
   return 'evening';
+}
+
+export function getLocalizedCulture(val: unknown, lang: 'en' | 'ar'): string {
+  if (!val) return '';
+  if (typeof val === 'string') return lang === 'en' ? val : '';
+  if (Array.isArray(val)) {
+    const match = val.find((item: any) => {
+      const code = (item.culture || item.languageCode || '').toLowerCase();
+      return code.includes(lang);
+    });
+    if (match) return match.value || '';
+    if (lang === 'en' && val.length > 0) return val[0]?.value || '';
+    if (lang === 'ar' && val.length > 1) return val[1]?.value || '';
+  }
+  return '';
 }

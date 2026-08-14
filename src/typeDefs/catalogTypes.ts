@@ -1,20 +1,37 @@
-// Localized text can be a plain string or an array of language-specific values.
-// This matches the backend response shape consumed by `getLocalString`.
-export type LocalizedValue = string | Array<{ languageCode: string; value: string }>;
+export type LocalizedValue =
+  string | Array<{ languageCode?: string; culture?: string; value: string }>;
 
 export interface Supermarket {
   id: string;
   name: LocalizedValue;
   branches?: number;
+  logoPath?: string | null;
+  address?: string | null;
+  websiteUrl?: string | null;
 }
 
 export interface Offer {
   id: string;
-  title: LocalizedValue;
-  supermarketId?: string;
-  supermarketName?: string;
-  categoryName?: string;
-  categoryId?: string;
-  price?: number;
-  status?: string;
+  name?: LocalizedValue;
+  title?: LocalizedValue;
+  description?: string | LocalizedValue | null;
+  quantity?: number;
+  unitId?: string;
+  unitName?: string | null;
+  unitSymbol?: string | null;
+  originalPrice?: number | null;
+  discountedPrice?: number | null;
+  price?: number | null;
+  validFrom?: string | null;
+  validTo?: string | null;
+  categoryId?: string | null;
+  categoryName?: string | null;
+  imagePath?: string | null;
+  supermarketId?: string | null;
+  supermarketName?: string | null;
+  supermarketLogoPath?: string | null;
+  supermarketWebsiteUrl?: string | null;
+  isVerified?: boolean;
+  createdAt?: string | null;
+  status?: string | null;
 }

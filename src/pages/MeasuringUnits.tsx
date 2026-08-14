@@ -308,7 +308,7 @@ export default function MeasuringUnits() {
           {/* Add Unit Button */}
           <button
             onClick={handleOpenAddModal}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs hover:shadow-md shrink-0 border-none"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs hover:shadow-md shrink-0 border-none"
           >
             <svg
               width="15"
@@ -321,7 +321,7 @@ export default function MeasuringUnits() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            <span>+ Add Measuring Unit</span>
+            <span>Add Measuring Unit</span>
           </button>
         </div>
       </div>

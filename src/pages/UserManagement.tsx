@@ -114,7 +114,7 @@ export default function UserManagement() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-8 bg-primary text-white text-sm font-bold px-20 py-2.5 rounded-lg border-none cursor-pointer shadow-[0_4px_14px_rgba(42,74,62,0.25)] hover:opacity-90 transition-opacity"
+          className="flex items-center justify-center gap-2 bg-primary text-white text-sm font-bold px-6 py-2.5 rounded-lg border-none cursor-pointer shadow-[0_4px_14px_rgba(42,74,62,0.25)] hover:opacity-90 transition-opacity"
         >
           <svg
             width="16"

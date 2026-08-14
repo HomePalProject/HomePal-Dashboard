@@ -422,7 +422,7 @@ export default function OffersHub() {
         {/* Top Header Actions */}
         <div className="flex items-center gap-3 flex-wrap">
           {/* Search Input */}
-          <div className="relative min-w-[220px]">
+          <div className="relative w-full sm:w-auto sm:min-w-55">
             <svg
               width="15"
               height="15"
@@ -447,7 +447,7 @@ export default function OffersHub() {
           {/* Add Offer Button */}
           <button
             onClick={() => handleOpenModal()}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] active:scale-[0.98] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-sm hover:shadow-md shrink-0 border-none"
+            className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-5 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] active:scale-[0.98] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-sm hover:shadow-md shrink-0 border-none"
           >
             <svg
               width="16"
@@ -536,18 +536,18 @@ export default function OffersHub() {
         </div>
 
         {/* ── Sub-Filters & Sorting Toolbar ── */}
-        <div className="px-6 py-3.5 bg-white border-b border-slate-200 flex flex-wrap items-center gap-4">
+        <div className="px-6 py-3.5 bg-white border-b border-slate-200 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4">
           {/* Supermarket Dropdown Filter */}
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs">
             <span className="font-semibold text-slate-500">Supermarket:</span>
-            <div className="relative inline-flex items-center">
+            <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={selectedSupermarketFilter}
                 onChange={(e) => {
                   setSelectedSupermarketFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
+                className="w-full sm:w-auto appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
               >
                 <option value="all">All Supermarkets ({supermarkets.length})</option>
                 {supermarkets.map((m) => (
@@ -571,16 +571,16 @@ export default function OffersHub() {
           </div>
 
           {/* Category Dropdown Filter */}
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs">
             <span className="font-semibold text-slate-500">Category:</span>
-            <div className="relative inline-flex items-center">
+            <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={selectedCategoryFilter}
                 onChange={(e) => {
                   setSelectedCategoryFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
+                className="w-full sm:w-auto appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
               >
                 <option value="all">All Categories ({categories.length})</option>
                 {categories.map((c) => (
@@ -604,13 +604,13 @@ export default function OffersHub() {
           </div>
 
           {/* Sort By Dropdown */}
-          <div className="flex items-center gap-2 text-xs sm:ml-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs sm:ml-auto">
             <span className="font-semibold text-slate-500">Sort by:</span>
-            <div className="relative inline-flex items-center">
+            <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
+                className="w-full sm:w-auto appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
               >
                 <option value="newest">Newest Ingested</option>
                 <option value="oldest">Oldest First</option>

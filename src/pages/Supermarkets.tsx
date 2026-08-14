@@ -152,15 +152,15 @@ export default function Supermarkets() {
         </div>
 
         {/* Header Right Actions */}
-        <div className="flex items-center gap-3 flex-wrap shrink-0">
-          <div className="flex items-center gap-2 px-3.5 py-2 bg-[#EFECE6] border border-[#E2DDD3] rounded-xl text-xs font-bold text-[#2C4A3E]">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+          <div className="flex items-center justify-center gap-2 px-3.5 py-2 bg-[#EFECE6] border border-[#E2DDD3] rounded-xl text-xs font-bold text-[#2C4A3E]">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span>Live Sync Active</span>
           </div>
 
           <button
             onClick={() => setMarketModal({ open: true })}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] text-white border-none rounded-xl text-xs font-bold cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] shrink-0"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] text-white border-none rounded-xl text-xs font-bold cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] shrink-0"
           >
             <svg
               width="16"

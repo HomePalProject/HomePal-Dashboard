@@ -69,7 +69,7 @@ export default function ForgotPassword() {
             className="text-14 font-medium text-primary hover:text-primary-active transition-colors inline-flex items-center gap-1.5"
           >
             <svg
-              className="w-4 h-4"
+              className="w-16 h-16"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

@@ -236,7 +236,7 @@ export default function ProductCategories() {
         {/* Top Header Actions */}
         <div className="flex items-center gap-3 flex-wrap">
           {/* Search Input */}
-          <div className="relative min-w-[220px]">
+          <div className="relative w-full sm:w-auto sm:min-w-[220px]">
             <svg
               width="15"
               height="15"
@@ -315,7 +315,7 @@ export default function ProductCategories() {
           {/* Add Category Button */}
           <button
             onClick={() => handleOpenModal()}
-            className="flex items-center gap-2 px-4 py-2.5 bg-[#1F3D32] hover:bg-[#162D25] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-xs shrink-0 border-none"
+            className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-2.5 bg-[#1F3D32] hover:bg-[#162D25] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-xs shrink-0 border-none"
           >
             <svg
               width="15"
@@ -376,21 +376,42 @@ export default function ProductCategories() {
             return (
               <div
                 key={cat.id}
-                className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col group"
+                className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group border border-slate-100 hover:border-[#1F3D32]/20 relative hover:-translate-y-1"
               >
                 {/* Image Cover Container */}
-                <div className="relative w-full h-36 bg-slate-100 overflow-hidden flex items-center justify-center border-b border-slate-100">
+                <div className="relative w-full aspect-[4/3] bg-slate-50 overflow-hidden">
                   {imgUrl ? (
-                    <img
-                      src={imgUrl}
-                      alt={en}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
+                    <>
+                      <img
+                        src={imgUrl}
+                        alt={en}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out relative z-10"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          e.currentTarget.nextElementSibling?.classList.add('flex');
+                        }}
+                      />
+                      <div className="hidden flex-col items-center justify-center h-full w-full gap-2 text-slate-300 bg-gradient-to-br from-slate-50 to-slate-100 absolute inset-0 z-0">
+                        <svg
+                          width="40"
+                          height="40"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                        >
+                          <rect x="3" y="3" width="18" height="18" rx="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <polyline points="21 15 16 10 5 21" />
+                        </svg>
+                      </div>
+                    </>
                   ) : (
-                    <div className="flex flex-col items-center gap-2 text-slate-300">
+                    <div className="flex flex-col items-center justify-center h-full w-full gap-2 text-slate-300 bg-gradient-to-br from-slate-50 to-slate-100 absolute inset-0 z-0">
                       <svg
-                        width="32"
-                        height="32"
+                        width="40"
+                        height="40"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -403,21 +424,30 @@ export default function ProductCategories() {
                     </div>
                   )}
 
+                  {/* Gradient Overlay for better contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
                   {/* Items Count Badge */}
-                  <span className="absolute top-3 right-3 px-2.5 py-1 bg-white/90 backdrop-blur-xs border border-slate-200/80 rounded-lg text-[11px] font-extrabold text-slate-800 shadow-xs">
-                    {count} Items
-                  </span>
+                  <div className="absolute top-3 right-3 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm border border-white/50 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1F3D32]" />
+                    <span className="text-[11px] font-extrabold text-slate-800 tracking-wide uppercase">
+                      {count} Items
+                    </span>
+                  </div>
                 </div>
 
                 {/* Card Body */}
-                <div className="p-4 flex-1 flex flex-col justify-between gap-3">
+                <div className="p-5 flex-1 flex flex-col justify-between gap-4 relative bg-white">
                   <div>
-                    <h3 className="text-sm font-extrabold text-slate-900 m-0 truncate" title={en}>
+                    <h3
+                      className="text-[15px] font-black text-slate-900 m-0 truncate group-hover:text-[#1F3D32] transition-colors"
+                      title={en}
+                    >
                       {en || 'Untitled Category'}
                     </h3>
                     {ar && (
                       <p
-                        className="text-xs font-semibold text-slate-500 m-0 mt-1 text-right font-arabic"
+                        className="text-[13px] font-bold text-slate-400 m-0 mt-1 text-right font-arabic"
                         dir="rtl"
                       >
                         {ar}
@@ -426,11 +456,11 @@ export default function ProductCategories() {
                   </div>
 
                   {/* Card Action Bar */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                  <div className="flex items-center justify-between gap-2 pt-4 mt-auto border-t border-slate-50">
                     <button
                       onClick={() => handleOpenModal(cat)}
                       title="Edit Category"
-                      className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors border-none bg-transparent cursor-pointer"
+                      className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 text-slate-500 hover:text-[#1F3D32] hover:bg-[#1F3D32]/10 transition-colors border-none cursor-pointer"
                     >
                       <svg
                         width="15"
@@ -438,7 +468,7 @@ export default function ProductCategories() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="2.2"
                       >
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
@@ -448,7 +478,7 @@ export default function ProductCategories() {
                     <button
                       onClick={() => handleTriggerUpload(cat.id)}
                       title="Upload Cover Image"
-                      className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors border-none bg-transparent cursor-pointer"
+                      className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors border-none cursor-pointer"
                     >
                       <svg
                         width="15"
@@ -456,7 +486,7 @@ export default function ProductCategories() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="2.2"
                       >
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                         <polyline points="17 8 12 3 7 8" />
@@ -467,7 +497,7 @@ export default function ProductCategories() {
                     <button
                       onClick={() => setDeleteTarget(cat)}
                       title="Delete Category"
-                      className="p-2 rounded-xl text-red-600 hover:bg-red-50 transition-colors border-none bg-transparent cursor-pointer"
+                      className="flex items-center justify-center w-9 h-9 rounded-full bg-red-50 text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors border-none cursor-pointer ml-auto"
                     >
                       <svg
                         width="15"
@@ -475,7 +505,7 @@ export default function ProductCategories() {
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="2.2"
                       >
                         <polyline points="3 6 5 6 21 6" />
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
@@ -513,13 +543,23 @@ export default function ProductCategories() {
                     <tr key={cat.id} className="hover:bg-slate-50/60 transition-colors">
                       <td className="px-4 py-3">
                         {imgUrl ? (
-                          <img
-                            src={imgUrl}
-                            alt={en}
-                            className="w-10 h-10 rounded-lg object-cover bg-slate-100 border border-slate-200"
-                          />
+                          <>
+                            <img
+                              src={imgUrl}
+                              alt={en}
+                              className="w-10 h-10 rounded-lg object-cover bg-slate-100 border border-slate-200"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                e.currentTarget.nextElementSibling?.classList.add('flex');
+                              }}
+                            />
+                            <div className="hidden w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 items-center justify-center text-slate-400 font-bold text-xs">
+                              {en ? en.charAt(0).toUpperCase() : 'C'}
+                            </div>
+                          </>
                         ) : (
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs">
+                          <div className="flex w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 items-center justify-center text-slate-400 font-bold text-xs">
                             {en ? en.charAt(0).toUpperCase() : 'C'}
                           </div>
                         )}

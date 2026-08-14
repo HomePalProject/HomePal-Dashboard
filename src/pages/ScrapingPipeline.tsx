@@ -233,21 +233,45 @@ export default function ScrapingPipeline() {
   };
 
   const [totalCatalogOffersCount, setTotalCatalogOffersCount] = useState<number>(0);
+  const [catalogOffers, setCatalogOffers] = useState<Offer[]>([]);
 
   const fetchInitialData = useCallback(async () => {
     try {
       const [marketsRes, statusRes, offersRes] = await Promise.all([
         catalogService.getSupermarkets().catch(() => []),
         scraperService.getJobStatus().catch(() => null),
-        catalogService.getOffers({ onlyVerified: false }).catch(() => []),
+        catalogService.getOffers({ onlyVerified: false, pageSize: 1000 }).catch(() => []),
       ]);
 
       const marketsList = Array.isArray(marketsRes) ? marketsRes : [];
       setSupermarkets(marketsList);
 
-      if (Array.isArray(offersRes)) {
-        setTotalCatalogOffersCount(offersRes.length);
+      // Combine backend offers with recent session scraped offers for 100% consistency across pages
+      const sessionScrapedRaw = sessionStorage.getItem('homepal_recent_scraped_offers');
+      let scrapedSessionOffers: Offer[] = [];
+      if (sessionScrapedRaw) {
+        try {
+          scrapedSessionOffers = JSON.parse(sessionScrapedRaw);
+        } catch (e) {
+          console.error('Failed to parse session scraped offers', e);
+        }
       }
+
+      const rawOffersList = Array.isArray(offersRes) ? offersRes : [];
+      const combined = [...scrapedSessionOffers, ...rawOffersList];
+
+      const seen = new Set<string>();
+      const deduplicated = combined.filter((o) => {
+        const key =
+          o.id ||
+          `${getLocalString(o.name || o.title)}_${o.discountedPrice || o.price}_${o.supermarketId || o.supermarketName}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      setCatalogOffers(deduplicated);
+      setTotalCatalogOffersCount(deduplicated.length);
 
       if (marketsList.length > 0) {
         const first = marketsList[0];
@@ -264,6 +288,32 @@ export default function ScrapingPipeline() {
       console.error('Failed to load initial data:', err);
     }
   }, []);
+
+  // Desk View Metrics & Ingestion Timeline
+  const needsReviewCount = catalogOffers.filter(
+    (o) => !o.isVerified || o.status === 'Flagged'
+  ).length;
+  const activePipelinesCount = supermarkets.length;
+
+  const ingestionDays = Array.from({ length: 5 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dayLabel =
+      i === 0
+        ? 'Today'
+        : i === 1
+          ? 'Yesterday'
+          : d.toLocaleDateString('en-US', { weekday: 'short' });
+
+    const count = catalogOffers.filter((o) => {
+      if (!o.createdAt) return i === 0;
+      return new Date(o.createdAt).toDateString() === d.toDateString();
+    }).length;
+
+    return { label: dayLabel, count, isToday: i === 0, dateStr: d.toLocaleDateString() };
+  });
+
+  const maxIngestionCount = Math.max(...ingestionDays.map((d) => d.count), 1);
 
   useEffect(() => {
     void fetchInitialData();
@@ -1176,6 +1226,89 @@ export default function ScrapingPipeline() {
               <div className="flex justify-between py-1">
                 <span className="text-slate-500">Total Scraped Offers:</span>
                 <span className="font-bold text-slate-900">{totalParsedCount}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Widget 2: Desk View Metrics & Daily Ingestion Rate */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col gap-5">
+            <h3 className="text-sm font-extrabold text-slate-900 m-0">Desk View</h3>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div
+                onClick={() => navigate('/dashboard/offers')}
+                className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col cursor-pointer hover:bg-slate-100/80 transition-colors"
+                title="Click to view and verify unverified offers in Offers Hub"
+              >
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                  NEEDS REVIEW
+                </span>
+                <span className="text-2xl font-black text-slate-900 mt-1">{needsReviewCount}</span>
+                <span className="text-[10px] text-amber-700 font-semibold mt-0.5">
+                  Unverified Offers
+                </span>
+              </div>
+
+              <div
+                onClick={() => navigate('/dashboard/supermarkets')}
+                className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col cursor-pointer hover:bg-slate-100/80 transition-colors"
+                title="Click to manage supermarket chains"
+              >
+                <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                  ACTIVE PIPELINES
+                </span>
+                <span className="text-2xl font-black text-[#1F3D32] mt-1">
+                  {activePipelinesCount}
+                </span>
+                <span className="text-[10px] text-emerald-800 font-semibold mt-0.5">
+                  Supermarket Chains
+                </span>
+              </div>
+            </div>
+
+            {/* Daily Scraped Offers Ingestion Bar Chart Widget */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
+                    DAILY INGESTION RATE
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    Scraped & Synced Offers
+                  </span>
+                </div>
+                <span className="text-xs font-black text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-md">
+                  {catalogOffers.length} Total Offers
+                </span>
+              </div>
+              <div className="flex items-end justify-between h-14 gap-1.5 pt-3">
+                {ingestionDays.map((d) => {
+                  const heightPercent = Math.max(
+                    15,
+                    Math.round((d.count / maxIngestionCount) * 100)
+                  );
+                  return (
+                    <div
+                      key={d.label + d.dateStr}
+                      className={cn(
+                        'w-full rounded-xs transition-all',
+                        d.isToday ? 'bg-[#1F3D32]' : 'bg-slate-200 hover:bg-slate-300'
+                      )}
+                      style={{ height: `${heightPercent}%` }}
+                      title={`${d.label} (${d.dateStr}): ${d.count} offers`}
+                    />
+                  );
+                })}
+              </div>
+              <div className="flex justify-between text-[9px] text-slate-400 font-bold px-0.5">
+                {ingestionDays.map((d) => (
+                  <span
+                    key={d.label + d.dateStr}
+                    className={cn(d.isToday && 'text-[#1F3D32] font-black')}
+                  >
+                    {d.label}
+                  </span>
+                ))}
               </div>
             </div>
           </div>

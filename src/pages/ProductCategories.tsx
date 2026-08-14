@@ -150,7 +150,14 @@ export default function ProductCategories() {
       setDeleteTarget(null);
       void fetchCategories();
     } catch (err: any) {
-      showToast(`Delete failed: ${getErrorMessage(err)}`);
+      const status = err?.response?.status;
+      if (status === 500) {
+        showToast(
+          'Cannot delete category: It is currently linked to active products or offers in the database.'
+        );
+      } else {
+        showToast(`Delete failed: ${getErrorMessage(err)}`);
+      }
     } finally {
       setDeleting(false);
     }

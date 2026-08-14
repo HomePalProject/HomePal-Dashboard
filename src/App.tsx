@@ -16,6 +16,9 @@ const SupermarketPerformance = lazy(() => import('./pages/SupermarketPerformance
 const PnLDeepDive = lazy(() => import('./pages/PnLDeepDive'));
 const GeographicDemographics = lazy(() => import('./pages/GeographicDemographics'));
 const UserManagement = lazy(() => import('./pages/UserManagement'));
+const ScrapingPipeline = lazy(() => import('./pages/ScrapingPipeline'));
+const ProductCategories = lazy(() => import('./pages/ProductCategories'));
+const OffersHub = lazy(() => import('./pages/OffersHub'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -47,8 +50,10 @@ function App() {
           >
             <Route index element={<Overview />} />
             <Route path="preferences" element={<Preferences />} />
+            <Route path="categories" element={<ProductCategories />} />
             <Route path="households" element={<Households />} />
             <Route path="supermarkets" element={<Supermarkets />} />
+            <Route path="offers" element={<OffersHub />} />
             <Route path="stats" element={<Stats />} />
             <Route path="vision-ai-logs" element={<VisionAILogs />} />
             <Route path="supermarket-performance" element={<SupermarketPerformance />} />
@@ -56,6 +61,7 @@ function App() {
             <Route path="geographic-demographics" element={<GeographicDemographics />} />
             <Route path="profile" element={<Profile />} />
             <Route path="users" element={<UserManagement />} />
+            <Route path="scraping-pipeline" element={<ScrapingPipeline />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />

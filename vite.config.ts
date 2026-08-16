@@ -20,6 +20,7 @@ export default defineConfig({
       '@store': path.resolve(__dirname, './src/store'),
       '@styles': path.resolve(__dirname, './src/styles'),
       '@typeDefs': path.resolve(__dirname, './src/typeDefs'),
+      '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
 });

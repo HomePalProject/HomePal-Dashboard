@@ -15,7 +15,6 @@ export default function ProductCategories() {
     setViewMode,
     filtered,
     modalState,
-    setModalState,
     deleteTarget,
     setDeleteTarget,
     fileInputRef,
@@ -33,18 +32,14 @@ export default function ProductCategories() {
     setArName,
     description,
     setDescription,
-    coverFile,
     setCoverFile,
     coverPreview,
     setCoverPreview,
     saving,
     formError,
     toastMessage,
-    showToast,
     // other flags
-    uploading,
     deleting,
-    refresh,
   } = useProductCategories();
 
   return (

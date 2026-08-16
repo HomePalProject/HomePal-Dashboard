@@ -33,7 +33,7 @@ export function getImageUrl(path?: string | null): string | null {
     return path;
   }
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://homepal.runasp.net';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL?.replace('/api', '');
   return `${baseUrl}${cleanPath}`;
 }
 

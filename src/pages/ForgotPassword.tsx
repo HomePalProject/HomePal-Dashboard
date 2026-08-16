@@ -19,7 +19,7 @@ export default function ForgotPassword() {
     error,
   } = useMutation({
     mutationFn: async (email: string) => {
-      const response = await api.post('/api/auth/forgot-password', { email });
+      const response = await api.post('/auth/forgot-password', { email });
       return response.data;
     },
     onSuccess: () => {

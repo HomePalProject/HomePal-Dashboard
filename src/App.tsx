@@ -11,7 +11,7 @@ const Preferences = lazy(() => import('./pages/Preferences'));
 const Households = lazy(() => import('./pages/Households'));
 const Supermarkets = lazy(() => import('./pages/Supermarkets'));
 const Stats = lazy(() => import('./pages/Stats'));
-const VisionAILogs = lazy(() => import('./pages/VisionAILogs'));
+const TokenUsage = lazy(() => import('./pages/TokenUsage'));
 const SupermarketPerformance = lazy(() => import('./pages/SupermarketPerformance'));
 const PnLDeepDive = lazy(() => import('./pages/PnLDeepDive'));
 const GeographicDemographics = lazy(() => import('./pages/GeographicDemographics'));
@@ -56,7 +56,7 @@ function App() {
             <Route path="supermarkets" element={<Supermarkets />} />
             <Route path="offers" element={<OffersHub />} />
             <Route path="stats" element={<Stats />} />
-            <Route path="vision-ai-logs" element={<VisionAILogs />} />
+            <Route path="ai-token-usage" element={<TokenUsage />} />
             <Route path="supermarket-performance" element={<SupermarketPerformance />} />
             <Route path="pnl-deep-dive" element={<PnLDeepDive />} />
             <Route path="geographic-demographics" element={<GeographicDemographics />} />

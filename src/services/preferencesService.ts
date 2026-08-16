@@ -8,7 +8,7 @@ import type {
 
 export const preferencesService = {
   getCategories: async (): Promise<PreferenceCategoryResponse[]> => {
-    const response = await api.get('/api/preferences/categories');
+    const response = await api.get('/preferences/categories');
     return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
@@ -21,8 +21,8 @@ export const preferencesService = {
     if (categoryId) params.set('categoryId', categoryId);
 
     const endpoint = searchQuery
-      ? `/api/preferences/search?${params.toString()}`
-      : `/api/preferences?${params.toString()}`;
+      ? `/preferences/search?${params.toString()}`
+      : `/preferences?${params.toString()}`;
 
     const response = await api.get(endpoint);
     return response.data?.data !== undefined ? response.data.data : response.data;
@@ -34,8 +34,8 @@ export const preferencesService = {
       name: [{ languageCode: 'en', value: data.name }],
       description: data.description ? [{ languageCode: 'en', value: data.description }] : undefined,
     };
-    const response = await api.post('/api/preferences', payload);
-    return response.data;
+    const response = await api.post('/preferences', payload);
+    return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
   updatePreference: async (id: string, data: AddPreferenceRequest) => {
@@ -45,13 +45,13 @@ export const preferencesService = {
       name: [{ languageCode: 'en', value: data.name }],
       description: data.description ? [{ languageCode: 'en', value: data.description }] : undefined,
     };
-    const response = await api.put(`/api/preferences/${id}`, payload);
-    return response.data;
+    const response = await api.put(`/preferences/${id}`, payload);
+    return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
   deletePreference: async (id: string) => {
-    const response = await api.delete(`/api/preferences/${id}`);
-    return response.data;
+    const response = await api.delete(`/preferences/${id}`);
+    return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
   createCategory: async (data: CreateCategoryRequest) => {
@@ -59,8 +59,8 @@ export const preferencesService = {
       name: [{ languageCode: 'en', value: data.name }],
       description: data.description ? [{ languageCode: 'en', value: data.description }] : undefined,
     };
-    const response = await api.post('/api/preferences/categories', payload);
-    return response.data;
+    const response = await api.post('/preferences/categories', payload);
+    return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
   updateCategory: async (id: string, data: CreateCategoryRequest) => {
@@ -69,12 +69,12 @@ export const preferencesService = {
       name: [{ languageCode: 'en', value: data.name }],
       description: data.description ? [{ languageCode: 'en', value: data.description }] : undefined,
     };
-    const response = await api.put(`/api/preferences/categories/${id}`, payload);
-    return response.data;
+    const response = await api.put(`/preferences/categories/${id}`, payload);
+    return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
   deleteCategory: async (id: string) => {
-    const response = await api.delete(`/api/preferences/categories/${id}`);
-    return response.data;
+    const response = await api.delete(`/preferences/categories/${id}`);
+    return response.data?.data !== undefined ? response.data.data : response.data;
   },
 };

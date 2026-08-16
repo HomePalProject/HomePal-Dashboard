@@ -7,12 +7,12 @@ import type {
 
 export const scraperService = {
   getJobStatus: async (): Promise<ScraperJobStatus> => {
-    const response = await api.get('/api/offers/scrape/status');
+    const response = await api.get('/offers/scrape/status');
     return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
   scrapeFacebookPage: async (data: ScrapeFacebookPageRequest): Promise<OfferScraperResult> => {
-    const response = await api.post('/api/offers/scrape/facebook-page', data);
+    const response = await api.post('/offers/scrape/facebook-page', data);
     return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
@@ -28,7 +28,7 @@ export const scraperService = {
     if (ocrText) formData.append('OcrText', ocrText);
     if (caption) formData.append('Caption', caption);
 
-    const response = await api.post('/api/offers/scrape/image-file', formData, {
+    const response = await api.post('/offers/scrape/image-file', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

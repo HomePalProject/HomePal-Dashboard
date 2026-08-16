@@ -24,6 +24,8 @@ export interface UserResponse {
   birthDate?: string | null;
   governorate?: string | null;
   city?: string | null;
+  governorateId?: string | null;
+  cityId?: string | null;
   isActive: boolean;
   isProfileComplete: boolean;
   profileImageUrl?: string | null;

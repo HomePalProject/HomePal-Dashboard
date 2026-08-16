@@ -3,7 +3,7 @@ import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
 
 export const catalogService = {
   getSupermarkets: async (): Promise<Supermarket[]> => {
-    const response = await api.get('/api/supermarkets');
+    const response = await api.get('/supermarkets');
     const data = response.data?.data;
     // Handle paginated response: { data: { items: [...] } }
     if (data?.items && Array.isArray(data.items)) return data.items;
@@ -32,31 +32,31 @@ export const catalogService = {
     };
 
     if (id) {
-      return api.put(`/api/supermarkets/${id}`, payload);
+      return api.put(`/supermarkets/${id}`, payload);
     }
-    return api.post('/api/supermarkets', payload);
+    return api.post('/supermarkets', payload);
   },
   deleteSupermarket: async (id: string): Promise<void> => {
-    return api.delete(`/api/supermarkets/${id}`);
+    return api.delete(`/supermarkets/${id}`);
   },
   uploadSupermarketLogo: async (id: string, file: File): Promise<any> => {
     const formData = new FormData();
     formData.append('Image', file);
-    return api.post(`/api/supermarkets/${id}/logo`, formData, {
+    return api.post(`/supermarkets/${id}/logo`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
   },
   deleteSupermarketLogo: async (id: string): Promise<any> => {
-    return api.delete(`/api/supermarkets/${id}/logo`);
+    return api.delete(`/supermarkets/${id}/logo`);
   },
   getOffers: async (params?: {
     onlyVerified?: boolean;
     pageNumber?: number;
     pageSize?: number;
   }): Promise<Offer[]> => {
-    const response = await api.get('/api/offers', {
+    const response = await api.get('/offers', {
       params: { onlyVerified: false, pageSize: 1000, ...params },
     });
     const data = response.data?.data;
@@ -68,11 +68,11 @@ export const catalogService = {
   },
   saveOffer: async (data: Partial<Offer>, id?: string): Promise<Offer> => {
     if (id) {
-      return api.put(`/api/offers/${id}`, data);
+      return api.put(`/offers/${id}`, data);
     }
-    return api.post('/api/offers', data);
+    return api.post('/offers', data);
   },
   deleteOffer: async (id: string): Promise<void> => {
-    return api.delete(`/api/offers/${id}`);
+    return api.delete(`/offers/${id}`);
   },
 };

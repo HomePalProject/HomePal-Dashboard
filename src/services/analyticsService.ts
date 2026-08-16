@@ -3,31 +3,28 @@ import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
 import type { PnLDeepDiveData } from '@typeDefs/pnlTypes';
 import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
 import type { SupermarketPerformanceData } from '@typeDefs/supermarketTypes';
-import type { VisionLogsData } from '@typeDefs/visionAITypes';
+import type { TokenUsageMetrics } from '@typeDefs/tokenUsageTypes';
+import { api } from './api';
 
-// Import fallback constants
-import { mockStatsData } from '@constants/statsData';
-import { MOCK_DEMOGRAPHICS_DATA } from '@constants/demographicsData';
-import { MOCK_HOUSEHOLDS_DATA } from '@constants/householdsData';
+// Import fallback constants for endpoints that don't exist yet
 import { MOCK_PNL_DATA } from '@constants/pnlData';
 import { mockSupermarketPerformanceData } from '@constants/supermarketData';
-import { fallbackVisionLogsData } from '@constants/visionAIData';
 
-// Simulated network delay
+// Simulated network delay for mock endpoints
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const analyticsService = {
   getOverview: async (): Promise<AnalyticsOverviewData> => {
-    await delay();
-    return mockStatsData;
+    const response = await api.get('/analytics/overview');
+    return response.data?.data ?? response.data;
   },
   getDemographics: async (): Promise<GeographicDemographicsData> => {
-    await delay();
-    return MOCK_DEMOGRAPHICS_DATA;
+    const response = await api.get('/analytics/demographics');
+    return response.data?.data ?? response.data;
   },
   getHouseholdsSummary: async (): Promise<HouseholdsSummaryData> => {
-    await delay();
-    return MOCK_HOUSEHOLDS_DATA;
+    const response = await api.get('/analytics/households-summary');
+    return response.data?.data ?? response.data;
   },
   getPnLDeepDive: async (): Promise<PnLDeepDiveData> => {
     await delay();
@@ -37,8 +34,16 @@ export const analyticsService = {
     await delay();
     return mockSupermarketPerformanceData;
   },
-  getVisionLogs: async (): Promise<VisionLogsData> => {
-    await delay();
-    return fallbackVisionLogsData;
+  getTokenUsage: async (
+    fromTimestamp?: string,
+    toTimestamp?: string
+  ): Promise<TokenUsageMetrics> => {
+    const params = new URLSearchParams();
+    if (fromTimestamp) params.append('FromTimestamp', fromTimestamp);
+    if (toTimestamp) params.append('ToTimestamp', toTimestamp);
+
+    const url = `/analytics/token-usage${params.toString() ? `?${params.toString()}` : ''}`;
+    const response = await api.get(url);
+    return response.data?.data ?? response.data;
   },
 };

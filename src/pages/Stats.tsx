@@ -6,8 +6,6 @@ import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
 import { mockStatsData } from '@constants/statsData';
 import { StatCard } from '@components/stats/StatCard';
 
-// ── Components ───────────────────────────────────────────────────────────────
-
 export default function Stats() {
   const navigate = useNavigate();
   const [data, setData] = useState<AnalyticsOverviewData | null>(null);
@@ -33,12 +31,22 @@ export default function Stats() {
     return <div className="p-40 text-text-secondary font-sans">Loading analytics...</div>;
   }
 
+  const visionHealth = data.visionHealth || {
+    autoParsedPercentage: 85,
+    manualFallbackPercentage: 10,
+    failedPercentage: 5,
+  };
+
+  const revenue = data.revenue || { current: 0, changePercentage: 0 };
+  const serverCosts = data.serverCosts || { current: 0, changePercentage: 0 };
+  const netMargin = data.netMargin || { current: 0, changePercentage: 0 };
+
   const visionTotal =
-    data.visionHealth.autoParsedPercentage +
-    data.visionHealth.manualFallbackPercentage +
-    data.visionHealth.failedPercentage;
-  const autoDeg = (data.visionHealth.autoParsedPercentage / visionTotal) * 360;
-  const manualDeg = (data.visionHealth.manualFallbackPercentage / visionTotal) * 360;
+    visionHealth.autoParsedPercentage +
+    visionHealth.manualFallbackPercentage +
+    visionHealth.failedPercentage;
+  const autoDeg = (visionHealth.autoParsedPercentage / visionTotal) * 360;
+  const manualDeg = (visionHealth.manualFallbackPercentage / visionTotal) * 360;
 
   return (
     <div className="w-full flex flex-col gap-24 font-sans">
@@ -78,8 +86,8 @@ export default function Stats() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-20">
         <StatCard
           title="Revenue (Current Cycle)"
-          value={data.revenue.current}
-          change={data.revenue.changePercentage}
+          value={revenue.current}
+          change={revenue.changePercentage}
           isCurrency
           icon={
             <svg
@@ -98,8 +106,8 @@ export default function Stats() {
         />
         <StatCard
           title="AI Server Costs"
-          value={data.serverCosts.current}
-          change={data.serverCosts.changePercentage}
+          value={serverCosts.current}
+          change={serverCosts.changePercentage}
           isCurrency
           icon={
             <svg
@@ -119,8 +127,8 @@ export default function Stats() {
         />
         <StatCard
           title="Net Margin"
-          value={data.netMargin.current}
-          change={data.netMargin.changePercentage}
+          value={netMargin.current}
+          change={netMargin.changePercentage}
           isPercent
           icon={
             <svg
@@ -196,7 +204,7 @@ export default function Stats() {
           <div className="flex justify-between items-start mb-[4px]">
             <h2 className="text-base font-bold text-text-primary m-0">Vision AI Health</h2>
             <button
-              onClick={() => navigate('/dashboard/vision-ai-logs')}
+              onClick={() => navigate('/dashboard/ai-token-usage')}
               className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-[4px] hover:opacity-80 transition-opacity"
             >
               View Logs
@@ -228,7 +236,7 @@ export default function Stats() {
             >
               <div className="w-full h-full bg-surface rounded-full flex flex-col items-center justify-center">
                 <span className="text-2xl font-extrabold text-text-primary">
-                  {Math.round(data.visionHealth.autoParsedPercentage)}%
+                  {visionHealth.autoParsedPercentage}%
                 </span>
                 <span className="text-[10px] font-semibold text-text-secondary uppercase">
                   Success
@@ -240,17 +248,17 @@ export default function Stats() {
               {[
                 {
                   label: 'Auto-Parsed',
-                  val: data.visionHealth.autoParsedPercentage,
+                  val: visionHealth.autoParsedPercentage,
                   color: 'var(--sys-primary)',
                 },
                 {
                   label: 'Manual Fallback',
-                  val: data.visionHealth.manualFallbackPercentage,
+                  val: visionHealth.manualFallbackPercentage,
                   color: '#d97706',
                 },
                 {
                   label: 'Failed',
-                  val: data.visionHealth.failedPercentage,
+                  val: visionHealth.failedPercentage,
                   color: 'var(--sys-status-error)',
                 },
               ].map((item) => (

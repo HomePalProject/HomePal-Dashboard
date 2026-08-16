@@ -5,7 +5,7 @@ import { api } from '@services/api';
 
 export const authService = {
   async login(credentials: LoginCredentials): Promise<{ token: string; user: User }> {
-    const response = await api.post<ApiResponse<LoginResponseData>>('/api/auth/login', credentials);
+    const response = await api.post<ApiResponse<LoginResponseData>>('/auth/login', credentials);
     const res = response.data;
 
     if (!res.success || !res.data?.tokens?.accessToken) {

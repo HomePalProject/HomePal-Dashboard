@@ -79,12 +79,12 @@ These pages call a `/api/analytics/*` namespace that **does not exist at all** (
 
 | Feature | Endpoints | Note |
 |---|---|---|
-| Household Members administration | `/api/households/members*` | |
-| Household Invitations oversight | `/api/households/invitations*` | |
 | **Offer scraping pipeline** (genuine AI feature) | `POST /api/offers/scrape/facebook-page`, `POST /api/offers/scrape/image-file`, `GET /api/offers/scrape/status` | Async job with `isRunning`, scraped/extracted counts, start/complete timestamps, error message. This is a real backend AI capability — a strong, honest replacement for the fake `VisionAILogs` page. |
 | Offer verification/moderation | `isVerified` field on `OfferResponse` | Field exists, no UI to review or toggle it |
 | Product Categories CRUD | `/api/products/categories*` | Reference data used by Pantry items |
 | Measuring Units CRUD | `/api/units*` | Reference data used by Pantry/Offers |
+
+**Removed from this list (2026-08-16):** "Household Members administration" and "Household Invitations oversight" were previously listed here, but don't belong — `GET /api/households/members` and `GET /api/households/invitations` take no `householdId` parameter, so they resolve strictly to the *caller's own* household via auth context. There's no cross-household, admin-wide listing endpoint (no `/api/admin/households` or equivalent) anywhere in the spec. These are self-service endpoints for a household manager managing their own household — a **mobile app** concern (see the mobile-flows audit), not something buildable as an admin dashboard page against the current API.
 
 ### 2.3 Partially wired — verify before extending
 

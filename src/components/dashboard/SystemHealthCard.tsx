@@ -23,7 +23,7 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
       return;
     }
     api
-      .get('/api/preferences/categories')
+      .get('/preferences/categories')
       .then((res) => setStatus(res.status === 200 ? 'online' : 'offline'))
       .catch((err) => {
         const isOnlineStatus = err.response?.status === 401 || err.response?.status === 403;

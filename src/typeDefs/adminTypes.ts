@@ -8,6 +8,8 @@ export interface AdminUser {
   birthDate: string;
   governorate: string;
   city: string;
+  governorateId: string;
+  cityId: string;
   isActive: boolean;
   isProfileComplete: boolean;
   profileImageUrl?: string;
@@ -25,8 +27,8 @@ export interface CreateAdminRequest {
   confirmPassword?: string;
   gender: number;
   birthDate: string;
-  governorate: string;
-  city: string;
+  governorateId: string;
+  cityId: string;
 }
 
 export interface PaginatedAdminsResponse {

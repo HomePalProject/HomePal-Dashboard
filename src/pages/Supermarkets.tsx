@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { cn, getErrorMessage } from '@lib/utils';
 import { catalogService } from '@services/catalogService';
 import type { Supermarket } from '@typeDefs/catalogTypes';
@@ -71,6 +72,7 @@ function SupermarketLogo({
 }
 
 export default function Supermarkets() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -81,6 +83,20 @@ export default function Supermarkets() {
   });
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('openAdd') === 'true') {
+      setMarketModal({ open: true });
+      // Clean query parameter after opening
+      setSearchParams(
+        (prev) => {
+          prev.delete('openAdd');
+          return prev;
+        },
+        { replace: true }
+      );
+    }
+  }, [searchParams, setSearchParams]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);

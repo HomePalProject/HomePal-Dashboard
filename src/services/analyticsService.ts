@@ -2,13 +2,17 @@ import type { GeographicDemographicsData } from '@typeDefs/demographicsTypes';
 import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
 import type { PnLDeepDiveData } from '@typeDefs/pnlTypes';
 import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
-import type { SupermarketPerformanceData } from '@typeDefs/supermarketTypes';
 import type { TokenUsageMetrics } from '@typeDefs/tokenUsageTypes';
+import type {
+  MealPlansSummaryData,
+  ShoppingTrendsData,
+  UserDemographicsData,
+  HouseholdOverviewReportData,
+} from '@typeDefs/analyticsTypes';
 import { api } from './api';
 
-// Import fallback constants for endpoints that don't exist yet
+// Import fallback constants for endpoints that don't exist yet (PnL)
 import { MOCK_PNL_DATA } from '@constants/pnlData';
-import { mockSupermarketPerformanceData } from '@constants/supermarketData';
 
 // Simulated network delay for mock endpoints
 const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -26,13 +30,29 @@ export const analyticsService = {
     const response = await api.get('/analytics/households-summary');
     return response.data?.data ?? response.data;
   },
+  getMealPlansSummary: async (): Promise<MealPlansSummaryData> => {
+    const response = await api.get('/analytics/meal-plans-summary');
+    return response.data?.data ?? response.data;
+  },
+  getShoppingTrends: async (): Promise<ShoppingTrendsData> => {
+    const response = await api.get('/analytics/shopping-trends');
+    return response.data?.data ?? response.data;
+  },
+  getUserDemographics: async (): Promise<UserDemographicsData> => {
+    const response = await api.get('/analytics/user-demographics');
+    return response.data?.data ?? response.data;
+  },
+  getHouseholdOverviewReport: async (): Promise<HouseholdOverviewReportData> => {
+    const response = await api.get('/reports/household-overview');
+    return response.data?.data ?? response.data;
+  },
   getPnLDeepDive: async (): Promise<PnLDeepDiveData> => {
     await delay();
     return MOCK_PNL_DATA;
   },
-  getSupermarketPerformance: async (): Promise<SupermarketPerformanceData> => {
-    await delay();
-    return mockSupermarketPerformanceData;
+  getSupermarketPerformance: async (): Promise<ShoppingTrendsData> => {
+    const response = await api.get('/analytics/shopping-trends');
+    return response.data?.data ?? response.data;
   },
   getTokenUsage: async (
     fromTimestamp?: string,

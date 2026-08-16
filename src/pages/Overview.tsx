@@ -45,7 +45,7 @@ export default function Overview() {
       try {
         const [summaryRes, catRes] = await Promise.all([
           analyticsService.getHouseholdsSummary(),
-          api.get('/preferences/categories').catch(() => ({ data: [] })),
+          api.get('/api/preferences/categories').catch(() => ({ data: [] })),
         ]);
         setSummaryData(summaryRes);
 
@@ -113,7 +113,7 @@ export default function Overview() {
         <div className="sm:row-span-2">
           <MetricCard
             icon={HouseIcon}
-            value={summaryData?.totalHouseholds?.toLocaleString() ?? '—'}
+            value={summaryData?.totalHouseholds.toLocaleString() ?? '—'}
             label="Total Households Managed"
             badge="Platform"
             note="Based on aggregated demographics"
@@ -166,7 +166,7 @@ export default function Overview() {
                 <div className="flex justify-between py-16 border-b border-surface-variant">
                   <span className="text-14 font-semibold text-text-primary">Active Households</span>
                   <span className="text-14 font-bold text-primary">
-                    {summaryData?.activeHouseholds?.toLocaleString() ?? '—'}
+                    {summaryData.activeHouseholds.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between py-16 border-b border-surface-variant">

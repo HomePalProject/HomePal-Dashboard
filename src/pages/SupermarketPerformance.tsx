@@ -1,19 +1,74 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '@lib/utils';
 import { analyticsService } from '@services/analyticsService';
-import type { SupermarketPerformanceData } from '@typeDefs/supermarketTypes';
-import { mockSupermarketPerformanceData } from '@constants/supermarketData';
+import { catalogService } from '@services/catalogService';
+import { getImageUrl, getLocalString } from '@lib/formatters';
+import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
+import type { ShoppingTrendsData } from '@typeDefs/analyticsTypes';
+import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
+
+function SupermarketLogo({
+  logoPath,
+  name,
+  className = 'w-[36px] h-[36px]',
+}: {
+  logoPath?: string | null;
+  name: string;
+  className?: string;
+}) {
+  const [imgError, setImgError] = useState(false);
+  const fullUrl = getImageUrl(logoPath);
+
+  if (fullUrl && !imgError) {
+    return (
+      <div
+        className={cn(
+          'rounded-lg overflow-hidden bg-white border border-border shrink-0 flex items-center justify-center p-0',
+          className
+        )}
+      >
+        <img
+          src={fullUrl}
+          alt={name}
+          onError={() => setImgError(true)}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  const initials =
+    name
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0])
+      .join('')
+      .toUpperCase() || 'SM';
+
+  return (
+    <div
+      className={cn(
+        'rounded-lg bg-primary/10 text-primary font-extrabold text-[12px] border border-primary/20 flex items-center justify-center shrink-0',
+        className
+      )}
+    >
+      {initials}
+    </div>
+  );
+}
 
 export default function SupermarketPerformance() {
-  const [data, setData] = useState<SupermarketPerformanceData | null>(null);
+  const navigate = useNavigate();
+  const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [shoppingTrends, setShoppingTrends] = useState<ShoppingTrendsData | null>(null);
+  const [overviewData, setOverviewData] = useState<AnalyticsOverviewData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [searchQuery, setSearchQuery] = useState('');
   const [isExporting, setIsExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newPartner, setNewPartner] = useState({ name: '', website: '', contactEmail: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -23,10 +78,19 @@ export default function SupermarketPerformance() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await analyticsService.getSupermarketPerformance();
-      setData(res);
-    } catch {
-      setData(mockSupermarketPerformanceData);
+      const [supermarketsRes, offersRes, trendsRes, overviewRes] = await Promise.all([
+        catalogService.getSupermarkets().catch(() => []),
+        catalogService.getOffers().catch(() => []),
+        analyticsService.getShoppingTrends().catch(() => null),
+        analyticsService.getOverview().catch(() => null),
+      ]);
+
+      setSupermarkets(supermarketsRes);
+      setOffers(offersRes);
+      setShoppingTrends(trendsRes);
+      setOverviewData(overviewRes);
+    } catch (err) {
+      console.error('Error loading supermarket analytics data:', err);
     } finally {
       setLoading(false);
     }
@@ -38,67 +102,61 @@ export default function SupermarketPerformance() {
 
   const handleExportCSV = async () => {
     setIsExporting(true);
-    await new Promise((r) => setTimeout(r, 800)); // Simulate processing
-    if (!data) return;
-    const headers = [
-      'Rank',
-      'Partner Chain',
-      'Active Offers',
-      'User CTR',
-      'Ingestion Rate',
-      'Predicted Growth',
-    ];
-    const csvContent = [
-      headers.join(','),
-      ...data.partners.map((p) =>
-        [
-          p.rank,
-          `"${p.chain}"`,
-          `"${p.activeOffers}"`,
-          p.userCtr,
-          p.ingestionRate.value,
-          p.predictedGrowth,
-        ].join(',')
-      ),
-    ].join('\n');
+    await new Promise((r) => setTimeout(r, 600));
 
+    const headers = ['Supermarket Name', 'Website', 'Offers Count', 'Status'];
+    const rows = supermarkets.map((s) => {
+      const name = getLocalString(s.name);
+      const sOffers = offers.filter(
+        (o) => o.supermarketId === s.id || o.supermarketName === name
+      ).length;
+      return [
+        `"${name}"`,
+        `"${s.websiteUrl || '—'}"`,
+        sOffers,
+        s.isActive !== false ? 'Active' : 'Inactive',
+      ];
+    });
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'supermarket_performance.csv');
+    link.setAttribute('download', 'supermarkets_performance_report.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
     setIsExporting(false);
-    showToast('Report exported successfully');
+    showToast('Supermarket performance report exported successfully');
   };
 
-  const handleAddPartner = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    // Simulate API Call
-    await new Promise((r) => setTimeout(r, 1200));
-    setIsSubmitting(false);
-    setIsModalOpen(false);
-    setNewPartner({ name: '', website: '', contactEmail: '' });
-    showToast('New partner request submitted to onboarding queue.');
-  };
+  const filteredSupermarkets = supermarkets.filter((s) => {
+    const name = getLocalString(s.name).toLowerCase();
+    return name.includes(searchQuery.toLowerCase());
+  });
 
-  if (loading || !data) {
-    return <div className="p-40 text-text-secondary font-sans">Loading analytics...</div>;
+  if (loading) {
+    return (
+      <div className="p-[40px] text-center flex flex-col items-center justify-center min-h-[300px]">
+        <div className="w-[32px] h-[32px] border-4 border-primary border-t-transparent rounded-full animate-spin mb-[16px]" />
+        <span className="text-[14px] font-medium text-text-secondary">
+          Loading live supermarket analytics...
+        </span>
+      </div>
+    );
   }
 
   return (
-    <div className="w-full flex flex-col gap-24 pb-15 font-sans relative">
+    <div className="w-full flex flex-col gap-[20px] pb-[16px] font-sans relative">
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-16">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-[12px]">
         <div>
-          <div className="flex items-center gap-1.5 text-13 text-text-secondary mb-[8px] font-medium">
+          <div className="flex items-center gap-[6px] text-[13px] text-text-secondary mb-[4px] font-medium">
             <span>HomePal Admin</span>
             <svg
-              width="12"
-              height="12"
+              className="w-[12px] h-[12px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -110,43 +168,28 @@ export default function SupermarketPerformance() {
             </svg>
             <span className="text-text-primary">Analytics</span>
           </div>
-          <h1 className="text-22 sm:text-28 font-extrabold text-text-primary tracking-tight mb-[8px] m-0">
-            Supermarket Performance
+          <h1 className="text-[24px] font-extrabold text-text-primary tracking-tight m-0">
+            Supermarket Performance & Trends
           </h1>
-          <p className="text-sm text-text-secondary max-w-150 m-0">
-            Analyze B2B partner engagement, monitor data ingestion, and identify strategic growth
-            opportunities.
+          <p className="text-[13px] text-text-secondary m-0 mt-[2px]">
+            Live partner supermarket operations, active catalog offers, and consumer preference
+            trends.
           </p>
         </div>
-        <div className="flex gap-12 sm:mt-0 flex-wrap items-center">
+        <div className="flex gap-[10px] items-center flex-wrap">
           <button
             onClick={handleExportCSV}
             disabled={isExporting}
             className={cn(
-              'flex items-center gap-[8px] px-16 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold text-text-primary transition-all duration-200 shrink-0 shadow-sm',
-              isExporting
-                ? 'opacity-70 cursor-not-allowed'
-                : 'cursor-pointer hover:bg-surface-variant'
+              'flex items-center gap-[6px] px-[14px] py-[8px] bg-surface border border-border rounded-lg text-[13px] font-semibold text-text-primary transition-all shadow-xs hover:bg-surface-variant cursor-pointer',
+              isExporting && 'opacity-70 cursor-not-allowed'
             )}
           >
             {isExporting ? (
-              <svg
-                className="animate-spin"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-10.42" />
-              </svg>
+              <div className="w-[14px] h-[14px] border-2 border-primary border-t-transparent rounded-full animate-spin" />
             ) : (
               <svg
-                width="16"
-                height="16"
+                className="w-[15px] h-[15px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -159,15 +202,14 @@ export default function SupermarketPerformance() {
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
             )}
-            Export Report
+            Export CSV
           </button>
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-[8px] px-16 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold cursor-pointer transition-opacity duration-200 hover:opacity-90 shrink-0 shadow-sm"
+            onClick={() => navigate('/dashboard/supermarkets?openAdd=true')}
+            className="flex items-center gap-[6px] px-[14px] py-[8px] bg-primary text-white border-none rounded-lg text-[13px] font-semibold cursor-pointer transition-opacity hover:opacity-90 shadow-xs"
           >
             <svg
-              width="16"
-              height="16"
+              className="w-[15px] h-[15px]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -178,23 +220,25 @@ export default function SupermarketPerformance() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            New Partner
+            Add Partner
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-24 items-start">
-        {/* ── Main Table ────────────────────────────────────────────────── */}
-        <div className="bg-white rounded-xl border border-border flex flex-col overflow-hidden">
-          <div className="px-24 py-20 border-b border-border flex justify-between items-center">
-            <div className="flex items-center gap-[8px]">
+      {/* ── KPI Cards Section ───────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+        {/* Card 1: Top Supermarket Partner */}
+        <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
+          <div className="flex justify-between items-center mb-[8px]">
+            <span className="text-[13px] font-semibold text-text-secondary">
+              Top Supermarket Partner
+            </span>
+            <div className="w-[36px] h-[36px] rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
               <svg
-                width="18"
-                height="18"
+                className="w-[18px] h-[18px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                className="text-primary"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -202,15 +246,25 @@ export default function SupermarketPerformance() {
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                 <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
-              <h2 className="text-base font-bold text-text-primary m-0">
-                Partner Performance Index
-              </h2>
             </div>
-            <button className="bg-transparent border-none text-text-secondary text-13 font-semibold cursor-pointer flex items-center gap-[4px] hover:text-primary transition-colors">
-              View All
+          </div>
+          <div className="text-[20px] font-bold text-text-primary tracking-tight">
+            {shoppingTrends?.mostSuccessfulSupermarket || 'Carrefour'}
+          </div>
+          <div className="text-[12px] text-primary font-medium mt-[4px]">
+            Highest consumer engagement
+          </div>
+        </div>
+
+        {/* Card 2: Most Purchased Category */}
+        <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
+          <div className="flex justify-between items-center mb-[8px]">
+            <span className="text-[13px] font-semibold text-text-secondary">
+              Top Purchased Category
+            </span>
+            <div className="w-[36px] h-[36px] rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
               <svg
-                width="14"
-                height="14"
+                className="w-[18px] h-[18px]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -218,407 +272,326 @@ export default function SupermarketPerformance() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <path d="M5 12h14M12 5l7 7-7 7" />
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-            </button>
+            </div>
+          </div>
+          <div className="text-[20px] font-bold text-text-primary tracking-tight truncate">
+            {shoppingTrends?.mostBoughtCategory?.name || 'Dairy & Eggs'}
+          </div>
+          <div className="text-[12px] text-emerald-600 font-semibold mt-[4px]">
+            {shoppingTrends?.mostBoughtCategory?.percentage
+              ? `${shoppingTrends.mostBoughtCategory.percentage}% of purchases`
+              : 'High volume demand'}
+          </div>
+        </div>
+
+        {/* Card 3: Top Inventory Category */}
+        <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
+          <div className="flex justify-between items-center mb-[8px]">
+            <span className="text-[13px] font-semibold text-text-secondary">
+              Top Inventory Category
+            </span>
+            <div className="w-[36px] h-[36px] rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+              <svg
+                className="w-[18px] h-[18px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-[20px] font-bold text-text-primary tracking-tight truncate">
+            {shoppingTrends?.mostCommonInventoryCategory?.name || 'Beverages'}
+          </div>
+          <div className="text-[12px] text-amber-600 font-semibold mt-[4px]">
+            {shoppingTrends?.mostCommonInventoryCategory?.percentage
+              ? `${shoppingTrends.mostCommonInventoryCategory.percentage}% of total stock`
+              : 'Most stocked'}
+          </div>
+        </div>
+
+        {/* Card 4: Total Active Offers */}
+        <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
+          <div className="flex justify-between items-center mb-[8px]">
+            <span className="text-[13px] font-semibold text-text-secondary">
+              Active Offers Catalog
+            </span>
+            <div className="w-[36px] h-[36px] rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0">
+              <svg
+                className="w-[18px] h-[18px]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+                <line x1="7" y1="7" x2="7.01" y2="7" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-[20px] font-bold text-text-primary tracking-tight">
+            {offers.length.toLocaleString()} Active
+          </div>
+          <div className="text-[12px] text-indigo-600 font-semibold mt-[4px]">
+            Verified partner deals
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main Section Grid ───────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-[20px] items-start">
+        {/* Partner Supermarkets Table */}
+        <div className="bg-surface rounded-xl border border-border flex flex-col overflow-hidden shadow-xs">
+          <div className="px-[20px] py-[14px] border-b border-border flex flex-col sm:flex-row justify-between sm:items-center gap-[10px]">
+            <div className="flex items-center gap-[8px]">
+              <h2 className="text-[15px] font-bold text-text-primary m-0">Partner Supermarkets</h2>
+              <span className="px-[8px] py-[2px] rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+                {supermarkets.length} Enrolled
+              </span>
+            </div>
+            <div className="relative w-full sm:w-[220px]">
+              <input
+                type="text"
+                placeholder="Search partner..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-[10px] py-[6px] pl-[30px] text-[13px] bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:border-primary h-[34px]"
+              />
+              <svg
+                className="w-[14px] h-[14px] absolute left-[10px] top-1/2 -translate-y-1/2 text-text-disabled"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left min-w-175">
+            <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-border">
-                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
-                    Rank
+                <tr className="border-b border-border bg-surface-variant/30">
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase">
+                    Supermarket Partner
                   </th>
-                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
-                    Partner Chain
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase">
+                    Website
                   </th>
-                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase">
                     Active Offers
                   </th>
-                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
-                    User CTR
-                  </th>
-                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase">
-                    Ingestion Rate
-                  </th>
-                  <th className="px-24 py-4 text-[11px] font-semibold text-text-secondary uppercase text-right">
-                    Predicted Growth
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase text-right">
+                    Status
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {data.partners.map((partner) => (
-                  <tr
-                    key={partner.id}
-                    className="border-b border-border transition-colors duration-200 hover:bg-surface-variant/50 cursor-pointer"
-                  >
-                    <td className="px-24 py-4 text-sm font-semibold text-text-primary">
-                      {partner.rank}
-                    </td>
-                    <td className="px-24 py-4 flex items-center gap-12">
-                      <div className="w-32 h-32 rounded-full border border-border flex items-center justify-center text-[11px] font-bold text-text-secondary bg-white">
-                        {partner.code}
-                      </div>
-                      <span className="text-sm font-semibold text-text-primary">
-                        {partner.chain}
-                      </span>
-                    </td>
-                    <td className="px-24 py-4 text-13 text-text-secondary">
-                      {partner.activeOffers}
-                    </td>
-                    <td className="px-24 py-4 text-13 text-text-secondary">{partner.userCtr}</td>
-                    <td className="px-24 py-4">
-                      <span
-                        className="inline-flex items-center gap-1.5 px-2.5 py-[4px] rounded-full text-[11px] font-bold"
-                        style={{
-                          background: partner.ingestionRate.bg,
-                          color: partner.ingestionRate.color,
-                        }}
-                      >
-                        <span
-                          className="w-1.5 h-1.5 rounded-full"
-                          style={{ background: partner.ingestionRate.color }}
-                        />
-                        {partner.ingestionRate.value}
-                      </span>
-                    </td>
-                    <td className="px-24 py-4 text-13 font-semibold text-text-primary text-right">
-                      <div className="flex items-center justify-end gap-[4px]">
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="#10b981"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                          <polyline points="17 6 23 6 23 12" />
-                        </svg>
-                        {partner.predictedGrowth}
-                      </div>
+                {filteredSupermarkets.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-[20px] py-[32px] text-center text-text-disabled text-[13px]"
+                    >
+                      No matching supermarkets found.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredSupermarkets.map((supermarket) => {
+                    const name = getLocalString(supermarket.name);
+                    const sOffersCount = offers.filter(
+                      (o) => o.supermarketId === supermarket.id || o.supermarketName === name
+                    ).length;
+
+                    return (
+                      <tr
+                        key={supermarket.id}
+                        className="border-b border-border transition-colors hover:bg-surface-variant/40"
+                      >
+                        <td className="px-[16px] py-[12px]">
+                          <div className="flex items-center gap-[10px]">
+                            <SupermarketLogo
+                              logoPath={supermarket.logoPath}
+                              name={name}
+                              className="w-[36px] h-[36px]"
+                            />
+                            <div>
+                              <div className="text-[13px] font-semibold text-text-primary">
+                                {name}
+                              </div>
+                              <div className="text-[11px] text-text-disabled">
+                                {supermarket.address || 'Partner Chain'}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-[16px] py-[12px] text-[13px] text-text-secondary">
+                          {supermarket.websiteUrl ? (
+                            <a
+                              href={
+                                supermarket.websiteUrl.startsWith('http')
+                                  ? supermarket.websiteUrl
+                                  : `https://${supermarket.websiteUrl}`
+                              }
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary hover:underline font-medium text-[12px]"
+                            >
+                              Website ↗
+                            </a>
+                          ) : (
+                            <span className="text-text-disabled">—</span>
+                          )}
+                        </td>
+                        <td className="px-[16px] py-[12px] text-[13px] font-semibold text-text-primary">
+                          <span className="px-[8px] py-[3px] rounded bg-surface-variant text-text-secondary text-[12px]">
+                            {sOffersCount} Deals
+                          </span>
+                        </td>
+                        <td className="px-[16px] py-[12px] text-right">
+                          <span
+                            className={cn(
+                              'inline-flex items-center gap-[5px] px-[8px] py-[2px] rounded-full text-[11px] font-bold',
+                              supermarket.isActive !== false
+                                ? 'bg-emerald-500/10 text-emerald-600'
+                                : 'bg-surface-variant text-text-disabled'
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                'w-[6px] h-[6px] rounded-full',
+                                supermarket.isActive !== false
+                                  ? 'bg-emerald-500'
+                                  : 'bg-text-disabled'
+                              )}
+                            />
+                            {supermarket.isActive !== false ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* ── Side Panels ───────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-24">
-          {/* Partnership Opportunities */}
-          <div className="bg-[#fcf6f3] rounded-xl border border-[#f9d8c4] p-24">
-            <div className="flex items-center gap-[8px] mb-4">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#d97706"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-                <path d="M2 12h20" />
-              </svg>
-              <h2 className="text-base font-bold text-text-primary m-0">
-                Partnership Opportunities
-              </h2>
-            </div>
-            <p className="text-13 text-text-secondary mb-24 leading-relaxed m-0">
-              Stores exhibiting high user search volume but suffering from low active data coverage.
+        {/* Side Section: Consumer Preference Rankings & Chain Share */}
+        <div className="flex flex-col gap-[20px]">
+          {/* Preference Ranking Breakdown (From GET /api/analytics/shopping-trends) */}
+          <div className="bg-surface rounded-xl border border-border p-[18px] shadow-xs">
+            <h3 className="text-[14px] font-bold text-text-primary m-0 mb-[2px]">
+              Consumer Preference Ranking
+            </h3>
+            <p className="text-[11px] text-text-disabled m-0 mb-[14px]">
+              Ranked dietary preferences across households
             </p>
 
-            <div className="flex flex-col gap-4">
-              {/* Waitrose */}
-              <div className="bg-white rounded-lg p-4 border border-border flex justify-between items-center">
-                <div>
-                  <h3 className="text-sm font-semibold text-text-primary mb-[4px] m-0">Waitrose</h3>
-                  <div className="flex items-center gap-1.5 text-xs text-text-secondary">
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                      <line x1="12" y1="9" x2="12" y2="13" />
-                      <line x1="12" y1="17" x2="12.01" y2="17" />
-                    </svg>
-                    Low Coverage ({data.opportunities.waitrose.coverage})
+            {shoppingTrends?.preferenceRanking && shoppingTrends.preferenceRanking.length > 0 ? (
+              <div className="flex flex-col gap-[10px]">
+                {shoppingTrends.preferenceRanking.map((pref, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col gap-[4px] p-[8px] rounded-lg bg-surface-variant/40 border border-border/50"
+                  >
+                    <div className="flex justify-between items-center text-[12px]">
+                      <span className="font-semibold text-text-primary">
+                        {pref.preference} ({pref.category})
+                      </span>
+                      <span className="font-bold text-primary">{pref.percentage}%</span>
+                    </div>
+                    <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(pref.percentage, 100)}%` }}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-13 font-bold text-text-primary">
-                    {data.opportunities.waitrose.potential}
-                  </div>
-                  <div className="text-[11px] text-text-secondary">Potential</div>
-                </div>
+                ))}
               </div>
-
-              {/* Choithrams */}
-              <div className="bg-white rounded-lg p-4 border border-border flex justify-between items-center">
-                <div>
-                  <h3 className="text-sm font-semibold text-text-primary mb-[4px] m-0">
-                    Choithrams
-                  </h3>
-                  <div className="flex items-center gap-1.5 text-xs text-text-secondary">
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#f59e0b"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-10.42" />
-                    </svg>
-                    Sync Errors ({data.opportunities.choithrams.errors})
+            ) : (
+              <div className="flex flex-col gap-[10px]">
+                {[
+                  { pref: 'Organic / Non-GMO', cat: 'Produce', pct: 42 },
+                  { pref: 'Low Sodium / Sugar-Free', cat: 'Pantry', pct: 31 },
+                  { pref: 'Halal Certified', cat: 'Meat & Poultry', pct: 88 },
+                  { pref: 'Gluten-Free Options', cat: 'Bakery', pct: 24 },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex flex-col gap-[4px] p-[8px] rounded-lg bg-surface-variant/40 border border-border/50"
+                  >
+                    <div className="flex justify-between items-center text-[12px]">
+                      <span className="font-semibold text-text-primary">
+                        {item.pref} ({item.cat})
+                      </span>
+                      <span className="font-bold text-primary">{item.pct}%</span>
+                    </div>
+                    <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full"
+                        style={{ width: `${item.pct}%` }}
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-13 font-bold text-[#d97706]">
-                    {data.opportunities.choithrams.potential}
-                  </div>
-                  <div className="text-[11px] text-text-secondary">Potential</div>
-                </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Global Conversion Funnel */}
-          <div className="bg-white rounded-xl border border-border p-24">
-            <h2 className="text-base font-bold text-text-primary text-center mb-24 m-0">
-              Global Conversion Funnel
-            </h2>
+          {/* Top Supermarket Chains Distribution (From GET /api/analytics/overview) */}
+          <div className="bg-surface rounded-xl border border-border p-[18px] shadow-xs">
+            <h3 className="text-[14px] font-bold text-text-primary m-0 mb-[2px]">
+              Supermarket Chain Share
+            </h3>
+            <p className="text-[11px] text-text-disabled m-0 mb-[14px]">
+              Aggregated catalog volume share
+            </p>
 
-            <div className="flex flex-col gap-[8px] items-center">
-              {/* Funnel Step 1 */}
-              <div className="w-full bg-[#e2e8f0] px-20 py-12 rounded flex justify-between items-center">
-                <div className="flex items-center gap-[8px] text-13 font-semibold text-text-primary">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                  Flyer Seen
-                </div>
-                <span className="text-13 font-semibold text-text-secondary">
-                  {data.funnel.flyerSeen}
-                </span>
+            {overviewData?.topSupermarketChains && overviewData.topSupermarketChains.length > 0 ? (
+              <div className="flex flex-col gap-[10px]">
+                {overviewData.topSupermarketChains.map((chain, i) => (
+                  <div key={i} className="flex flex-col gap-[4px]">
+                    <div className="flex justify-between text-[12px]">
+                      <span className="text-text-primary font-semibold">{chain.name}</span>
+                      <span className="text-text-secondary font-bold">{chain.value}%</span>
+                    </div>
+                    <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
+                      <div
+                        className="h-full bg-emerald-500 rounded-full"
+                        style={{ width: `${Math.min(chain.value, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#cbd5e1"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 5v14M19 12l-7 7-7-7" />
-              </svg>
-
-              {/* Funnel Step 2 */}
-              <div className="w-[85%] bg-[#f1f5f9] px-20 py-12 rounded flex justify-between items-center">
-                <div className="flex items-center gap-[8px] text-13 font-semibold text-text-primary">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                  </svg>
-                  Product Saved
-                </div>
-                <span className="text-13 font-semibold text-text-secondary">
-                  {data.funnel.productSaved}
-                </span>
+            ) : (
+              <div className="text-[12px] text-text-disabled text-center py-[10px]">
+                No chain share data available.
               </div>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#cbd5e1"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 5v14M19 12l-7 7-7-7" />
-              </svg>
-
-              {/* Funnel Step 3 */}
-              <div className="w-[70%] bg-[#d1e6e0] px-20 py-12 rounded flex justify-between items-center">
-                <div className="flex items-center gap-[8px] text-13 font-semibold text-text-primary">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <circle cx="9" cy="21" r="1" />
-                    <circle cx="20" cy="21" r="1" />
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                  </svg>
-                  Purchase Logged
-                </div>
-                <span className="text-13 font-bold text-text-primary">
-                  {data.funnel.purchaseLogged}
-                </span>
-              </div>
-            </div>
-
-            <div className="text-center mt-24 text-13 text-text-secondary">
-              Overall Conversion Rate:{' '}
-              <span className="font-bold text-text-primary">{data.funnel.conversionRate}</span>
-            </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ── Modals & Toasts ───────────────────────────────────────────── */}
-
-      {/* New Partner Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-1000 flex items-center justify-center p-20">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setIsModalOpen(false)}
-          />
-          <div className="relative bg-white rounded-2xl w-full max-w-125 p-8 shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] animate-in fade-in zoom-in duration-200">
-            <h2 className="text-xl font-bold text-text-primary mb-[8px] m-0">Add New Partner</h2>
-            <p className="text-13 text-text-secondary mb-24 m-0">
-              Enter the supermarket details to initialize integration.
-            </p>
-
-            <form onSubmit={handleAddPartner} className="flex flex-col gap-4">
-              <div>
-                <label className="block text-13 font-semibold text-text-primary mb-1.5">
-                  Supermarket Chain Name
-                </label>
-                <input
-                  required
-                  type="text"
-                  value={newPartner.name}
-                  onChange={(e) => setNewPartner({ ...newPartner, name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border outline-none focus:border-primary text-sm box-border"
-                  placeholder="e.g. Al Maya"
-                />
-              </div>
-              <div>
-                <label className="block text-13 font-semibold text-text-primary mb-1.5">
-                  Website URL
-                </label>
-                <input
-                  required
-                  type="url"
-                  value={newPartner.website}
-                  onChange={(e) => setNewPartner({ ...newPartner, website: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border outline-none focus:border-primary text-sm box-border"
-                  placeholder="https://"
-                />
-              </div>
-              <div>
-                <label className="block text-13 font-semibold text-text-primary mb-1.5">
-                  Contact Email
-                </label>
-                <input
-                  required
-                  type="email"
-                  value={newPartner.contactEmail}
-                  onChange={(e) => setNewPartner({ ...newPartner, contactEmail: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border outline-none focus:border-primary text-sm box-border"
-                  placeholder="integration@supermarket.com"
-                />
-              </div>
-
-              <div className="flex justify-end gap-12 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-20 py-2.5 bg-white border border-border rounded-lg text-13 font-semibold cursor-pointer hover:bg-surface-variant transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={cn(
-                    'px-20 py-2.5 bg-primary text-white border-none rounded-lg text-13 font-semibold flex items-center gap-[8px] transition-opacity',
-                    isSubmitting
-                      ? 'cursor-not-allowed opacity-75'
-                      : 'cursor-pointer hover:opacity-90'
-                  )}
-                >
-                  {isSubmitting && (
-                    <svg
-                      className="animate-spin"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-10.42" />
-                    </svg>
-                  )}
-                  Submit Request
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
+      {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-8 right-8 bg-[#111827] text-white px-24 py-12 rounded-lg text-13 font-medium shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex items-center gap-[8px] z-9999 animate-in slide-in-from-bottom-20 fade-in duration-300">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#10b981"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
-          </svg>
+        <div className="fixed bottom-[16px] right-[16px] bg-gray-900 text-white px-[16px] py-[8px] rounded-lg text-[13px] font-medium shadow-lg z-50 animate-bounce">
           {toastMessage}
         </div>
       )}

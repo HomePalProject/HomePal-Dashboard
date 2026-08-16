@@ -8,6 +8,7 @@ export interface Supermarket {
   logoPath?: string | null;
   address?: string | null;
   websiteUrl?: string | null;
+  isActive?: boolean;
 }
 
 export interface Offer {

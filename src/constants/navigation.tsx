@@ -219,4 +219,5 @@ export const PAGE_LABELS: Record<string, string> = {
   '/dashboard/scraping-pipeline': 'Offer Scraping Pipeline',
   '/dashboard/measuring-units': 'Measuring Units',
   '/dashboard/profile': 'Account Settings',
+  '/dashboard/ai-token-usage': 'AI Token Usage',
 };

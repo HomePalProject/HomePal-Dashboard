@@ -18,7 +18,6 @@ export default function Header({
 }: HeaderProps) {
   return (
     <div className="flex items-center gap-3 flex-wrap">
-      {/* Search Input */}
       <div className="relative w-full sm:w-auto sm:min-w-220">
         <svg
           width="15"
@@ -41,7 +40,6 @@ export default function Header({
         />
       </div>
 
-      {/* View Switcher */}
       <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
         <button
           onClick={() => setViewMode('grid')}
@@ -98,6 +96,7 @@ export default function Header({
       {/* Add Category */}
       <Button
         variant="primary"
+        size="sm"
         onClick={onAdd}
         className="flex items-center gap-2 w-full sm:w-auto shrink-0"
       >

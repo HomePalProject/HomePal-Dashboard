@@ -36,15 +36,15 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
 
   return (
     <Card
-      className={`h-full flex flex-col items-center justify-center text-center bg-primary border-none shadow-none transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-40'
+      className={`h-full flex flex-col items-center justify-center text-center bg-primary border-none shadow-none transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] py-6 ${
+        vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}
     >
-      <div className="text-[10px] font-bold tracking-[0.12em] text-white/55 uppercase mb-16">
+      <div className="text-[10px] font-bold tracking-[0.12em] text-white/55 uppercase mb-6">
         System Health
       </div>
 
-      <div className="relative w-72 h-72 mb-16 flex items-center justify-center">
+      <div className="relative w-28 h-28 mb-6 flex items-center justify-center">
         <div
           className={`absolute w-full h-full rounded-full border-4 box-border transition-colors duration-400 ${
             isChecking
@@ -55,7 +55,7 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
           }`}
         />
         <span
-          className={`absolute w-40 h-40 rounded-full transition-all duration-400 ${
+          className={`absolute w-16 h-16 rounded-full transition-all duration-400 ${
             isChecking
               ? 'bg-white/50 shadow-[0_0_0_3px_rgba(255,255,255,0.15)]'
               : isOnline
@@ -65,10 +65,10 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
         />
       </div>
 
-      <div className="text-18 font-bold text-white mb-4">
+      <div className="text-sm font-bold text-white mb-2">
         {isChecking ? 'Checking…' : isOnline ? 'Stable & Online' : 'Service Offline'}
       </div>
-      <div className="text-12 text-white/55 mb-20">
+      <div className="text-xs text-white/55 mb-6">
         {isChecking
           ? 'Pinging API server…'
           : isOnline
@@ -76,7 +76,7 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
             : 'Cannot reach the API.'}
       </div>
 
-      <button className="bg-white/15 border-none rounded-md text-white text-[11px] font-bold tracking-[0.08em] px-20 py-8 cursor-pointer uppercase transition-colors hover:bg-white/25">
+      <button className="bg-white/15 border-none rounded-md text-white text-[11px] font-bold tracking-[0.08em] px-6 py-2 cursor-pointer uppercase transition-colors hover:bg-white/25">
         Details
       </button>
     </Card>

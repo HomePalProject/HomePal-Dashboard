@@ -3,7 +3,7 @@ import type { Supermarket } from '@typeDefs/catalogTypes';
 import { Modal } from '@components/ui/Modal';
 import { Field } from '@components/ui/Field';
 import { ModalActions } from '@components/ui/ModalActions';
-import { getLocalString } from '@lib/formatters';
+import { getLocalizedCulture } from '@lib/formatters';
 
 export function SupermarketFormModal({
   initial,
@@ -14,7 +14,13 @@ export function SupermarketFormModal({
   onSave: (d: any) => Promise<string | null>;
   onClose: () => void;
 }) {
-  const [name, setName] = useState(initial ? getLocalString(initial.name) : '');
+  const [nameEn, setNameEn] = useState(
+    initial
+      ? getLocalizedCulture(initial.name, 'en') ||
+          (typeof initial.name === 'string' ? initial.name : '')
+      : ''
+  );
+  const [nameAr, setNameAr] = useState(initial ? getLocalizedCulture(initial.name, 'ar') : '');
   const [address, setAddress] = useState(initial?.address || '');
   const [websiteUrl, setWebsiteUrl] = useState(initial?.websiteUrl || '');
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -38,12 +44,15 @@ export function SupermarketFormModal({
     setDeleteLogo(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     setError(null);
     const err = await onSave({
-      name: [{ culture: 'en-US', languageCode: 'en-US', value: name.trim() }],
+      name: [
+        { culture: 'en-US', languageCode: 'en-US', value: nameEn.trim() || nameAr.trim() },
+        { culture: 'ar-EG', languageCode: 'ar-EG', value: nameAr.trim() || nameEn.trim() },
+      ],
       address: address.trim() || null,
       websiteUrl: websiteUrl.trim() || null,
       logoFile,
@@ -124,15 +133,27 @@ export function SupermarketFormModal({
           </div>
         </div>
 
-        <Field label="Supermarket Name" required>
-          <input
-            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Spinneys Egypt"
-            required
-          />
-        </Field>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="English Name" required>
+            <input
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border"
+              value={nameEn}
+              onChange={(e) => setNameEn(e.target.value)}
+              placeholder="e.g. Spinneys Egypt"
+              required={!nameAr}
+            />
+          </Field>
+          <Field label="Arabic Name">
+            <input
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border text-right"
+              dir="rtl"
+              value={nameAr}
+              onChange={(e) => setNameAr(e.target.value)}
+              placeholder="مثال: سبينيس مصر"
+              required={!nameEn}
+            />
+          </Field>
+        </div>
 
         <Field label="Facebook Page / Scraper URL">
           <input

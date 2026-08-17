@@ -6,6 +6,7 @@ import { productCategoryService } from '@services/productCategoryService';
 import type { Offer, Supermarket } from '@typeDefs/catalogTypes';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 import { getImageUrl, getLocalString, getLocalizedCulture } from '@lib/formatters';
+import { fetchBilingual } from '@lib/localization';
 import { Modal } from '@components/ui/Modal';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 
@@ -45,15 +46,18 @@ export default function OffersHub() {
   const [deleting, setDeleting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [loadingEditId, setLoadingEditId] = useState<string | null>(null);
 
   // Form Fields
-  const [title, setTitle] = useState('');
+  const [titleEn, setTitleEn] = useState('');
+  const [titleAr, setTitleAr] = useState('');
   const [supermarketId, setSupermarketId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [originalPrice, setOriginalPrice] = useState('');
   const [discountedPrice, setDiscountedPrice] = useState('');
   const [validToDate, setValidToDate] = useState('');
-  const [description, setDescription] = useState('');
+  const [descriptionEn, setDescriptionEn] = useState('');
+  const [descriptionAr, setDescriptionAr] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [isVerified, setIsVerified] = useState(false);
 
@@ -111,32 +115,73 @@ export default function OffersHub() {
     void loadInitialData();
   }, [loadInitialData]);
 
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
   // Open Create/Edit Modal
-  const handleOpenModal = (off?: Offer) => {
+  const handleOpenModal = async (off?: Offer) => {
     if (off) {
-      setEditingOffer(off);
-      setTitle(getLocalString(off.title || off.name));
-      setSupermarketId(off.supermarketId || '');
-      setCategoryId(off.categoryId || '');
-      setOriginalPrice(off.originalPrice ? String(off.originalPrice) : '');
+      let resolvedOffer = off;
+      if (off.id && UUID_RE.test(off.id)) {
+        setLoadingEditId(off.id);
+        try {
+          const { en, ar } = await fetchBilingual((lang) =>
+            catalogService.getOfferById(off.id, lang)
+          );
+          const mergedName = [
+            { culture: 'en', value: getLocalString(en.name) },
+            { culture: 'ar', value: getLocalString(ar.name) },
+          ];
+          resolvedOffer = {
+            ...off,
+            name: mergedName,
+            title: mergedName,
+            description: [
+              { culture: 'en', value: (en.description as string) || '' },
+              { culture: 'ar', value: (ar.description as string) || '' },
+            ],
+          };
+        } catch {
+          showToast('Could not load both languages — showing available data only.');
+        } finally {
+          setLoadingEditId(null);
+        }
+      }
+
+      setEditingOffer(resolvedOffer);
+      setTitleEn(
+        getLocalizedCulture(resolvedOffer.title || resolvedOffer.name, 'en') ||
+          (typeof (resolvedOffer.title || resolvedOffer.name) === 'string'
+            ? ((resolvedOffer.title || resolvedOffer.name) as string)
+            : '')
+      );
+      setTitleAr(getLocalizedCulture(resolvedOffer.title || resolvedOffer.name, 'ar'));
+      setSupermarketId(resolvedOffer.supermarketId || '');
+      setCategoryId(resolvedOffer.categoryId || '');
+      setOriginalPrice(resolvedOffer.originalPrice ? String(resolvedOffer.originalPrice) : '');
       setDiscountedPrice(
-        off.discountedPrice || off.price ? String(off.discountedPrice || off.price) : ''
+        resolvedOffer.discountedPrice || resolvedOffer.price
+          ? String(resolvedOffer.discountedPrice || resolvedOffer.price)
+          : ''
       );
-      setValidToDate(off.validTo ? off.validTo.split('T')[0] : '');
-      setDescription(
-        typeof off.description === 'string' ? off.description : getLocalString(off.description)
+      setValidToDate(resolvedOffer.validTo ? resolvedOffer.validTo.split('T')[0] : '');
+      setDescriptionEn(
+        getLocalizedCulture(resolvedOffer.description, 'en') ||
+          (typeof resolvedOffer.description === 'string' ? resolvedOffer.description : '')
       );
-      setImageUrl(off.imagePath || '');
-      setIsVerified(!!off.isVerified);
+      setDescriptionAr(getLocalizedCulture(resolvedOffer.description, 'ar'));
+      setImageUrl(resolvedOffer.imagePath || '');
+      setIsVerified(!!resolvedOffer.isVerified);
     } else {
       setEditingOffer(null);
-      setTitle('');
+      setTitleEn('');
+      setTitleAr('');
       setSupermarketId(supermarkets.length > 0 ? supermarkets[0].id : '');
       setCategoryId('');
       setOriginalPrice('');
       setDiscountedPrice('');
       setValidToDate('');
-      setDescription('');
+      setDescriptionEn('');
+      setDescriptionAr('');
       setImageUrl('');
       setIsVerified(true);
     }
@@ -149,18 +194,39 @@ export default function OffersHub() {
   };
 
   // Submit Save Offer
-  const handleSaveOffer = async (e: React.FormEvent) => {
+  const handleSaveOffer = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!title.trim()) return;
+    if (!titleEn.trim() && !titleAr.trim()) return;
 
     setSaving(true);
     const selectedMarket = supermarkets.find((s) => s.id === supermarketId);
     const selectedCategory = categories.find((c) => c.id === categoryId);
 
+    const titlePayload = [
+      { culture: 'en-US', languageCode: 'en-US', value: titleEn.trim() || titleAr.trim() },
+      { culture: 'ar-EG', languageCode: 'ar-EG', value: titleAr.trim() || titleEn.trim() },
+    ];
+
+    const descriptionPayload =
+      descriptionEn.trim() || descriptionAr.trim()
+        ? [
+            {
+              culture: 'en-US',
+              languageCode: 'en-US',
+              value: descriptionEn.trim() || descriptionAr.trim(),
+            },
+            {
+              culture: 'ar-EG',
+              languageCode: 'ar-EG',
+              value: descriptionAr.trim() || descriptionEn.trim(),
+            },
+          ]
+        : undefined;
+
     const payload: Partial<Offer> = {
-      title: title.trim(),
-      name: title.trim(),
-      description: description.trim(),
+      title: titlePayload,
+      name: titlePayload,
+      description: descriptionPayload,
       originalPrice: originalPrice ? parseFloat(originalPrice) : undefined,
       discountedPrice: discountedPrice ? parseFloat(discountedPrice) : undefined,
       price: discountedPrice
@@ -446,7 +512,7 @@ export default function OffersHub() {
 
           {/* Add Offer Button */}
           <button
-            onClick={() => handleOpenModal()}
+            onClick={() => void handleOpenModal()}
             className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-5 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] active:scale-[0.98] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-sm hover:shadow-md shrink-0 border-none"
           >
             <svg
@@ -860,21 +926,36 @@ export default function OffersHub() {
 
                           {/* Edit Button */}
                           <button
-                            onClick={() => handleOpenModal(off)}
+                            onClick={() => void handleOpenModal(off)}
+                            disabled={loadingEditId === off.id}
                             title="Edit Offer"
-                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-none bg-transparent cursor-pointer transition-colors"
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-none bg-transparent cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            <svg
-                              width="15"
-                              height="15"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            >
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg>
+                            {loadingEditId === off.id ? (
+                              <svg
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="animate-spin"
+                              >
+                                <path d="M21 12a9 9 0 1 1-9-9" />
+                              </svg>
+                            ) : (
+                              <svg
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                              >
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                              </svg>
+                            )}
                           </button>
 
                           {/* Delete Button */}
@@ -943,19 +1024,35 @@ export default function OffersHub() {
           isOpen={true}
         >
           <form onSubmit={handleSaveOffer} className="flex flex-col gap-4 pt-2">
-            {/* Title */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                Offer Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Premium Ribeye Steak"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400"
-                required
-              />
+            {/* Title Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  English Offer Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={titleEn}
+                  onChange={(e) => setTitleEn(e.target.value)}
+                  placeholder="e.g. Premium Ribeye Steak"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400"
+                  required={!titleAr}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Arabic Offer Title
+                </label>
+                <input
+                  type="text"
+                  dir="rtl"
+                  value={titleAr}
+                  onChange={(e) => setTitleAr(e.target.value)}
+                  placeholder="مثال: ستيك ريب آي"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400 text-right"
+                  required={!titleEn}
+                />
+              </div>
             </div>
 
             {/* Supermarket & Category Grid */}
@@ -1052,6 +1149,33 @@ export default function OffersHub() {
                 placeholder="/uploads/products/xyz.jpg or https://..."
                 className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white outline-none focus:border-slate-400"
               />
+            </div>
+
+            {/* Description Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  English Description
+                </label>
+                <textarea
+                  value={descriptionEn}
+                  onChange={(e) => setDescriptionEn(e.target.value)}
+                  placeholder="Offer details..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400 min-h-[60px]"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  Arabic Description
+                </label>
+                <textarea
+                  dir="rtl"
+                  value={descriptionAr}
+                  onChange={(e) => setDescriptionAr(e.target.value)}
+                  placeholder="تفاصيل العرض..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400 min-h-[60px] text-right"
+                />
+              </div>
             </div>
 
             {/* Verification Status Toggle */}

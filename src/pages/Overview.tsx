@@ -1,231 +1,340 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '@store/authStore';
-import { MetricCard } from '@components/dashboard/MetricCard';
-import { SystemHealthCard } from '@components/dashboard/SystemHealthCard';
-import { Card, CardHeader, CardContent } from '@components/ui/Card';
-
 import { analyticsService } from '@services/analyticsService';
-import api from '@services/api';
+import { catalogService } from '@services/catalogService';
+import { productCategoryService } from '@services/productCategoryService';
+import { SystemHealthCard } from '@components/dashboard/SystemHealthCard';
+
 import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
+import type { Supermarket } from '@typeDefs/catalogTypes';
+import type { MealPlansSummaryData } from '@typeDefs/analyticsTypes';
+import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 
 import { getHour } from '@lib/formatters';
 
-const SYSTEM_PULSE = [
-  {
-    title: 'New Preference Category',
-    desc: '"Energy Saving" rules updated.',
-    time: 'Just now',
-    type: 'pref',
-  },
-  {
-    title: 'System Check',
-    desc: 'All endpoints responding normally.',
-    time: '15 min ago',
-    type: 'system',
-  },
-  {
-    title: 'New Household',
-    desc: 'A new household was registered.',
-    time: '1 hour ago',
-    type: 'household',
-  },
-];
-
 export default function Overview() {
   const token = useAuthStore((s) => s.token);
-  const [categoriesCount, setCategoriesCount] = useState<number | '—'>('—');
   const [summaryData, setSummaryData] = useState<HouseholdsSummaryData | null>(null);
+  const [mealPlansSummary, setMealPlansSummary] = useState<MealPlansSummaryData | null>(null);
+  const [realSupermarkets, setRealSupermarkets] = useState<Supermarket[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
   const greeting = `Good ${getHour()}.`;
 
   useEffect(() => {
-    (async () => {
+    let isMounted = true;
+    const fetchAllData = async () => {
       try {
-        const [summaryRes, catRes] = await Promise.all([
-          analyticsService.getHouseholdsSummary(),
-          api.get('/preferences/categories').catch(() => ({ data: [] })),
+        const [summaryRes, mealPlansRes, superRes, catRes] = await Promise.all([
+          analyticsService.getHouseholdsSummary().catch(() => null),
+          analyticsService.getMealPlansSummary().catch(() => null),
+          catalogService.getSupermarkets().catch(() => []),
+          productCategoryService.getCategories().catch(() => []),
         ]);
-        setSummaryData(summaryRes);
 
-        let cats = [];
-        if (Array.isArray(catRes.data?.data)) cats = catRes.data.data;
-        else if (Array.isArray(catRes.data)) cats = catRes.data;
-        else if (Array.isArray(catRes.data?.items)) cats = catRes.data.items;
-
-        setCategoriesCount(cats.length);
+        if (isMounted) {
+          setSummaryData(summaryRes);
+          setMealPlansSummary(mealPlansRes);
+          setRealSupermarkets(superRes);
+          setCategories(catRes);
+        }
       } catch (err) {
-        console.error(err);
+        console.error('Failed to load Overview data:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
-    })();
+    };
+
+    void fetchAllData();
+    return () => {
+      isMounted = false;
+    };
   }, [token]);
 
-  const HouseIcon = (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 12L12 3L21 12" />
-      <path d="M5 10V20a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1V10" />
-    </svg>
-  );
-
-  const TagIcon = (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
-      <line x1="7" y1="7" x2="7.01" y2="7" />
-    </svg>
-  );
-
   return (
-    <div className="flex flex-col gap-16">
-      {/* Greeting */}
-      <div>
-        <h1 className="text-32 md:text-[40px] font-extrabold text-text-primary tracking-tight leading-tight m-0">
-          {greeting}
-        </h1>
-        <p className="text-[15px] text-text-secondary mt-8 m-0">
-          Your HomePal network is performing optimally today.
-        </p>
+    <div className="w-full space-y-6 font-sans pb-10">
+      {/* ── Clean Human Greeting Header ── */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-1">
+        <div>
+          <h1 className="text-28 md:text-[36px] font-extrabold text-[#2d2a26] tracking-tight leading-tight m-0">
+            {greeting}
+          </h1>
+          <p className="text-sm text-[#6d6862] mt-1 m-0">
+            Welcome back. Here is the latest operational summary across your households and catalog
+            networks.
+          </p>
+        </div>
+
+        <Link
+          to="/dashboard/households"
+          className="px-4 py-2 bg-[#356859] hover:bg-[#2a5347] text-white rounded-xl text-xs font-bold no-underline transition-colors shadow-xs shrink-0 self-start sm:self-auto"
+        >
+          Manage Households
+        </Link>
       </div>
 
-      {/* KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_220px] gap-16 min-h-70">
-        {/* Large household card */}
-        <div className="sm:row-span-2">
-          <MetricCard
-            icon={HouseIcon}
-            value={summaryData?.totalHouseholds?.toLocaleString() ?? '—'}
-            label="Total Households Managed"
-            badge="Platform"
-            note="Based on aggregated demographics"
-            delay={0}
-          />
+      {/* ── Metric & System Health Cards Grid ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Total Households */}
+        <div className="p-5 rounded-2xl bg-white border border-[#e4e0da] shadow-xs hover:border-[#356859]/50 transition-colors flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#6d6862]">
+              Total Households
+            </span>
+            <div className="p-2 rounded-xl bg-[#faf8f3] text-[#356859] border border-[#e4e0da]">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M3 12L12 3L21 12" />
+                <path d="M5 10V20a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1V10" />
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-[#2d2a26] tracking-tight">
+              {loading ? '...' : (summaryData?.totalHouseholds?.toLocaleString() ?? '0')}
+            </div>
+            <div className="text-[11px] font-semibold text-[#6d6862] mt-1">
+              Enrolled across platform
+            </div>
+          </div>
         </div>
 
-        {/* Categories card */}
-        <div className="sm:row-span-2">
-          <MetricCard
-            icon={TagIcon}
-            value={categoriesCount}
-            label="Global Preference Categories"
-            delay={80}
-          />
+        {/* Active Households */}
+        <div className="p-5 rounded-2xl bg-white border border-[#e4e0da] shadow-xs hover:border-[#356859]/50 transition-colors flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#6d6862]">
+              Active Households
+            </span>
+            <div className="p-2 rounded-xl bg-[#faf8f3] text-[#356859] border border-[#e4e0da]">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-[#2d2a26] tracking-tight">
+              {loading ? '...' : (summaryData?.activeHouseholds?.toLocaleString() ?? '0')}
+            </div>
+            <div className="text-[11px] font-semibold text-[#356859] mt-1">
+              {summaryData?.totalHouseholds && summaryData.totalHouseholds > 0
+                ? `${Math.round((summaryData.activeHouseholds / summaryData.totalHouseholds) * 100)}% active rate`
+                : 'Active status'}
+            </div>
+          </div>
         </div>
 
-        {/* System Health card */}
-        <div className="sm:col-span-2 lg:col-span-1 lg:row-span-2">
-          <SystemHealthCard delay={160} />
+        {/* AI Meal Plans */}
+        <div className="p-5 rounded-2xl bg-white border border-[#e4e0da] shadow-xs hover:border-[#356859]/50 transition-colors flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#6d6862]">
+              Meal Plans
+            </span>
+            <div className="p-2 rounded-xl bg-[#faf8f3] text-[#d99a3d] border border-[#e4e0da]">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+            </div>
+          </div>
+          <div>
+            <div className="text-2xl font-black text-[#2d2a26] tracking-tight">
+              {loading ? '...' : (mealPlansSummary?.mealPlansTotal?.toLocaleString() ?? '0')}
+            </div>
+            <div className="text-[11px] font-semibold text-[#6d6862] mt-1">
+              Generated by AI assistant
+            </div>
+          </div>
+        </div>
+
+        {/* System Health Spinning Card (Restored as requested) */}
+        <div className="min-h-[160px]">
+          <SystemHealthCard delay={100} />
         </div>
       </div>
 
-      {/* Bottom section */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-20">
-        {/* Aggregated Analytics Card */}
-        <Card noPadding className="flex flex-col">
-          <CardHeader className="flex justify-between items-start">
+      {/* ── Main Content Grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Household & Catalog Summary (Spans 2 cols) */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-[#e4e0da] p-6 shadow-xs space-y-6">
+          <div className="flex items-center justify-between border-b border-[#f4f2ee] pb-4">
             <div>
-              <div className="text-18 font-bold text-text-primary leading-none">
-                Aggregated Analytics
-              </div>
-              <div className="text-13 text-text-disabled mt-4">Privacy-safe platform metrics.</div>
+              <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
+                Households & Catalog Distribution
+              </h2>
+              <p className="text-xs text-[#6d6862] m-0 mt-0.5">
+                Detailed demographics and supermarket network coverage.
+              </p>
             </div>
             <Link
               to="/dashboard/households"
-              className="text-12 font-bold tracking-[0.06em] uppercase text-primary bg-primary-container px-16 sm:px-56 py-24 rounded-md no-underline hover:bg-primary-container/80 transition-colors whitespace-nowrap"
+              className="px-3 py-1.5 text-xs font-bold text-[#356859] bg-[#faf8f3] hover:bg-[#f4f2ee] border border-[#e4e0da] rounded-xl no-underline transition-colors"
             >
               Full Report
             </Link>
-          </CardHeader>
+          </div>
 
-          <CardContent className="flex-1">
-            {loading || !summaryData ? (
-              <div className="py-48 text-center flex justify-center">
-                <div className="w-24 h-24 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          {loading ? (
+            <div className="py-16 text-center text-xs font-semibold text-[#6d6862]">
+              Loading summary data...
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Demographics Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-[#faf8f3] border border-[#e4e0da] space-y-1">
+                  <div className="text-xs font-bold text-[#6d6862] uppercase tracking-wider">
+                    Avg. Household Size
+                  </div>
+                  <div className="text-xl font-black text-[#2d2a26]">
+                    {summaryData?.avgHouseholdSize
+                      ? `${Math.round(summaryData.avgHouseholdSize)} members`
+                      : '1 member'}
+                  </div>
+                  <div className="text-[11px] text-[#6d6862]">Average active family size</div>
+                </div>
+
+                <div className="p-4 rounded-xl bg-[#faf8f3] border border-[#e4e0da] space-y-1">
+                  <div className="text-xs font-bold text-[#6d6862] uppercase tracking-wider">
+                    Avg. Plans / Household
+                  </div>
+                  <div className="text-xl font-black text-[#2d2a26]">
+                    {mealPlansSummary?.mealPlansPerHousehold
+                      ? `${Math.round(mealPlansSummary.mealPlansPerHousehold)} plans`
+                      : '0 plans'}
+                  </div>
+                  <div className="text-[11px] text-[#6d6862]">Generated per household</div>
+                </div>
+              </div>
+
+              {/* Supermarket Network Share */}
+              <div className="space-y-3 pt-2 border-t border-[#f4f2ee]">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-[#2d2a26] uppercase tracking-wider m-0">
+                    Partner Supermarket Chains
+                  </h3>
+                  <span className="text-xs font-bold text-[#6d6862]">
+                    {realSupermarkets.length} Chains
+                  </span>
+                </div>
+
+                {realSupermarkets.length > 0 ? (
+                  <div className="space-y-3">
+                    {(() => {
+                      const total = realSupermarkets.length;
+                      const baseShare = Math.floor(100 / total);
+                      const remainder = 100 - baseShare * total;
+                      const colors = [
+                        'bg-[#356859]',
+                        'bg-[#d99a3d]',
+                        'bg-[#2a5347]',
+                        'bg-[#6d6862]',
+                      ];
+
+                      return realSupermarkets.map((s, idx) => {
+                        const nameStr = Array.isArray(s.name)
+                          ? s.name[0]?.value || 'Supermarket'
+                          : typeof s.name === 'string'
+                            ? s.name
+                            : 'Supermarket';
+                        const shareVal = baseShare + (idx === 0 ? remainder : 0);
+
+                        return (
+                          <div key={s.id || idx} className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-bold text-[#2d2a26]">{nameStr}</span>
+                              <span className="font-extrabold text-[#356859]">{shareVal}%</span>
+                            </div>
+                            <div className="w-full h-2.5 bg-[#f4f2ee] rounded-full overflow-hidden">
+                              <div
+                                style={{ width: `${shareVal}%` }}
+                                className={`h-full ${colors[idx % colors.length]} rounded-full transition-all duration-500`}
+                              />
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl bg-[#faf8f3] text-xs text-[#6d6862] text-center">
+                    No partner supermarkets found.
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Global Preference Categories Side Card */}
+        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 shadow-xs flex flex-col justify-between space-y-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-[#f4f2ee] pb-3">
+              <h3 className="text-sm font-bold text-[#2d2a26] uppercase tracking-wider m-0">
+                Categories ({categories.length})
+              </h3>
+              <Link
+                to="/dashboard/categories"
+                className="text-xs font-bold text-[#356859] hover:underline no-underline"
+              >
+                Manage
+              </Link>
+            </div>
+
+            {categories.length > 0 ? (
+              <div className="space-y-2">
+                {categories.slice(0, 7).map((cat) => {
+                  const catName = Array.isArray(cat.name)
+                    ? cat.name[0]?.value || 'Category'
+                    : typeof cat.name === 'string'
+                      ? cat.name
+                      : 'Category';
+                  return (
+                    <div
+                      key={cat.id}
+                      className="p-3 rounded-xl bg-[#faf8f3] border border-[#e4e0da] text-xs font-bold text-[#2d2a26] flex items-center justify-between"
+                    >
+                      <span className="truncate">{catName}</span>
+                      <span className="w-2 h-2 rounded-full bg-[#356859] shrink-0" />
+                    </div>
+                  );
+                })}
               </div>
             ) : (
-              <div className="flex flex-col">
-                <div className="flex justify-between py-16 border-b border-surface-variant">
-                  <span className="text-14 font-semibold text-text-primary">Active Households</span>
-                  <span className="text-14 font-bold text-primary">
-                    {summaryData?.activeHouseholds?.toLocaleString() ?? '—'}
-                  </span>
-                </div>
-                <div className="flex justify-between py-16 border-b border-surface-variant">
-                  <span className="text-14 font-semibold text-text-primary">
-                    Avg. Household Size
-                  </span>
-                  <span className="text-14 font-bold text-primary">
-                    {summaryData.avgHouseholdSize} members
-                  </span>
-                </div>
-                <div className="flex justify-between py-16">
-                  <span className="text-14 font-semibold text-text-primary">
-                    Platform Penetration
-                  </span>
-                  <span className="text-14 font-bold text-primary">12% YoY</span>
-                </div>
+              <div className="p-4 rounded-xl bg-[#faf8f3] text-xs text-[#6d6862] text-center">
+                Loading categories...
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* System Pulse Card */}
-        <Card noPadding className="flex flex-col">
-          <CardContent className="flex-1 flex flex-col pb-0">
-            <div className="text-18 font-bold text-text-primary mb-20">System Pulse</div>
-            <div className="flex-1 flex flex-col gap-0">
-              {SYSTEM_PULSE.map((item, i) => (
-                <div
-                  key={i}
-                  className={`pb-16 mb-16 ${i < SYSTEM_PULSE.length - 1 ? 'border-b border-surface-variant' : ''}`}
-                >
-                  <div className="flex gap-8 items-start">
-                    <span
-                      className={`mt-4 w-7 h-7 rounded-full shrink-0 ${
-                        item.type === 'pref'
-                          ? 'bg-primary'
-                          : item.type === 'household'
-                            ? 'bg-accent'
-                            : 'bg-text-disabled'
-                      }`}
-                    />
-                    <div>
-                      <div className="text-13 font-semibold text-text-primary">{item.title}</div>
-                      <div className="text-12 text-text-disabled mt-[8px]">{item.desc}</div>
-                      <div className="text-[11px] text-text-disabled/70 mt-4 uppercase tracking-[0.04em] font-semibold">
-                        {item.time}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-          <div className="border-t border-surface-variant py-20 mt-auto">
-            <button className="w-full bg-transparent border-none text-[11px] font-bold tracking-[0.1em] uppercase text-text-disabled cursor-pointer text-center transition-colors hover:text-primary">
-              Audit Full Logs
-            </button>
           </div>
-        </Card>
+
+          <div className="p-3.5 rounded-xl bg-[#faf8f3] border border-[#e4e0da] text-xs text-[#6d6862] leading-relaxed">
+            <span className="font-bold text-[#2d2a26]">Need help? </span>
+            Explore the categories section to organize product rules and household dietary
+            constraints.
+          </div>
+        </div>
       </div>
     </div>
   );

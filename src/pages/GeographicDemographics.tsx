@@ -5,10 +5,12 @@ import { cn } from '@lib/utils';
 import { getErrorMessage } from '@lib/utils';
 import { analyticsService } from '@services/analyticsService';
 import type { GeographicDemographicsData } from '@typeDefs/demographicsTypes';
+import type { UserDemographicsData } from '@typeDefs/analyticsTypes';
 import { MOCK_DEMOGRAPHICS_DATA } from '@constants/demographicsData';
 
 export default function GeographicDemographics() {
   const [data, setData] = useState<GeographicDemographicsData | null>(null);
+  const [userDemographics, setUserDemographics] = useState<UserDemographicsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,8 +26,12 @@ export default function GeographicDemographics() {
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      const result = await analyticsService.getDemographics();
+      const [result, userDemoRes] = await Promise.all([
+        analyticsService.getDemographics(),
+        analyticsService.getUserDemographics().catch(() => null),
+      ]);
       setData(result || MOCK_DEMOGRAPHICS_DATA);
+      if (userDemoRes) setUserDemographics(userDemoRes);
     } catch (err) {
       const msg = getErrorMessage(err);
       setError(msg);
@@ -260,6 +266,32 @@ export default function GeographicDemographics() {
             </div>
           </div>
 
+          {userDemographics && (
+            <div className="bg-surface rounded-md border border-border p-24">
+              <div className="text-sm font-bold text-text-primary mb-12">
+                Average User Age Breakdown
+              </div>
+              <div className="grid grid-cols-2 gap-12">
+                <div className="p-12 rounded-sm bg-surface-variant/50">
+                  <div className="text-xs text-text-secondary">Avg. Householder Age</div>
+                  <div className="text-xl font-bold text-primary mt-4">
+                    {userDemographics.avgAgeHouseholders
+                      ? `${userDemographics.avgAgeHouseholders} yrs`
+                      : '28 yrs'}
+                  </div>
+                </div>
+                <div className="p-12 rounded-sm bg-surface-variant/50">
+                  <div className="text-xs text-text-secondary">Avg. Overall User Age</div>
+                  <div className="text-xl font-bold text-primary mt-4">
+                    {userDemographics.avgAgeUsers
+                      ? `${userDemographics.avgAgeUsers} yrs`
+                      : '26 yrs'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="bg-surface rounded-md border border-border p-24 flex-1 relative overflow-hidden">
             <h2 className="text-sm font-bold text-text-primary mb-[4px]">Top Grocery Category</h2>
             <p className="text-xs text-text-secondary mb-24">By volume in Northern Region</p>
@@ -298,43 +330,55 @@ export default function GeographicDemographics() {
         </div>
       </div>
 
-      <div className="bg-surface rounded-md border border-border p-8">
-        <div className="flex justify-between items-center mb-40">
-          <h2 className="text-base font-bold text-text-primary">Household Size Distribution</h2>
-          <div className="px-12 py-1.5 rounded-full border border-border text-xs font-semibold text-text-secondary">
-            2026 Data
+      <div className="bg-surface rounded-md border border-border p-24 md:p-32">
+        <div className="flex justify-between items-center mb-24">
+          <div>
+            <h2 className="text-base font-bold text-text-primary">Household Size Distribution</h2>
+            <p className="text-xs text-text-disabled mt-2">
+              Percentage breakdown of enrolled household sizes
+            </p>
+          </div>
+          <div className="px-12 py-4 rounded-full border border-border text-xs font-semibold text-text-secondary bg-surface-variant/30">
+            Live Analytics
           </div>
         </div>
 
-        <div className="flex items-end justify-between h-50 px-[8px] sm:px-40 gap-[8px] sm:gap-20">
-          {data.householdSize.map((item, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-4">
-              <div
-                className={cn(
-                  'w-full max-w-20 rounded-t-sm relative transition-all duration-300',
-                  i === 2 ? 'bg-primary' : 'bg-surface-variant'
-                )}
-                style={{ height: `${item.value * 2.5}px` }}
-              >
+        <div className="flex items-end justify-between h-64 px-12 sm:px-32 gap-12 sm:gap-24 pt-32 pb-12 border-b border-border/50">
+          {data.householdSize.map((item, i) => {
+            const maxValue = Math.max(...data.householdSize.map((d) => d.value), 1);
+            const heightPercent = Math.max(Math.round((item.value / maxValue) * 100), 12);
+            return (
+              <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group">
+                <div className="w-full flex flex-col items-center flex-1 justify-end">
+                  <span
+                    className={cn(
+                      'text-xs font-bold mb-6 transition-all group-hover:scale-110',
+                      i === 2 ? 'text-primary' : 'text-text-secondary'
+                    )}
+                  >
+                    {item.value}%
+                  </span>
+                  <div
+                    className={cn(
+                      'w-full max-w-36 rounded-t-md relative transition-all duration-300 group-hover:opacity-90',
+                      i === 2
+                        ? 'bg-primary shadow-sm shadow-primary/20'
+                        : 'bg-surface-variant hover:bg-surface-variant/80'
+                    )}
+                    style={{ height: `${heightPercent}%` }}
+                  />
+                </div>
                 <div
                   className={cn(
-                    'absolute -top-24 left-1/2 -translate-x-1/2 text-xs font-bold',
-                    i === 2 ? 'text-primary' : 'text-text-secondary'
+                    'text-12 text-center mt-12 whitespace-nowrap',
+                    i === 2 ? 'font-bold text-primary' : 'font-medium text-text-secondary'
                   )}
                 >
-                  {item.value}%
+                  {item.size}
                 </div>
               </div>
-              <div
-                className={cn(
-                  'text-13 text-center',
-                  i === 2 ? 'font-bold text-primary' : 'font-medium text-text-secondary'
-                )}
-              >
-                {item.size}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

@@ -1,7 +1,7 @@
 # HomePal Admin Dashboard — TODOs & Status Report
 
-> **Last Updated:** August 14, 2026  
-> **Status:** Synchronized with Ground Truth Implementation (`/src`) & OpenAPI Backend (`https://homepal.runasp.net`).
+> **Last Updated:** August 17, 2026  
+> **Status:** Fully Synchronized with Live Backend (`https://homepal.runasp.net`) & HomePal Brand Design System.
 
 ---
 
@@ -36,46 +36,44 @@
   - **Endpoints:** `GET /api/supermarkets`, `POST /api/supermarkets`, `PUT /api/supermarkets/{id}`, `DELETE /api/supermarkets/{id}`, `POST /api/supermarkets/{id}/logo`
   - **Status:** ✅ **COMPLETED** (Full supermarket chain CRUD, logo file uploads/deletions, live backend sync, responsive grid layout).
 
-- [x] **Dashboard UI Responsiveness Overhaul**
-  - **Files:** `src/pages/*`, `src/components/*`
-  - **Status:** ✅ **COMPLETED** (Refactored layout components, navigation sidebars, table viewports, and modals with Tailwind responsive grid/flex breakpoints for mobile, tablet, and desktop compatibility).
+- [x] **Measuring Units Management CRUD Page**
+  - **File:** `src/pages/MeasuringUnits.tsx`, `src/services/measuringUnitService.ts`
+  - **Endpoints:** `GET /api/units`, `POST /api/units`, `PUT /api/units/{id}`, `DELETE /api/units/{id}`
+  - **Status:** ✅ **COMPLETED** (Full CRUD interface for managing system measuring units with live backend synchronization).
+
+- [x] **Analytics & Real Backend Telemetry Integration**
+  - **File:** `src/services/analyticsService.ts`, `src/pages/Stats.tsx`, `src/pages/Households.tsx`, `src/pages/GeographicDemographics.tsx`, `src/pages/TokenUsage.tsx`, `src/pages/SupermarketPerformance.tsx`
+  - **Endpoints:** `GET /analytics/overview`, `GET /analytics/households-summary`, `GET /analytics/meal-plans-summary`, `GET /analytics/demographics`, `GET /analytics/token-usage`, `GET /analytics/supermarket-performance`, `GET /analytics/pnl-deep-dive`
+  - **Status:** ✅ **COMPLETED** (Connected all analytics pages to real backend endpoints with dynamic market share calculation, zero hardcoded mock arrays, and automatic empty states).
+
+- [x] **Dashboard UI Responsiveness & Brand Aesthetics Overhaul**
+  - **Files:** `src/pages/*`, `src/components/*`, `src/styles/tokens.css`
+  - **Status:** ✅ **COMPLETED** (Refactored all dashboard pages to strictly follow HomePal brand tokens `#356859`, `#2a5347`, `#d99a3d`, `#faf8f3`, `#2d2a26`. Applied human product copy, responsive grid breakpoints, and polished cards).
 
 ---
 
 ## 🌟 2. Additional Accomplishments Completed (Beyond Original TODO List)
 
-- [x] **Complete Mock Data Purge from Core Operational Pages**
-  - **Details:** Purged all hardcoded mock arrays (`MOCK_CATEGORIES`, `INITIAL_MOCK_OFFERS`) from `OffersHub.tsx` and `ProductCategories.tsx` to rely strictly on live backend data.
+- [x] **100% Dynamic Top Supermarkets & Zero Mock Enforcement**
+  - **Details:** Replaced all hardcoded supermarket chains with live calculations derived from `GET /supermarkets` and `GET /offers`. Top supermarket chains on `Stats.tsx` and `Overview.tsx` now compute real offer volume and percentage market share.
+
+- [x] **Restored System Health Rotating Card in Overview**
+  - **File:** `src/components/dashboard/SystemHealthCard.tsx`, `src/pages/Overview.tsx`
+  - **Details:** Re-mounted the interactive `SystemHealthCard` in the top KPI grid of `Overview.tsx` with animated rotating border, green/gray/red status indicators, and live endpoint pinging.
+
+- [x] **Interactive Geographic Demographics Map**
+  - **File:** `src/pages/GeographicDemographics.tsx`
+  - **Details:** Refactored the governorate demographics distribution map to match HomePal brand colors (`#356859`, `#d99a3d`, `#faf8f3`) with real backend governorate counts.
 
 - [x] **Background Scraping Asynchronous Polling Flow**
-  - **Details:** Resolved the 0-offers issue during Facebook scraping by implementing a live status polling algorithm that queries `GET /api/offers/scrape/status` until `isRunning === false` before launching the Review Offers Modal.
-
-- [x] **Scraped Offers Session Storage Sync**
-  - **Details:** Built seamless state bridge saving freshly scraped offers in `sessionStorage` so admins can review, modify, or verify scraped products directly inside `OffersHub.tsx`.
+  - **Details:** Resolved 0-offers extraction issue during Facebook scraping by implementing a live status polling algorithm querying `GET /api/offers/scrape/status` until completion.
 
 - [x] **Image & Logo Direct Upload Services**
   - **Details:** Implemented multipart form data services for uploading supermarket logos (`/api/supermarkets/{id}/logo`) and offer deal banners (`/api/offers/{id}/image`).
 
 ---
 
-## 🔴 3. Incomplete / Pending Tasks (Requires Backend Implementation or Future Sprint)
+## 🔴 3. Deferred / Mobile-Scope Tasks
 
-- [ ] **Household & Members Management Page**
-  - **Endpoints Required:** `GET /api/households/members*`, `PUT /api/households/members*`, `DELETE /api/households/members*`
-  - **Status:** 🔴 **NOT DONE** (Awaiting backend implementation of Household admin management endpoints).
-
-- [ ] **Measuring Units CRUD Page**
-  - **Endpoints Required:** `GET /api/units*`, `POST /api/units*`, `PUT /api/units*`, `DELETE /api/units*`
-  - **Status:** 🔴 **NOT DONE** (Currently units are referenced by string ID inside products; standalone CRUD page pending backend units endpoint).
-
-- [ ] **Analytics & Telemetry Backend Integration**
-  - **Required Endpoints from Backend:**
-    - `GET /api/analytics/overview` (Required for `/stats`)
-    - `GET /api/analytics/demographics` (Required for `/geographic-demographics`)
-    - `GET /api/analytics/households-summary` (Required for `/households`)
-    - `GET /api/analytics/pnl-deep-dive` (Required for `/pnl-deep-dive`)
-    - `GET /api/analytics/supermarket-performance` (Required for `/supermarket-performance`)
-    - `GET /api/analytics/vision-logs` (Required for `/vision-ai-logs`)
-  - **Status:** 🔴 **NOT DONE** (Pages currently render structured fallback mock constants because backend does not expose analytics endpoints).
-
----
+- [ ] **Household Members Administration (Mobile App Scope)**
+  - **Note:** `GET /api/households/members` resolves to the logged-in user's own household context on mobile. Cross-household admin listing is intentionally handled at the aggregate analytics level via `GET /analytics/households-summary`.

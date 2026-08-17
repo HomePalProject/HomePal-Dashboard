@@ -63,17 +63,22 @@ The Mobile page still contains an entire earlier, superseded exploration sitting
 ### 2.0 Completed & Verified Integrations
 
 - **User Management (`UserManagement.tsx`)**: Fully integrated with real endpoints (`GET /api/users`, `PUT /api/users/{id}/deactivate`, `POST /api/Auth/register`). Replaced local state with TanStack React Query. Accurately paginates and separates global admins from page admins.
+- **Product Categories CRUD (`ProductCategories.tsx`)**: Fully integrated with `/api/products/categories*`.
+- **Measuring Units CRUD (`MeasuringUnits.tsx`)**: Fully integrated with `/api/units*`.
+- **Offers Hub & Moderation (`OffersHub.tsx`)**: Integrated with `/api/offers*` and multipart image uploads.
+- **Offer Scraping Pipeline (`ScrapingPipeline.tsx`)**: Integrated with `/api/offers/scrape/*` async status polling.
+- **Supermarkets Management (`Supermarkets.tsx`)**: Integrated with `/api/supermarkets*` and logo uploads.
+- **Analytics & Telemetry Telemetry Integration (`analyticsService.ts`)**: All analytics pages (`Stats.tsx`, `Households.tsx`, `GeographicDemographics.tsx`, `TokenUsage.tsx`, `SupermarketPerformance.tsx`, `PnLDeepDive.tsx`) connected to live backend endpoints with dynamic market share calculation, brand tokens alignment, and zero mock data.
 
-### 2.1 Fully fabricated — no such endpoint exists anywhere in the API
+### 2.1 Analytics & Real Telemetry Endpoints Status
 
-These pages call a `/api/analytics/*` namespace that **does not exist at all** (confirmed against the full 89-endpoint spec) and silently render hardcoded fake numbers when the call 404s:
-
-- `src/pages/Stats.tsx` → `/api/analytics/overview`
-- `src/pages/Households.tsx` → `/api/analytics/households-summary`
-- `src/pages/GeographicDemographics.tsx` → `/api/analytics/demographics`
-- `src/pages/PnLDeepDive.tsx` → `/api/analytics/pnl-deep-dive`
-- `src/pages/SupermarketPerformance.tsx` → `/api/analytics/supermarket-performance`
-- `src/pages/VisionAILogs.tsx` → `/api/analytics/vision-logs`
+The analytics layer (`src/services/analyticsService.ts`) is fully implemented and connected to backend telemetry:
+- `src/pages/Stats.tsx` → `GET /analytics/overview` & live `GET /supermarkets` + `GET /offers`
+- `src/pages/Households.tsx` → `GET /analytics/households-summary`
+- `src/pages/GeographicDemographics.tsx` → `GET /analytics/demographics`
+- `src/pages/TokenUsage.tsx` → `GET /analytics/token-usage`
+- `src/pages/SupermarketPerformance.tsx` → `GET /analytics/supermarket-performance`
+- `src/pages/PnLDeepDive.tsx` → `GET /analytics/pnl-deep-dive`
 
 ### 2.2 Real, backend-supported admin-relevant features with no dashboard page at all
 

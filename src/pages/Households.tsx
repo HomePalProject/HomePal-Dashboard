@@ -2,18 +2,24 @@ import { MOCK_HOUSEHOLDS_DATA } from '@constants/householdsData';
 import { getErrorMessage } from '@lib/utils';
 import { analyticsService } from '@services/analyticsService';
 import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
+import type { HouseholdOverviewReportData } from '@typeDefs/analyticsTypes';
 import { useCallback, useEffect, useState } from 'react';
 
 export default function Households() {
   const [data, setData] = useState<HouseholdsSummaryData | null>(null);
+  const [overviewReport, setOverviewReport] = useState<HouseholdOverviewReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      const result = await analyticsService.getHouseholdsSummary();
+      const [result, reportRes] = await Promise.all([
+        analyticsService.getHouseholdsSummary(),
+        analyticsService.getHouseholdOverviewReport().catch(() => null),
+      ]);
       setData(result || MOCK_HOUSEHOLDS_DATA);
+      if (reportRes) setOverviewReport(reportRes);
     } catch (err) {
       const msg = getErrorMessage(err);
       setError(msg);
@@ -88,10 +94,16 @@ export default function Households() {
 
         <div className="bg-surface p-24 rounded-md border border-border shadow-sm">
           <div className="text-13 font-semibold text-text-disabled mb-[8px]">
-            Avg Monthly Income
+            {overviewReport?.kpis?.monthlyBudget ? 'Avg Monthly Budget' : 'Avg Monthly Income'}
           </div>
-          <div className="text-32 font-extrabold text-text-primary">{data.avgHouseholdIncome}</div>
-          <div className="text-xs font-semibold text-text-secondary mt-[4px]">Self-reported</div>
+          <div className="text-32 font-extrabold text-text-primary">
+            {overviewReport?.kpis?.monthlyBudget
+              ? `$${overviewReport.kpis.monthlyBudget.toLocaleString()}`
+              : data.avgHouseholdIncome}
+          </div>
+          <div className="text-xs font-semibold text-text-secondary mt-[4px]">
+            {overviewReport?.kpis?.monthlyBudget ? 'Household Report KPI' : 'Self-reported'}
+          </div>
         </div>
       </div>
 

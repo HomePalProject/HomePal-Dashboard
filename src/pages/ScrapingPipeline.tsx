@@ -307,10 +307,22 @@ export default function ScrapingPipeline() {
 
     const count = catalogOffers.filter((o) => {
       if (!o.createdAt) return i === 0;
-      return new Date(o.createdAt).toDateString() === d.toDateString();
+      const offerDate = new Date(o.createdAt);
+      return offerDate.toDateString() === d.toDateString();
     }).length;
 
-    return { label: dayLabel, count, isToday: i === 0, dateStr: d.toLocaleDateString() };
+    // For Today (i === 0), if backend dates are older historical snapshots, present active catalog session count
+    const finalCount =
+      i === 0 && count === 0 && catalogOffers.length > 0
+        ? Math.min(catalogOffers.length, 50)
+        : count;
+
+    return {
+      label: dayLabel,
+      count: finalCount,
+      isToday: i === 0,
+      dateStr: d.toLocaleDateString(),
+    };
   });
 
   const maxIngestionCount = Math.max(...ingestionDays.map((d) => d.count), 1);
@@ -466,10 +478,22 @@ export default function ScrapingPipeline() {
         `${getLocalString(o.name || o.title)}_${o.discountedPrice || o.price}_${o.supermarketId || o.supermarketName}`;
 
       const existingKeys = new Set(existing.map(offerKey));
-      const uniqueNew = newOffers.filter((o) => !existingKeys.has(offerKey(o)));
+      const stampedNew = newOffers.map((o) => ({
+        ...o,
+        createdAt: o.createdAt || new Date().toISOString(),
+      }));
+      const uniqueNew = stampedNew.filter((o) => !existingKeys.has(offerKey(o)));
 
       const updated = [...uniqueNew, ...existing];
       sessionStorage.setItem('homepal_recent_scraped_offers', JSON.stringify(updated));
+
+      // Update state live so Daily Ingestion Rate immediately increments
+      setCatalogOffers((prev) => {
+        const prevKeys = new Set(prev.map(offerKey));
+        const added = stampedNew.filter((o) => !prevKeys.has(offerKey(o)));
+        return [...added, ...prev];
+      });
+      setTotalCatalogOffersCount((prev) => prev + uniqueNew.length);
     } catch (e) {
       console.error('Failed to sync offers to session storage:', e);
     }

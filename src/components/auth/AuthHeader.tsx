@@ -5,7 +5,7 @@ interface AuthHeaderProps {
 
 export function AuthHeader({ title, subtitle }: AuthHeaderProps) {
   return (
-    <div className="mb-8">
+    <div className="mb-8 motion-safe:animate-[slideUp_0.6s_ease-out_both]">
       <div className="flex items-center gap-12 mb-24">
         <div className="w-40 h-40 md:w-52 md:h-52 rounded-lg flex items-center justify-center">
           <img

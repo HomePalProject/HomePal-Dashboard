@@ -45,7 +45,10 @@ export default function Login() {
     <AuthLayout>
       <AuthHeader title="Hi, Welcome Back!" subtitle="Sign in to your admin account." />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-20">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-20 motion-safe:animate-[slideUp_0.6s_ease-out_80ms_both]"
+      >
         <InputField
           label="Email or Username"
           type="text"

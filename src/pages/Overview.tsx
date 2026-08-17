@@ -178,7 +178,7 @@ export default function Overview() {
       {/* ── Main Content Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Household & Catalog Summary (Spans 2 cols) */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-[#e4e0da] p-6 shadow-xs space-y-6">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-[#e4e0da] p-6 shadow-xs space-y-3.5">
           <div className="flex items-center justify-between border-b border-[#f4f2ee] pb-4">
             <div>
               <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
@@ -201,9 +201,9 @@ export default function Overview() {
               Loading summary data...
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-3.5">
               {/* Demographics Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <div className="p-12 rounded-xl bg-[#faf8f3] border border-[#e4e0da] space-y-1">
                   <div className="text-xs font-bold text-[#6d6862] uppercase tracking-wider">
                     Avg. Household Size

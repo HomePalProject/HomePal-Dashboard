@@ -1,26 +1,34 @@
 import React from 'react';
+import { cn } from '@lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary';
+  size?: 'sm' | 'md';
   isLoading?: boolean;
   fullWidth?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
+  size = 'md',
   isLoading = false,
   fullWidth = false,
   children,
-  className = '',
+  className,
   disabled,
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center font-bold rounded-md transition-colors min-h-[44px] px-24 py-12 text-[16px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+    'inline-flex items-center justify-center font-bold rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 
   const variantClasses = {
     primary: 'bg-primary text-text-inverse hover:bg-primary-active focus-visible:ring-primary',
     secondary: 'bg-surface-variant text-text-primary hover:bg-border focus-visible:ring-border',
+  };
+
+  const sizeClasses = {
+    sm: 'min-h-[36px] px-3 py-1.5 text-xs rounded-xl',
+    md: 'min-h-[44px] px-4 py-2 text-[16px]',
   };
 
   const widthClass = fullWidth ? 'w-full' : '';
@@ -28,7 +36,14 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-      className={`${baseClasses} ${variantClasses[variant]} ${widthClass} ${disabledClass} ${className}`}
+      className={cn(
+        baseClasses,
+        variantClasses[variant],
+        sizeClasses[size],
+        widthClass,
+        disabledClass,
+        className
+      )}
       disabled={disabled || isLoading}
       {...props}
     >

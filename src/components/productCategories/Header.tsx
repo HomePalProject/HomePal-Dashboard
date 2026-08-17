@@ -1,4 +1,5 @@
 import { cn } from '@lib/utils';
+import { Button } from '@components/ui/Button';
 
 interface HeaderProps {
   viewMode: 'grid' | 'table';
@@ -95,9 +96,10 @@ export default function Header({
       </div>
 
       {/* Add Category */}
-      <button
+      <Button
+        variant="primary"
         onClick={onAdd}
-        className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-4 py-2.5 bg-[#1F3D32] hover:bg-[#162D25] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-xs shrink-0 border-none"
+        className="flex items-center gap-2 w-full sm:w-auto shrink-0"
       >
         <svg
           width="15"
@@ -111,7 +113,7 @@ export default function Header({
           <line x1="5" y1="12" x2="19" y2="12" />
         </svg>
         Add New Category
-      </button>
+      </Button>
     </div>
   );
 }

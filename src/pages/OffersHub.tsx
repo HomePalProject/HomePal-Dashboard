@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { cn, getErrorMessage } from '@lib/utils';
+import { Button } from '@components/ui/Button';
 import { catalogService } from '@services/catalogService';
 import { productCategoryService } from '@services/productCategoryService';
 import type { Offer, Supermarket } from '@typeDefs/catalogTypes';
@@ -511,9 +512,10 @@ export default function OffersHub() {
           </div>
 
           {/* Add Offer Button */}
-          <button
+          <Button
+            variant="primary"
             onClick={() => void handleOpenModal()}
-            className="flex items-center justify-center sm:justify-start gap-2 w-full sm:w-auto px-5 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] active:scale-[0.98] text-white rounded-xl text-xs font-bold cursor-pointer transition-all shadow-sm hover:shadow-md shrink-0 border-none"
+            className="flex items-center gap-2 shrink-0 w-full sm:w-auto"
           >
             <svg
               width="16"
@@ -527,21 +529,21 @@ export default function OffersHub() {
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
             <span>Add New Offer</span>
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* ── Main Layout: Full Width Offers Table Card ── */}
       <div className="w-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs flex flex-col">
         {/* Filter Tabs Header */}
-        <div className="px-6 py-4 bg-slate-50/70 border-b border-slate-200 flex items-center gap-2.5 overflow-x-auto">
+        <div className="px-6 py-4 bg-slate-50/70 border-b border-slate-200 flex flex-nowrap items-center gap-2.5 overflow-x-auto scrollbar-hide">
           <button
             onClick={() => {
               setActiveTab('all');
               setCurrentPage(1);
             }}
             className={cn(
-              'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border-none cursor-pointer',
+              'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border-none cursor-pointer whitespace-nowrap',
               activeTab === 'all'
                 ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                 : 'bg-transparent text-slate-500 hover:text-slate-900'
@@ -555,7 +557,7 @@ export default function OffersHub() {
               setCurrentPage(1);
             }}
             className={cn(
-              'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border-none cursor-pointer flex items-center gap-1.5',
+              'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap',
               activeTab === 'unverified'
                 ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                 : 'bg-transparent text-slate-500 hover:text-slate-900'
@@ -574,7 +576,7 @@ export default function OffersHub() {
               setCurrentPage(1);
             }}
             className={cn(
-              'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border-none cursor-pointer',
+              'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border-none cursor-pointer whitespace-nowrap',
               activeTab === 'expiring'
                 ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
                 : 'bg-transparent text-slate-500 hover:text-slate-900'
@@ -585,7 +587,7 @@ export default function OffersHub() {
 
           <button
             onClick={() => navigate('/dashboard/scraping-pipeline')}
-            className="ml-auto flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:underline border-none bg-transparent cursor-pointer shrink-0"
+            className="ml-auto flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:underline border-none bg-transparent cursor-pointer shrink-0 whitespace-nowrap"
           >
             <svg
               width="14"
@@ -602,10 +604,10 @@ export default function OffersHub() {
         </div>
 
         {/* ── Sub-Filters & Sorting Toolbar ── */}
-        <div className="px-6 py-3.5 bg-white border-b border-slate-200 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-4">
+        <div className="px-6 py-3.5 bg-white border-b border-slate-200 flex flex-row flex-wrap items-center gap-3">
           {/* Supermarket Dropdown Filter */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs">
-            <span className="font-semibold text-slate-500">Supermarket:</span>
+          <div className="flex items-center gap-2 text-xs w-full sm:w-auto">
+            <span className="hidden sm:inline font-semibold text-slate-500">Supermarket:</span>
             <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={selectedSupermarketFilter}
@@ -637,8 +639,8 @@ export default function OffersHub() {
           </div>
 
           {/* Category Dropdown Filter */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs">
-            <span className="font-semibold text-slate-500">Category:</span>
+          <div className="flex items-center gap-2 text-xs w-full sm:w-auto">
+            <span className="hidden sm:inline font-semibold text-slate-500">Category:</span>
             <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={selectedCategoryFilter}
@@ -670,8 +672,8 @@ export default function OffersHub() {
           </div>
 
           {/* Sort By Dropdown */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs sm:ml-auto">
-            <span className="font-semibold text-slate-500">Sort by:</span>
+          <div className="flex items-center gap-2 text-xs w-full sm:w-auto sm:ml-auto">
+            <span className="hidden sm:inline font-semibold text-slate-500">Sort by:</span>
             <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={sortBy}
@@ -745,13 +747,13 @@ export default function OffersHub() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                  <th className="pl-6 pr-4 py-3.5">OFFER</th>
-                  <th className="px-4 py-3.5">SUPERMARKET</th>
-                  <th className="px-4 py-3.5">ORIGINAL PRICE</th>
-                  <th className="px-4 py-3.5">OFFER PRICE</th>
-                  <th className="px-4 py-3.5">VALIDITY</th>
-                  <th className="px-4 py-3.5">STATUS</th>
-                  <th className="pr-6 pl-4 py-3.5 text-right">ACTIONS</th>
+                  <th className="pl-6 pr-4 py-3.5 whitespace-nowrap">OFFER</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">SUPERMARKET</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">ORIGINAL PRICE</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">OFFER PRICE</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">VALIDITY</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">STATUS</th>
+                  <th className="pr-6 pl-4 py-3.5 text-right whitespace-nowrap">ACTIONS</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -767,7 +769,7 @@ export default function OffersHub() {
                   return (
                     <tr key={off.id} className="hover:bg-slate-50/60 transition-colors">
                       {/* OFFER Column */}
-                      <td className="pl-6 pr-4 py-4">
+                      <td className="pl-6 pr-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
                             {imgUrl ? (
@@ -793,10 +795,16 @@ export default function OffersHub() {
                             )}
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-900 line-clamp-1">
+                            <span
+                              className="font-bold text-slate-900 line-clamp-1 max-w-[200px]"
+                              title={titleText}
+                            >
                               {titleText}
                             </span>
-                            <span className="text-[11px] text-slate-400 font-semibold">
+                            <span
+                              className="text-[11px] text-slate-400 font-semibold truncate max-w-[200px]"
+                              title={categoryText}
+                            >
                               {categoryText}
                             </span>
                           </div>
@@ -804,21 +812,23 @@ export default function OffersHub() {
                       </td>
 
                       {/* SUPERMARKET Column */}
-                      <td className="px-4 py-4 font-extrabold text-slate-800">
+                      <td className="px-4 py-4 font-extrabold text-slate-800 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           {off.supermarketLogoPath && (
                             <img
                               src={getImageUrl(off.supermarketLogoPath)!}
                               alt={marketName}
-                              className="w-5 h-5 rounded-full object-cover border border-slate-200"
+                              className="w-5 h-5 rounded-full object-cover border border-slate-200 shrink-0"
                             />
                           )}
-                          <span>{marketName}</span>
+                          <span className="truncate max-w-[120px]" title={marketName}>
+                            {marketName}
+                          </span>
                         </div>
                       </td>
 
                       {/* ORIGINAL PRICE Column */}
-                      <td className="px-4 py-4 text-slate-500 font-semibold">
+                      <td className="px-4 py-4 text-slate-500 font-semibold whitespace-nowrap">
                         {hasDiscount ? (
                           <span className="line-through text-slate-400 text-xs">
                             {origPrice} EGP
@@ -831,7 +841,7 @@ export default function OffersHub() {
                       </td>
 
                       {/* OFFER PRICE Column */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-black text-slate-900">{discPrice} EGP</span>
                           {hasDiscount && (
@@ -843,7 +853,7 @@ export default function OffersHub() {
                       </td>
 
                       {/* VALIDITY Column */}
-                      <td className="px-4 py-4 text-slate-600 font-semibold">
+                      <td className="px-4 py-4 text-slate-600 font-semibold whitespace-nowrap">
                         {off.status === 'Expiring' ||
                         (off.validTo &&
                           new Date(off.validTo) <= new Date(Date.now() + 86400000)) ? (

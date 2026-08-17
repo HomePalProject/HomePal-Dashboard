@@ -1,4 +1,4 @@
-import { cn } from '@lib/utils';
+import { Button } from '@components/ui/Button';
 
 interface DeleteConfirmationProps {
   isOpen: boolean;
@@ -22,24 +22,12 @@ export default function DeleteConfirmation({
           Are you sure you want to delete this category? This action cannot be undone.
         </p>
         <div className="flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50"
-          >
+          <Button variant="secondary" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            disabled={loading}
-            className={cn(
-              'px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 transition-all shadow-xs flex items-center gap-2',
-              loading && 'opacity-70 cursor-not-allowed'
-            )}
-          >
-            {loading ? 'Deleting…' : 'Delete'}
-          </button>
+          </Button>
+          <Button variant="danger" onClick={onConfirm} isLoading={loading}>
+            Delete
+          </Button>
         </div>
       </div>
     </div>

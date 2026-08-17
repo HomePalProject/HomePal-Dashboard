@@ -65,15 +65,27 @@ export default function useProductCategories() {
         const { en, ar } = await fetchBilingual((lang) =>
           productCategoryService.getCategoryById(cat.id, lang)
         );
+
+        const enNameVal = typeof en.name === 'string' ? en.name : getLocalizedName(en.name, 'en');
+        const arNameVal = typeof ar.name === 'string' ? ar.name : getLocalizedName(ar.name, 'ar');
+        const enDescVal =
+          typeof en.description === 'string'
+            ? en.description
+            : getLocalizedName(en.description ?? undefined, 'en');
+        const arDescVal =
+          typeof ar.description === 'string'
+            ? ar.description
+            : getLocalizedName(ar.description ?? undefined, 'ar');
+
         resolvedCat = {
           ...cat,
           name: [
-            { culture: 'en', value: getLocalizedName(en.name, 'en') },
-            { culture: 'ar', value: getLocalizedName(ar.name, 'en') },
+            { culture: 'en-US', languageCode: 'en-US', value: enNameVal },
+            { culture: 'ar-EG', languageCode: 'ar-EG', value: arNameVal },
           ],
           description: [
-            { culture: 'en', value: getLocalizedName(en.description ?? undefined, 'en') },
-            { culture: 'ar', value: getLocalizedName(ar.description ?? undefined, 'en') },
+            { culture: 'en-US', languageCode: 'en-US', value: enDescVal },
+            { culture: 'ar-EG', languageCode: 'ar-EG', value: arDescVal },
           ],
         };
       } catch {
@@ -82,12 +94,13 @@ export default function useProductCategories() {
         setLoadingEditId(null);
       }
 
-      const en = getLocalizedName(resolvedCat.name, 'en');
+      const en =
+        getLocalizedName(resolvedCat.name, 'en') ||
+        (typeof resolvedCat.name === 'string' ? resolvedCat.name : '');
       const ar = getLocalizedName(resolvedCat.name, 'ar');
       const descEn =
-        typeof resolvedCat.description === 'string'
-          ? resolvedCat.description
-          : getLocalizedName(resolvedCat.description ?? undefined, 'en');
+        getLocalizedName(resolvedCat.description ?? undefined, 'en') ||
+        (typeof resolvedCat.description === 'string' ? resolvedCat.description : '');
       setEnName(en);
       setArName(ar);
       setDescription(descEn);

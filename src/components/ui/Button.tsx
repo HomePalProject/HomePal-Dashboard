@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'danger';
   isLoading?: boolean;
   fullWidth?: boolean;
 }
@@ -16,11 +16,13 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'inline-flex items-center justify-center font-bold rounded-md transition-colors min-h-[44px] px-24 py-12 text-[16px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+    'inline-flex items-center justify-center font-bold rounded-xl transition-all min-h-[40px] px-5 py-2.5 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-xs active:scale-[0.98] border-none cursor-pointer';
 
   const variantClasses = {
-    primary: 'bg-primary text-text-inverse hover:bg-primary-active focus-visible:ring-primary',
-    secondary: 'bg-surface-variant text-text-primary hover:bg-border focus-visible:ring-border',
+    primary: 'bg-[#1F3D32] hover:bg-[#152a22] text-white focus-visible:ring-[#1F3D32]',
+    secondary:
+      'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-400',
+    danger: 'bg-red-600 hover:bg-red-700 text-white focus-visible:ring-red-600',
   };
 
   const widthClass = fullWidth ? 'w-full' : '';

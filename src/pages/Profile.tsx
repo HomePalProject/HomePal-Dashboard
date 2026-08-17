@@ -1,159 +1,129 @@
-import { useState } from 'react';
-import { cn } from '@lib/utils';
-import { Toggle } from '@components/ui/Toggle';
+import { useState, useEffect } from 'react';
+import { authService } from '@services/authService';
 
 export default function Profile() {
-  const [maintenanceMode, setMaintenanceMode] = useState(false);
-  const [sessionTimeout, setSessionTimeout] = useState('30');
-  const [strictAuditLogs, setStrictAuditLogs] = useState(true);
+  const [meData, setMeData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchMe() {
+      try {
+        const res = await authService.getMe();
+        if (res.success) {
+          setMeData(res.data);
+        } else {
+          setError(res.message || 'Failed to load profile data.');
+        }
+      } catch (err: any) {
+        setError(err.message || 'Error communicating with server.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchMe();
+  }, []);
 
   return (
-    <div className="w-full flex flex-col gap-7 font-sans">
-      {/* ── Page Title & Action Header ── */}
+    <div className="w-full flex flex-col gap-7 font-sans pb-10">
+      {/* ── Page Title ── */}
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-24 sm:text-32 font-extrabold text-[#2d2a26] tracking-tight m-0">
-            Admin & System Settings
+            Admin Profile
           </h1>
           <p className="text-sm text-[#7a7571] mt-1.5 mb-0">
-            Manage platform administrators, roles, security controls, and mobile application status.
+            View your personal administrative account details and activity.
           </p>
         </div>
       </div>
 
-      {/* ── Section 2: Platform Controls & Maintenance Mode ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-24">
-        {/* Mobile App Maintenance Mode Control */}
-        <div className="bg-white rounded-2xl border border-[#e4e0da] shadow-[0_2px_12px_rgba(45,42,38,0.04)] p-24 flex flex-col justify-between">
-          <div>
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-2.5">
-                <div
-                  className={cn(
-                    'w-9 h-9 rounded-lg flex items-center justify-center',
-                    maintenanceMode
-                      ? 'bg-status-error-container text-status-error'
-                      : 'bg-[#dceee8] text-[#2a4a3e]'
-                  )}
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-[#2d2a26] m-0">
-                    Mobile App Maintenance Mode
-                  </h3>
-                  <div className="text-xs text-[#a8a39d] mt-0.5">
-                    Target: HomePal Mobile Application (End-Users)
-                  </div>
-                </div>
-              </div>
-
-              {/* Maintenance Toggle */}
-              <Toggle
-                checked={maintenanceMode}
-                onChange={setMaintenanceMode}
-                title={maintenanceMode ? 'Disable Maintenance Mode' : 'Enable Maintenance Mode'}
-              />
-            </div>
-
-            <p className="text-13 text-[#5a5652] mt-4 leading-relaxed">
-              Enabling Maintenance Mode displays a{' '}
-              <strong>"System under scheduled maintenance"</strong> screen on the Mobile Application
-              for clients. The Admin Panel remains operational.
-            </p>
+      {/* ── Profile Card ── */}
+      <div className="bg-white rounded-2xl border border-[#e4e0da] shadow-xs p-6 md:p-10 flex flex-col md:flex-row gap-10 items-start min-h-[300px]">
+        {loading ? (
+          <div className="flex-1 flex justify-center items-center h-48 w-full text-xs font-bold text-[#6d6862]">
+            Loading profile data...
           </div>
-
-          <div className="pt-4 border-t border-[#f4f2ee] flex justify-between items-center mt-4">
-            <span className="text-xs font-semibold text-[#7a7571]">Current Mobile App Status:</span>
-            <span
-              className={cn(
-                'text-xs font-extrabold px-2.5 py-[4px] rounded-full',
-                maintenanceMode
-                  ? 'text-status-error bg-status-error-container'
-                  : 'text-status-success bg-status-success-container'
-              )}
-            >
-              {maintenanceMode ? '⚠️ Under Maintenance' : '🟢 Live & Operational'}
-            </span>
+        ) : error ? (
+          <div className="flex-1 flex justify-center items-center h-48 w-full text-xs font-bold text-red-500 bg-red-50 rounded-xl border border-red-100">
+            {error}
           </div>
-        </div>
-
-        {/* Security Policies */}
-        <div className="bg-white rounded-2xl border border-[#e4e0da] shadow-[0_2px_12px_rgba(45,42,38,0.04)] p-24 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-lg bg-[#f4f2ee] text-[#2a4a3e] flex items-center justify-center">
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
+        ) : meData ? (
+          <>
+            {/* Avatar Section */}
+            <div className="flex flex-col items-center gap-4 shrink-0">
+              <div className="w-32 h-32 rounded-full bg-[#f4f2ee] flex items-center justify-center border border-[#e4e0da] shadow-sm overflow-hidden text-4xl font-extrabold text-[#a8a39d]">
+                {meData?.username?.charAt(0)?.toUpperCase() || '?'}
               </div>
-              <h3 className="text-base font-bold text-[#2d2a26] m-0">
-                Security & Session Policies
-              </h3>
+              <span className="px-4 py-1.5 bg-[#eaf4ef] text-[#2a4a3e] text-[11px] font-extrabold tracking-wide uppercase rounded-full border border-[#dceee8]">
+                {meData?.isActive ? 'Active Status' : 'Inactive Account'}
+              </span>
             </div>
 
-            {/* Session Timeout Selector */}
-            <div className="mb-4">
-              <label className="block text-xs font-semibold text-[#5a5652] mb-1.5">
-                Admin Session Idle Timeout
-              </label>
-              <select
-                value={sessionTimeout}
-                onChange={(e) => setSessionTimeout(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-[#e4e0da] text-13 text-[#2d2a26] bg-[#fcfbf9] outline-none cursor-pointer"
-              >
-                <option value="15">15 Minutes (High Security)</option>
-                <option value="30">30 Minutes (Recommended)</option>
-                <option value="60">1 Hour</option>
-                <option value="0">Never (Dev Mode)</option>
-              </select>
-            </div>
-
-            {/* Strict Audit Logging */}
-            <div className="flex justify-between items-center pt-2.5">
+            {/* Details Section */}
+            <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-8">
               <div>
-                <div className="text-13 font-semibold text-[#2d2a26]">
-                  Strict Security Audit Logs
-                </div>
-                <div className="text-[11px] text-[#a8a39d]">
-                  Log every admin action with IP address and username
+                <label className="text-[11px] font-bold text-[#a8a39d] uppercase tracking-wider block mb-1.5">
+                  Full Name / Username
+                </label>
+                <div className="text-base font-extrabold text-[#2d2a26]">
+                  {meData?.username || 'Pal Admin'}
                 </div>
               </div>
-              <Toggle
-                checked={strictAuditLogs}
-                onChange={setStrictAuditLogs}
-                title="Strict Security Audit Logs"
-              />
+              <div>
+                <label className="text-[11px] font-bold text-[#a8a39d] uppercase tracking-wider block mb-1.5">
+                  Email Address
+                </label>
+                <div className="text-base font-extrabold text-[#2d2a26]">
+                  {meData?.email || 'admin@homepal.com'}
+                </div>
+              </div>
+              <div>
+                <label className="text-[11px] font-bold text-[#a8a39d] uppercase tracking-wider block mb-1.5">
+                  System Roles
+                </label>
+                <div className="flex gap-2 flex-wrap">
+                  {meData?.roles && meData.roles.length > 0 ? (
+                    meData.roles.map((role: string) => (
+                      <span
+                        key={role}
+                        className="px-2 py-1 bg-[#f4f2ee] text-[#2d2a26] text-xs font-bold rounded-md border border-[#e4e0da]"
+                      >
+                        {role}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-base font-extrabold text-[#2d2a26]">Administrator</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className="text-[11px] font-bold text-[#a8a39d] uppercase tracking-wider block mb-1.5">
+                  Account ID
+                </label>
+                <div className="text-base font-extrabold text-[#2d2a26] text-xs">
+                  {meData?.id || '—'}
+                </div>
+              </div>
+              <div>
+                <label className="text-[11px] font-bold text-[#a8a39d] uppercase tracking-wider block mb-1.5">
+                  Gender
+                </label>
+                <div className="text-base font-extrabold text-[#2d2a26] capitalize">
+                  {meData?.gender || '—'}
+                </div>
+              </div>
+              <div>
+                <label className="text-[11px] font-bold text-[#a8a39d] uppercase tracking-wider block mb-1.5">
+                  Account Created
+                </label>
+                <div className="text-base font-extrabold text-[#2d2a26]">
+                  {meData?.createdAt ? new Date(meData.createdAt).toLocaleDateString() : '—'}
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div className="pt-4 border-t border-[#f4f2ee] text-right mt-4">
-            <span className="text-[11px] text-[#a8a39d]">
-              All security policies enforced globally across admin accounts.
-            </span>
-          </div>
-        </div>
+          </>
+        ) : null}
       </div>
     </div>
   );

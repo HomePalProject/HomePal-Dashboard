@@ -209,7 +209,7 @@ export default function Preferences() {
 
   return (
     <div className="w-full py-8 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-7 gap-16">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-7 gap-6 sm:gap-16">
         <div>
           <h1 className="text-24 sm:text-28 font-bold text-text-primary m-0">System Preferences</h1>
           <p className="text-sm text-text-secondary mt-1.5 mb-0">
@@ -218,7 +218,7 @@ export default function Preferences() {
         </div>
         <button
           onClick={() => (isPrefsTab ? setPrefModal({ open: true }) : setCatModal({ open: true }))}
-          className="flex items-center gap-[8px] px-20 py-2.5 bg-primary text-white border-none rounded-[10px] cursor-pointer text-sm font-semibold whitespace-nowrap"
+          className="flex items-center gap-[8px] px-6 sm:px-20 py-2.5 bg-primary text-white border-none rounded-[10px] cursor-pointer text-sm font-semibold whitespace-nowrap w-fit shrink-0"
         >
           <svg
             width="16"
@@ -235,7 +235,7 @@ export default function Preferences() {
         </button>
       </div>
 
-      <div className="flex border-b-[1.5px] border-border mb-24">
+      <div className="flex border-b-[1.5px] border-border mb-8 sm:mb-24 overflow-x-auto">
         {(['preferences', 'categories'] as Tab[]).map((tab) => (
           <button
             key={tab}
@@ -245,7 +245,7 @@ export default function Preferences() {
               setFilterCategoryId('');
             }}
             className={cn(
-              'px-20 py-2.5 border-0 bg-transparent cursor-pointer text-sm font-semibold -mb-0.5 border-b-2',
+              'px-6 sm:px-20 py-2.5 border-0 bg-transparent cursor-pointer text-sm font-semibold -mb-0.5 border-b-2 whitespace-nowrap',
               activeTab === tab
                 ? 'text-primary border-primary font-bold'
                 : 'text-text-secondary border-transparent'
@@ -256,8 +256,8 @@ export default function Preferences() {
         ))}
       </div>
 
-      <div className="flex gap-12 items-center mb-20 flex-wrap">
-        <div className="relative flex-1 min-w-45 max-w-75">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-12 sm:items-center mb-8 sm:mb-20">
+        <div className="relative flex-1 min-w-full sm:min-w-45 sm:max-w-75">
           <svg
             width="15"
             height="15"
@@ -265,7 +265,7 @@ export default function Preferences() {
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
-            className="absolute left-12 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
           >
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -274,14 +274,14 @@ export default function Preferences() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={isPrefsTab ? 'Search preferences…' : 'Search categories…'}
-            className="w-full pl-9 pr-12 py-2.5 border-[1.5px] border-border rounded-lg text-sm text-text-primary bg-surface outline-none box-border"
+            className="w-full pl-11 pr-4 py-2.5 border-[1.5px] border-border rounded-lg text-sm text-text-primary bg-surface outline-none box-border"
           />
         </div>
         {isPrefsTab && (
           <select
             value={filterCategoryId}
             onChange={(e) => setFilterCategoryId(e.target.value)}
-            className="w-full max-w-50 px-12 py-2.5 border-[1.5px] border-border rounded-lg text-sm text-text-primary bg-surface outline-none box-border appearance-none"
+            className="w-full sm:w-auto sm:max-w-50 px-4 py-2.5 border-[1.5px] border-border rounded-lg text-sm text-text-primary bg-surface outline-none box-border appearance-none"
           >
             <option value="">All Categories</option>
             {categories.map((c) => (
@@ -291,7 +291,7 @@ export default function Preferences() {
             ))}
           </select>
         )}
-        <span className="ml-auto text-xs text-text-secondary font-semibold tracking-wider uppercase">
+        <span className="sm:ml-auto text-xs text-text-secondary font-semibold tracking-wider uppercase">
           {loading
             ? '…'
             : `${displayedItems.length} item${displayedItems.length !== 1 ? 's' : ''} found`}
@@ -305,104 +305,112 @@ export default function Preferences() {
       )}
 
       <div className="bg-surface rounded-xl border border-border overflow-x-auto">
-        <div className={cn('grid px-20 py-12 border-b border-border bg-surface-variant', cols)}>
-          {headers.map((h) => (
-            <span
-              key={h}
-              className="text-[11px] font-bold text-text-secondary tracking-widest uppercase"
-            >
-              {h}
-            </span>
-          ))}
-        </div>
-
-        {loading && <div className="p-12 text-center text-text-secondary text-sm">Loading…</div>}
-
-        {!loading && displayedItems.length === 0 && (
-          <div className="p-12 text-center text-text-secondary text-sm">
-            {searchQuery ? 'No results found.' : `No ${activeTab} yet. Add your first one!`}
+        <div className="min-w-[800px]">
+          <div
+            className={cn(
+              'grid px-6 sm:px-20 py-4 border-b border-border bg-surface-variant items-center',
+              cols,
+              'gap-4'
+            )}
+          >
+            {headers.map((h) => (
+              <span
+                key={h}
+                className="text-[11px] font-bold text-text-secondary tracking-widest uppercase whitespace-nowrap"
+              >
+                {h}
+              </span>
+            ))}
           </div>
-        )}
 
-        {!loading &&
-          isPrefsTab &&
-          preferences.map((pref, i) => {
-            const badge = getCategoryColor(pref.categoryName);
-            return (
+          {loading && <div className="p-12 text-center text-text-secondary text-sm">Loading…</div>}
+
+          {!loading && displayedItems.length === 0 && (
+            <div className="p-12 text-center text-text-secondary text-sm">
+              {searchQuery ? 'No results found.' : `No ${activeTab} yet. Add your first one!`}
+            </div>
+          )}
+
+          {!loading &&
+            isPrefsTab &&
+            preferences.map((pref, i) => {
+              const badge = getCategoryColor(pref.categoryName);
+              return (
+                <div
+                  key={pref.id}
+                  className={cn(
+                    'grid px-6 sm:px-20 py-4 items-center transition-colors duration-150 hover:bg-surface-variant gap-4',
+                    i < preferences.length - 1 && 'border-b border-border',
+                    cols
+                  )}
+                >
+                  <span className="text-sm font-semibold text-text-primary">
+                    {getLocalString(pref.name)}
+                  </span>
+                  <span
+                    className={cn(
+                      'inline-block px-2.5 py-0.75 rounded-full text-[11px] font-bold tracking-wider uppercase w-fit whitespace-nowrap',
+                      badge.bg,
+                      badge.text
+                    )}
+                  >
+                    {pref.categoryName}
+                  </span>
+                  <span className="text-13 text-text-secondary leading-relaxed truncate">
+                    {getLocalString(pref.description)}
+                  </span>
+                  <div className="flex gap-[8px] justify-end sm:justify-start">
+                    <ActionBtn
+                      icon="edit"
+                      title="Edit"
+                      loading={loadingEditId === pref.id}
+                      onClick={() => void handleEditPreference(pref)}
+                    />
+                    <ActionBtn
+                      icon="delete"
+                      title="Delete"
+                      danger
+                      onClick={() => setDeleteTarget({ type: 'preference', item: pref })}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+
+          {!loading &&
+            !isPrefsTab &&
+            filteredCats.map((cat, i) => (
               <div
-                key={pref.id}
+                key={cat.id}
                 className={cn(
-                  'grid px-20 py-4 items-center transition-colors duration-150 hover:bg-surface-variant',
-                  i < preferences.length - 1 && 'border-b border-border',
+                  'grid px-6 sm:px-20 py-4 items-center transition-colors duration-150 hover:bg-surface-variant gap-4',
+                  i < filteredCats.length - 1 && 'border-b border-border',
                   cols
                 )}
               >
                 <span className="text-sm font-semibold text-text-primary">
-                  {getLocalString(pref.name)}
+                  {getLocalString(cat.name)}
                 </span>
-                <span
-                  className={cn(
-                    'inline-block px-2.5 py-0.75 rounded-full text-[11px] font-bold tracking-wider uppercase w-fit',
-                    badge.bg,
-                    badge.text
-                  )}
-                >
-                  {pref.categoryName}
+                <span className="text-13 text-text-secondary leading-relaxed truncate">
+                  {getLocalString(cat.description)}
                 </span>
-                <span className="text-13 text-text-secondary leading-relaxed">
-                  {getLocalString(pref.description)}
-                </span>
-                <div className="flex gap-[8px]">
+                <div className="flex gap-[8px] justify-end sm:justify-start">
                   <ActionBtn
                     icon="edit"
                     title="Edit"
-                    loading={loadingEditId === pref.id}
-                    onClick={() => void handleEditPreference(pref)}
+                    loading={loadingEditId === cat.id}
+                    onClick={() => void handleEditCategory(cat)}
                   />
                   <ActionBtn
                     icon="delete"
                     title="Delete"
                     danger
-                    onClick={() => setDeleteTarget({ type: 'preference', item: pref })}
+                    onClick={() => setDeleteTarget({ type: 'category', item: cat })}
                   />
                 </div>
               </div>
-            );
-          })}
-
-        {!loading &&
-          !isPrefsTab &&
-          filteredCats.map((cat, i) => (
-            <div
-              key={cat.id}
-              className={cn(
-                'grid px-20 py-4 items-center transition-colors duration-150 hover:bg-surface-variant',
-                i < filteredCats.length - 1 && 'border-b border-border',
-                cols
-              )}
-            >
-              <span className="text-sm font-semibold text-text-primary">
-                {getLocalString(cat.name)}
-              </span>
-              <span className="text-13 text-text-secondary leading-relaxed">
-                {getLocalString(cat.description)}
-              </span>
-              <div className="flex gap-[8px]">
-                <ActionBtn
-                  icon="edit"
-                  title="Edit"
-                  loading={loadingEditId === cat.id}
-                  onClick={() => void handleEditCategory(cat)}
-                />
-                <ActionBtn
-                  icon="delete"
-                  title="Delete"
-                  danger
-                  onClick={() => setDeleteTarget({ type: 'category', item: cat })}
-                />
-              </div>
-            </div>
-          ))}
+            ))}
+        </div>
       </div>
 
       {prefModal.open && (

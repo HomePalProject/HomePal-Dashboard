@@ -24,8 +24,11 @@ export const measuringUnitService = {
     return [];
   },
 
-  getUnitById: async (id: string): Promise<MeasuringUnit> => {
-    const response = await api.get(`/units/${id}`);
+  getUnitById: async (id: string, acceptLanguage?: 'en' | 'ar'): Promise<MeasuringUnit> => {
+    const response = await api.get(
+      `/units/${id}`,
+      acceptLanguage ? { headers: { 'Accept-Language': acceptLanguage } } : undefined
+    );
     return response.data?.data !== undefined ? response.data.data : response.data;
   },
 

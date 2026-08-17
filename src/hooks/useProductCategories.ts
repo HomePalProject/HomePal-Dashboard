@@ -1,5 +1,6 @@
 import { getImageUrl } from '@/lib/formatters';
 import { getErrorMessage } from '@lib/utils';
+import { fetchBilingual } from '@lib/localization';
 import { productCategoryService } from '@services/productCategoryService';
 import type { CreateUpdateCategoryPayload, ProductCategory } from '@typeDefs/productCategoryTypes';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -28,6 +29,7 @@ export default function useProductCategories() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [loadingEditId, setLoadingEditId] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -53,22 +55,45 @@ export default function useProductCategories() {
     void fetchCategories();
   }, [fetchCategories]);
 
-  const handleOpenModal = (cat?: ProductCategory) => {
+  const handleOpenModal = async (cat?: ProductCategory) => {
     setFormError(null);
     setCoverFile(null);
     if (cat) {
-      const en = getLocalizedName(cat.name, 'en');
-      const ar = getLocalizedName(cat.name, 'ar');
+      let resolvedCat = cat;
+      setLoadingEditId(cat.id);
+      try {
+        const { en, ar } = await fetchBilingual((lang) =>
+          productCategoryService.getCategoryById(cat.id, lang)
+        );
+        resolvedCat = {
+          ...cat,
+          name: [
+            { culture: 'en', value: getLocalizedName(en.name, 'en') },
+            { culture: 'ar', value: getLocalizedName(ar.name, 'en') },
+          ],
+          description: [
+            { culture: 'en', value: getLocalizedName(en.description ?? undefined, 'en') },
+            { culture: 'ar', value: getLocalizedName(ar.description ?? undefined, 'en') },
+          ],
+        };
+      } catch {
+        showToast('Could not load both languages — showing available data only.');
+      } finally {
+        setLoadingEditId(null);
+      }
+
+      const en = getLocalizedName(resolvedCat.name, 'en');
+      const ar = getLocalizedName(resolvedCat.name, 'ar');
       const descEn =
-        typeof cat.description === 'string'
-          ? cat.description
-          : getLocalizedName(cat.description ?? undefined, 'en');
+        typeof resolvedCat.description === 'string'
+          ? resolvedCat.description
+          : getLocalizedName(resolvedCat.description ?? undefined, 'en');
       setEnName(en);
       setArName(ar);
       setDescription(descEn);
       const imgUrl = getImageUrl(cat.imagePath ?? undefined);
       setCoverPreview(imgUrl);
-      setModalState({ open: true, editing: cat });
+      setModalState({ open: true, editing: resolvedCat });
     } else {
       setEnName('');
       setArName('');
@@ -85,7 +110,7 @@ export default function useProductCategories() {
     setFormError(null);
   };
 
-  const handleSubmitForm = async (e: React.FormEvent) => {
+  const handleSubmitForm = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!enName.trim()) {
       setFormError('English Name is required.');
@@ -217,5 +242,6 @@ export default function useProductCategories() {
     showToast,
     refresh,
     deleting,
+    loadingEditId,
   };
 }

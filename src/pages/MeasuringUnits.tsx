@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { measuringUnitService } from '@services/measuringUnitService';
 import type { MeasuringUnit } from '@typeDefs/measuringUnitTypes';
 import { cn } from '@lib/utils';
+import { fetchBilingual } from '@lib/localization';
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return 'Aug 13, 2026';
@@ -113,6 +114,7 @@ export default function MeasuringUnits() {
 
   // Delete State
   const [deleteTarget, setDeleteTarget] = useState<MeasuringUnit | null>(null);
+  const [loadingEditId, setLoadingEditId] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -162,10 +164,35 @@ export default function MeasuringUnits() {
     setIsModalOpen(true);
   };
 
-  const handleOpenEditModal = (unit: MeasuringUnit) => {
-    setEditingUnit(unit);
-    const namePair = parseLocalizedPair(unit.name);
-    const symbolPair = parseLocalizedPair(unit.symbol);
+  const handleOpenEditModal = async (unit: MeasuringUnit) => {
+    let resolvedUnit = unit;
+    if (!unit.id.startsWith('seed-')) {
+      setLoadingEditId(unit.id);
+      try {
+        const { en, ar } = await fetchBilingual((lang) =>
+          measuringUnitService.getUnitById(unit.id, lang)
+        );
+        resolvedUnit = {
+          ...unit,
+          name: [
+            { culture: 'en', value: parseLocalizedPair(en.name).en },
+            { culture: 'ar', value: parseLocalizedPair(ar.name).en },
+          ],
+          symbol: [
+            { culture: 'en', value: parseLocalizedPair(en.symbol).en },
+            { culture: 'ar', value: parseLocalizedPair(ar.symbol).en },
+          ],
+        };
+      } catch {
+        showToast('Could not load both languages — showing available data only.');
+      } finally {
+        setLoadingEditId(null);
+      }
+    }
+
+    setEditingUnit(resolvedUnit);
+    const namePair = parseLocalizedPair(resolvedUnit.name);
+    const symbolPair = parseLocalizedPair(resolvedUnit.symbol);
     setNameEn(namePair.en !== '—' ? namePair.en : '');
     setNameAr(namePair.ar !== '—' ? namePair.ar : '');
     setSymbolEn(symbolPair.en !== '—' ? symbolPair.en : '');
@@ -173,7 +200,7 @@ export default function MeasuringUnits() {
     setIsModalOpen(true);
   };
 
-  const handleSaveUnit = async (e: React.FormEvent) => {
+  const handleSaveUnit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!nameEn.trim() && !nameAr.trim()) {
       showToast('Please enter at least one unit name (English or Arabic)');
@@ -411,9 +438,10 @@ export default function MeasuringUnits() {
                         <div className="flex items-center justify-end gap-1">
                           {/* Edit Button */}
                           <button
-                            onClick={() => handleOpenEditModal(unit)}
+                            onClick={() => void handleOpenEditModal(unit)}
+                            disabled={loadingEditId === unit.id}
                             title="Edit Unit"
-                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-none bg-transparent cursor-pointer transition-colors"
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-none bg-transparent cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <svg
                               width="15"

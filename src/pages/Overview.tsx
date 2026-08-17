@@ -58,7 +58,7 @@ export default function Overview() {
       {/* ── Clean Human Greeting Header ── */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-1">
         <div>
-          <h1 className="text-28 md:text-[36px] font-extrabold text-[#2d2a26] tracking-tight leading-tight m-0">
+          <h1 className="text-28 md:text-36 font-extrabold text-[#2d2a26] tracking-tight leading-tight m-0">
             {greeting}
           </h1>
           <p className="text-sm text-[#6d6862] mt-1 m-0">
@@ -69,7 +69,7 @@ export default function Overview() {
 
         <Link
           to="/dashboard/households"
-          className="px-4 py-2 bg-[#356859] hover:bg-[#2a5347] text-white rounded-xl text-xs font-bold no-underline transition-colors shadow-xs shrink-0 self-start sm:self-auto"
+          className="px-24 py-12 bg-[#356859] hover:bg-[#2a5347] text-white rounded-xl text-xs font-bold no-underline transition-colors shadow-xs shrink-0 self-start sm:self-auto"
         >
           Manage Households
         </Link>
@@ -204,7 +204,7 @@ export default function Overview() {
             <div className="space-y-6">
               {/* Demographics Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-[#faf8f3] border border-[#e4e0da] space-y-1">
+                <div className="p-12 rounded-xl bg-[#faf8f3] border border-[#e4e0da] space-y-1">
                   <div className="text-xs font-bold text-[#6d6862] uppercase tracking-wider">
                     Avg. Household Size
                   </div>
@@ -216,7 +216,7 @@ export default function Overview() {
                   <div className="text-[11px] text-[#6d6862]">Average active family size</div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#faf8f3] border border-[#e4e0da] space-y-1">
+                <div className="p-12 rounded-xl bg-[#faf8f3] border border-[#e4e0da] space-y-1">
                   <div className="text-xs font-bold text-[#6d6862] uppercase tracking-wider">
                     Avg. Plans / Household
                   </div>

@@ -29,3 +29,6 @@ swagger.json
 .agents
 *.md
 !README.md
+v*.json
+.claude
+skills-lock.json

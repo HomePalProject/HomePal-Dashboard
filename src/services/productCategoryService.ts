@@ -20,8 +20,11 @@ export const productCategoryService = {
     return [];
   },
 
-  getCategoryById: async (id: string): Promise<ProductCategory> => {
-    const response = await api.get(`/products/categories/${id}`);
+  getCategoryById: async (id: string, acceptLanguage?: 'en' | 'ar'): Promise<ProductCategory> => {
+    const response = await api.get(
+      `/products/categories/${id}`,
+      acceptLanguage ? { headers: { 'Accept-Language': acceptLanguage } } : undefined
+    );
     return response.data?.data !== undefined ? response.data.data : response.data;
   },
 

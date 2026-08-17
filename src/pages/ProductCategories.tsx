@@ -40,6 +40,7 @@ export default function ProductCategories() {
     toastMessage,
     // other flags
     deleting,
+    loadingEditId,
   } = useProductCategories();
 
   return (
@@ -67,7 +68,7 @@ export default function ProductCategories() {
         setViewMode={setViewMode}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        onAdd={() => handleOpenModal()}
+        onAdd={() => void handleOpenModal()}
       />
 
       {/* Main content */}
@@ -90,16 +91,26 @@ export default function ProductCategories() {
           </div>
           <p className="text-sm font-bold text-slate-700 m-0">No categories found</p>
           <button
-            onClick={() => handleOpenModal()}
+            onClick={() => void handleOpenModal()}
             className="text-xs font-bold text-emerald-700 hover:underline bg-transparent cursor-pointer border-none"
           >
             Create first category →
           </button>
         </div>
       ) : viewMode === 'grid' ? (
-        <GridView categories={filtered} onEdit={handleOpenModal} onUpload={handleTriggerUpload} />
+        <GridView
+          categories={filtered}
+          onEdit={(cat) => void handleOpenModal(cat)}
+          onUpload={handleTriggerUpload}
+          loadingEditId={loadingEditId}
+        />
       ) : (
-        <TableView categories={filtered} onEdit={handleOpenModal} onUpload={handleTriggerUpload} />
+        <TableView
+          categories={filtered}
+          onEdit={(cat) => void handleOpenModal(cat)}
+          onUpload={handleTriggerUpload}
+          loadingEditId={loadingEditId}
+        />
       )}
 
       {/* Delete confirmation */}

@@ -344,7 +344,7 @@ export default function ScrapingPipeline() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleRunSingleUrlScrape = async (e: React.FormEvent) => {
+  const handleRunSingleUrlScrape = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedSupermarket || !pageUrl) {
       setErrorMessage('Please select a supermarket and enter a Facebook page URL.');
@@ -499,7 +499,7 @@ export default function ScrapingPipeline() {
     }
   };
 
-  const handleRunImageUploadScrape = async (e: React.FormEvent) => {
+  const handleRunImageUploadScrape = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedSupermarket || !uploadFile) {
       setErrorMessage('Please select a supermarket and choose a flyer image file.');

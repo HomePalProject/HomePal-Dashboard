@@ -4,6 +4,7 @@ import { cn, getErrorMessage } from '@lib/utils';
 import { catalogService } from '@services/catalogService';
 import type { Supermarket } from '@typeDefs/catalogTypes';
 import { getLocalString, getImageUrl } from '@lib/formatters';
+import { fetchBilingual } from '@lib/localization';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { SupermarketFormModal } from '@components/supermarkets/SupermarketFormModal';
 
@@ -83,6 +84,7 @@ export default function Supermarkets() {
   });
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [loadingEditId, setLoadingEditId] = useState<string | null>(null);
 
   useEffect(() => {
     if (searchParams.get('openAdd') === 'true') {
@@ -134,6 +136,29 @@ export default function Supermarkets() {
       return null;
     } catch (error: any) {
       return getErrorMessage(error);
+    }
+  };
+
+  const handleEditSupermarket = async (s: Supermarket) => {
+    setLoadingEditId(s.id);
+    try {
+      const { en, ar } = await fetchBilingual((lang) =>
+        catalogService.getSupermarketById(s.id, lang)
+      );
+      setMarketModal({
+        open: true,
+        editing: {
+          ...s,
+          name: [
+            { culture: 'en', value: getLocalString(en.name) },
+            { culture: 'ar', value: getLocalString(ar.name) },
+          ],
+        },
+      });
+    } catch {
+      setMarketModal({ open: true, editing: s });
+    } finally {
+      setLoadingEditId(null);
     }
   };
 
@@ -396,20 +421,35 @@ export default function Supermarkets() {
                 {/* Bottom Action Row */}
                 <div className="flex items-center gap-2 pt-1">
                   <button
-                    onClick={() => setMarketModal({ open: true, editing: s })}
-                    className="flex-1 py-2 bg-white border border-[#EAE5D9] rounded-xl text-xs font-bold text-[#1A2E26] hover:bg-[#FAF8F5] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    onClick={() => void handleEditSupermarket(s)}
+                    disabled={loadingEditId === s.id}
+                    className="flex-1 py-2 bg-white border border-[#EAE5D9] rounded-xl text-xs font-bold text-[#1A2E26] hover:bg-[#FAF8F5] transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                      <path d="m18.5 2.5 2 2L10 15H8v-2z" />
-                    </svg>
+                    {loadingEditId === s.id ? (
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="animate-spin"
+                      >
+                        <path d="M21 12a9 9 0 1 1-9-9" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="m18.5 2.5 2 2L10 15H8v-2z" />
+                      </svg>
+                    )}
                     Edit
                   </button>
 
@@ -506,10 +546,11 @@ export default function Supermarkets() {
                       <td className="px-5 py-3.5 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
-                            onClick={() => setMarketModal({ open: true, editing: s })}
-                            className="px-3 py-1 rounded-lg border border-[#EAE5D9] text-xs font-bold text-[#1A2E26] bg-white hover:bg-[#FAF8F5]"
+                            onClick={() => void handleEditSupermarket(s)}
+                            disabled={loadingEditId === s.id}
+                            className="px-3 py-1 rounded-lg border border-[#EAE5D9] text-xs font-bold text-[#1A2E26] bg-white hover:bg-[#FAF8F5] disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            Edit
+                            {loadingEditId === s.id ? 'Loading…' : 'Edit'}
                           </button>
                           <button
                             onClick={() => setDeleteTarget({ id: s.id, name })}

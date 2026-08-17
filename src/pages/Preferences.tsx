@@ -10,7 +10,8 @@ import type {
 
 type Tab = 'preferences' | 'categories';
 
-import { getCategoryColor } from '@lib/formatters';
+import { getCategoryColor, getLocalString } from '@lib/formatters';
+import { fetchBilingual } from '@lib/localization';
 import { ActionBtn } from '@components/ui/ActionBtn';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { PreferenceFormModal } from '@components/preferences/PreferenceFormModal';
@@ -41,6 +42,7 @@ export default function Preferences() {
     | null
   >(null);
   const [deleting, setDeleting] = useState(false);
+  const [loadingEditId, setLoadingEditId] = useState<string | null>(null);
 
   // ── Fetch ──
 
@@ -111,6 +113,62 @@ export default function Preferences() {
     }
   };
 
+  const handleEditPreference = async (pref: PreferenceResponse) => {
+    setLoadingEditId(pref.id);
+    try {
+      const { en, ar } = await fetchBilingual((lang) =>
+        preferencesService.getPreferenceById(pref.id, lang)
+      );
+      setPrefModal({
+        open: true,
+        editing: {
+          ...pref,
+          name: [
+            { culture: 'en', value: getLocalString(en.name) },
+            { culture: 'ar', value: getLocalString(ar.name) },
+          ],
+          description: [
+            { culture: 'en', value: (en.description as string) || '' },
+            { culture: 'ar', value: (ar.description as string) || '' },
+          ],
+        },
+      });
+    } catch {
+      setFetchError('Could not load both languages — showing available data only.');
+      setPrefModal({ open: true, editing: pref });
+    } finally {
+      setLoadingEditId(null);
+    }
+  };
+
+  const handleEditCategory = async (cat: PreferenceCategoryResponse) => {
+    setLoadingEditId(cat.id);
+    try {
+      const { en, ar } = await fetchBilingual((lang) =>
+        preferencesService.getPreferenceCategoryById(cat.id, lang)
+      );
+      setCatModal({
+        open: true,
+        editing: {
+          ...cat,
+          name: [
+            { culture: 'en', value: getLocalString(en.name) },
+            { culture: 'ar', value: getLocalString(ar.name) },
+          ],
+          description: [
+            { culture: 'en', value: (en.description as string) || '' },
+            { culture: 'ar', value: (ar.description as string) || '' },
+          ],
+        },
+      });
+    } catch {
+      setFetchError('Could not load both languages — showing available data only.');
+      setCatModal({ open: true, editing: cat });
+    } finally {
+      setLoadingEditId(null);
+    }
+  };
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -138,8 +196,8 @@ export default function Preferences() {
   const filteredCats = searchQuery
     ? categories.filter(
         (c) =>
-          c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          c.description?.toLowerCase().includes(searchQuery.toLowerCase())
+          getLocalString(c.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
+          getLocalString(c.description).toLowerCase().includes(searchQuery.toLowerCase())
       )
     : categories;
   const displayedItems = isPrefsTab ? preferences : filteredCats;
@@ -228,7 +286,7 @@ export default function Preferences() {
             <option value="">All Categories</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {getLocalString(c.name)}
               </option>
             ))}
           </select>
@@ -279,7 +337,9 @@ export default function Preferences() {
                   cols
                 )}
               >
-                <span className="text-sm font-semibold text-text-primary">{pref.name}</span>
+                <span className="text-sm font-semibold text-text-primary">
+                  {getLocalString(pref.name)}
+                </span>
                 <span
                   className={cn(
                     'inline-block px-2.5 py-0.75 rounded-full text-[11px] font-bold tracking-wider uppercase w-fit',
@@ -290,13 +350,14 @@ export default function Preferences() {
                   {pref.categoryName}
                 </span>
                 <span className="text-13 text-text-secondary leading-relaxed">
-                  {pref.description ?? '—'}
+                  {getLocalString(pref.description)}
                 </span>
                 <div className="flex gap-[8px]">
                   <ActionBtn
                     icon="edit"
                     title="Edit"
-                    onClick={() => setPrefModal({ open: true, editing: pref })}
+                    loading={loadingEditId === pref.id}
+                    onClick={() => void handleEditPreference(pref)}
                   />
                   <ActionBtn
                     icon="delete"
@@ -320,15 +381,18 @@ export default function Preferences() {
                 cols
               )}
             >
-              <span className="text-sm font-semibold text-text-primary">{cat.name}</span>
+              <span className="text-sm font-semibold text-text-primary">
+                {getLocalString(cat.name)}
+              </span>
               <span className="text-13 text-text-secondary leading-relaxed">
-                {cat.description ?? '—'}
+                {getLocalString(cat.description)}
               </span>
               <div className="flex gap-[8px]">
                 <ActionBtn
                   icon="edit"
                   title="Edit"
-                  onClick={() => setCatModal({ open: true, editing: cat })}
+                  loading={loadingEditId === cat.id}
+                  onClick={() => void handleEditCategory(cat)}
                 />
                 <ActionBtn
                   icon="delete"
@@ -362,8 +426,8 @@ export default function Preferences() {
           confirmLabel="Delete"
           message={
             deleteTarget.type === 'preference'
-              ? `Are you sure you want to delete "${deleteTarget.item.name}"? This cannot be undone.`
-              : `Are you sure you want to delete the category "${deleteTarget.item.name}"? All preferences in this category may be affected.`
+              ? `Are you sure you want to delete "${getLocalString(deleteTarget.item.name)}"? This cannot be undone.`
+              : `Are you sure you want to delete the category "${getLocalString(deleteTarget.item.name)}"? All preferences in this category may be affected.`
           }
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

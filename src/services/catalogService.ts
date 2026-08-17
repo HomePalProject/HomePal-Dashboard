@@ -39,6 +39,13 @@ export const catalogService = {
   deleteSupermarket: async (id: string): Promise<void> => {
     return api.delete(`/supermarkets/${id}`);
   },
+  getSupermarketById: async (id: string, acceptLanguage?: 'en' | 'ar'): Promise<Supermarket> => {
+    const response = await api.get(
+      `/supermarkets/${id}`,
+      acceptLanguage ? { headers: { 'Accept-Language': acceptLanguage } } : undefined
+    );
+    return response.data?.data !== undefined ? response.data.data : response.data;
+  },
   uploadSupermarketLogo: async (id: string, file: File): Promise<any> => {
     const formData = new FormData();
     formData.append('Image', file);
@@ -74,5 +81,12 @@ export const catalogService = {
   },
   deleteOffer: async (id: string): Promise<void> => {
     return api.delete(`/offers/${id}`);
+  },
+  getOfferById: async (id: string, acceptLanguage?: 'en' | 'ar'): Promise<Offer> => {
+    const response = await api.get(
+      `/offers/${id}`,
+      acceptLanguage ? { headers: { 'Accept-Language': acceptLanguage } } : undefined
+    );
+    return response.data?.data !== undefined ? response.data.data : response.data;
   },
 };

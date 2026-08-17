@@ -58,21 +58,13 @@ export default function TokenUsage() {
           <h1 className="text-2xl font-black tracking-tight text-slate-900 m-0">
             Token Usage & Cost Center
           </h1>
-          <p className="text-xs text-slate-500 mt-1 m-0 max-w-2xl">
-            Live telemetry of Google Gemini multimodal vision and language model consumption fetched
-            directly from backend endpoint{' '}
-            <code className="text-emerald-700 font-mono font-bold bg-emerald-50 px-1.5 py-0.5 rounded">
-              /api/analytics/token-usage
-            </code>
-            .
-          </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex flex-wrap items-center gap-3 shrink-0 mt-4 sm:mt-0">
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white outline-none cursor-pointer hover:border-slate-300 transition-colors shadow-xs"
+            className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white outline-none cursor-pointer hover:border-slate-300 transition-colors shadow-xs"
           >
             <option value={1}>Last 24 Hours</option>
             <option value={7}>Last 7 Days</option>
@@ -88,7 +80,7 @@ export default function TokenUsage() {
               link.download = `token_usage_summary_${days}d.csv`;
               link.click();
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white border-none rounded-xl text-xs font-bold cursor-pointer hover:bg-slate-800 transition-colors shadow-xs"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-900 text-white border-none rounded-xl text-xs font-bold cursor-pointer hover:bg-slate-800 transition-colors shadow-xs flex-1 sm:flex-none"
           >
             <svg
               width="14"

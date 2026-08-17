@@ -64,3 +64,19 @@ export interface HouseholdOverviewReportData {
   mostBoughtCategories?: CategoryPurchase[];
   mostUsedSupermarkets?: SupermarketUsage[];
 }
+
+export interface RevenueMonthlyTrend {
+  month: string;
+  revenue: number;
+  transactionsCount: number;
+}
+
+export interface RevenueData {
+  totalRevenue: number;
+  monthlyRevenue: number;
+  currency: string;
+  activeSubscribers: number;
+  totalTransactions: number;
+  successfulTransactions: number;
+  monthlyTrend: RevenueMonthlyTrend[];
+}

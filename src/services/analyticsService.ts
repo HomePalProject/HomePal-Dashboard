@@ -1,6 +1,5 @@
 import type { GeographicDemographicsData } from '@typeDefs/demographicsTypes';
 import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
-import type { PnLDeepDiveData } from '@typeDefs/pnlTypes';
 import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
 import type { TokenUsageMetrics } from '@typeDefs/tokenUsageTypes';
 import type {
@@ -8,14 +7,9 @@ import type {
   ShoppingTrendsData,
   UserDemographicsData,
   HouseholdOverviewReportData,
+  RevenueData,
 } from '@typeDefs/analyticsTypes';
 import { api } from './api';
-
-// Import fallback constants for endpoints that don't exist yet (PnL)
-import { MOCK_PNL_DATA } from '@constants/pnlData';
-
-// Simulated network delay for mock endpoints
-const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const analyticsService = {
   getOverview: async (): Promise<AnalyticsOverviewData> => {
@@ -46,9 +40,9 @@ export const analyticsService = {
     const response = await api.get('/reports/household-overview');
     return response.data?.data ?? response.data;
   },
-  getPnLDeepDive: async (): Promise<PnLDeepDiveData> => {
-    await delay();
-    return MOCK_PNL_DATA;
+  getRevenue: async (): Promise<RevenueData> => {
+    const response = await api.get('/analytics/revenue');
+    return response.data?.data ?? response.data;
   },
   getSupermarketPerformance: async (): Promise<ShoppingTrendsData> => {
     const response = await api.get('/analytics/shopping-trends');

@@ -1,5 +1,6 @@
 import { getLocalizedName } from '@/utils/categoryHelpers';
 import { getImageUrl } from '@lib/formatters';
+import { Button } from '@components/ui/Button';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 
 interface GridProps {
@@ -26,7 +27,7 @@ export default function GridView({
         return (
           <div
             key={cat.id}
-            className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group border border-slate-100 hover:border-[#1F3D32]/20 relative hover:-translate-y-1"
+            className="bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group border border-slate-100 hover:border-primary/20 relative hover:-translate-y-1"
           >
             {/* Image Cover */}
             <div className="relative w-full aspect-4/3 bg-slate-50 overflow-hidden">
@@ -78,7 +79,7 @@ export default function GridView({
             </div>
 
             {/* Body */}
-            <div className="p-5 flex-1 flex flex-col justify-between gap-4 bg-white">
+            <div className="p-5 flex-1 flex flex-col justify-between gap-1 bg-white">
               <div>
                 <h3 className="text-[15px] font-black text-slate-900 truncate" title={en}>
                   {en || 'Untitled Category'}
@@ -94,12 +95,13 @@ export default function GridView({
               </div>
 
               {/* Action Bar */}
-              <div className="flex items-center justify-between gap-2 pt-4 border-t border-slate-50">
-                <button
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-50">
+                <Button
                   onClick={() => onEdit(cat)}
                   disabled={loadingEditId === cat.id}
                   title="Edit Category"
-                  className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 text-slate-600 hover:text-[#1F3D32] hover:bg-[#1F3D32]/10 disabled:cursor-not-allowed disabled:opacity-50"
+                  variant="ghost"
+                  size="icon"
                 >
                   {loadingEditId === cat.id ? (
                     <svg
@@ -126,11 +128,12 @@ export default function GridView({
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                   )}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => onUpload(cat.id)}
                   title="Upload Cover Image"
-                  className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                  variant="ghost"
+                  size="icon"
                 >
                   <svg
                     width="15"
@@ -144,11 +147,13 @@ export default function GridView({
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
                   </svg>
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => onDelete(cat)}
                   title="Delete Category"
-                  className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
+                  variant="ghost"
+                  size="icon"
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
                 >
                   <svg
                     width="15"
@@ -161,7 +166,7 @@ export default function GridView({
                     <path d="M3 6h18" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
-                </button>
+                </Button>
               </div>
             </div>
           </div>

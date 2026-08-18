@@ -1,5 +1,6 @@
 import { getLocalizedName } from '@/utils/categoryHelpers';
 import { getImageUrl } from '@lib/formatters';
+import { Button } from '@components/ui/Button';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 
 interface TableProps {
@@ -44,19 +45,19 @@ export default function TableView({
                         <img
                           src={imgUrl}
                           alt={en}
-                          className="w-10 h-10 rounded-lg object-cover bg-slate-100 border border-slate-200"
+                          className="w-10 h-10 rounded-3xl object-cover bg-slate-100 border border-slate-200"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
                             e.currentTarget.nextElementSibling?.classList.remove('hidden');
                             e.currentTarget.nextElementSibling?.classList.add('flex');
                           }}
                         />
-                        <div className="hidden flex-col items-center justify-center w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 text-slate-400 font-bold text-xs">
+                        <div className="hidden flex-col items-center justify-center w-10 h-10 rounded-3xl bg-slate-100 border border-slate-200 text-slate-400 font-bold text-xs">
                           {en?.charAt(0).toUpperCase()}
                         </div>
                       </>
                     ) : (
-                      <div className="flex w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 items-center justify-center text-slate-400 font-bold text-xs">
+                      <div className="flex w-10 h-10 rounded-3xl bg-slate-100 border border-slate-200 items-center justify-center text-slate-400 font-bold text-xs">
                         {en?.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -73,11 +74,12 @@ export default function TableView({
                   </td>
                   <td className="px-16 py-3 text-right whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1">
-                      <button
+                      <Button
                         onClick={() => onEdit(cat)}
                         disabled={loadingEditId === cat.id}
                         title="Edit Category"
-                        className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-none bg-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                        variant="ghost"
+                        size="icon"
                       >
                         {loadingEditId === cat.id ? (
                           <svg
@@ -104,11 +106,12 @@ export default function TableView({
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg>
                         )}
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => onUpload(cat.id)}
                         title="Upload Cover Image"
-                        className="p-1.5 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50 border-none bg-transparent"
+                        variant="ghost"
+                        size="icon"
                       >
                         <svg
                           width="14"
@@ -122,11 +125,13 @@ export default function TableView({
                           <polyline points="17 8 12 3 7 8" />
                           <line x1="12" y1="3" x2="12" y2="15" />
                         </svg>
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => onDelete(cat)}
                         title="Delete Category"
-                        className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 border-none bg-transparent transition-colors"
+                        variant="ghost"
+                        size="icon"
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
                       >
                         <svg
                           width="14"
@@ -139,7 +144,7 @@ export default function TableView({
                           <path d="M3 6h18" />
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

@@ -1,10 +1,10 @@
 import { productCategoryService } from '@services/productCategoryService';
 import DeleteConfirmation from '../components/productCategories/DeleteConfirmation';
 import GridView from '../components/productCategories/Grid';
-import Header from '../components/productCategories/Header';
 import TableView from '../components/productCategories/Table';
+import { ViewToolbar } from '../components/ui/ViewToolbar';
+import { Button } from '../components/ui/Button';
 import useProductCategories from '../hooks/useProductCategories';
-import { Button } from '@components/ui/Button';
 
 export default function ProductCategories() {
   const {
@@ -44,7 +44,7 @@ export default function ProductCategories() {
   } = useProductCategories();
 
   return (
-    <div className="w-full flex flex-col gap-6 font-sans pb-16 px-4 sm:px-0">
+    <div className="w-full flex flex-col gap-6 font-sans pb-4 px-1 sm:px-0">
       {/* Toast */}
       {toastMessage && (
         <div className="fixed top-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-3 border border-slate-700 animate-fade-in">
@@ -62,23 +62,43 @@ export default function ProductCategories() {
         className="hidden"
       />
 
-      {/* Header */}
-      <Header
-        viewMode={viewMode}
-        setViewMode={setViewMode}
+      {/* Control Bar */}
+      <ViewToolbar
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        onAdd={() => void handleOpenModal()}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search categories..."
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        primaryAction={
+          <Button
+            onClick={() => void handleOpenModal()}
+            size="sm"
+            className="w-full sm:w-auto gap-2"
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Add New Category
+          </Button>
+        }
       />
 
       {/* Main content */}
       {loading ? (
-        <div className="py-20 text-center text-slate-400 text-sm font-medium">
+        <div className="py-5 text-center text-slate-400 text-sm font-medium">
           Loading product categories...
         </div>
       ) : filtered.length === 0 ? (
-        <div className="py-20 border-2 border-dashed border-slate-200 rounded-2xl text-center flex flex-col items-center justify-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
+        <div className="py-5 border-2 border-dashed border-slate-200 rounded-2xl text-center flex flex-col items-center justify-center gap-3">
+          <div className="w-3 h-3 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
             {/* empty state icon */}
             <svg
               width="24"
@@ -90,12 +110,14 @@ export default function ProductCategories() {
             />
           </div>
           <p className="text-sm font-bold text-slate-700 m-0">No categories found</p>
-          <button
+          <Button
             onClick={() => void handleOpenModal()}
-            className="text-xs font-bold text-emerald-700 hover:underline bg-transparent cursor-pointer border-none"
+            variant="ghost"
+            size="sm"
+            className="text-emerald-700 hover:underline h-auto min-h-0 p-0 bg-transparent hover:bg-transparent"
           >
             Create first category →
-          </button>
+          </Button>
         </div>
       ) : viewMode === 'grid' ? (
         <GridView
@@ -129,7 +151,7 @@ export default function ProductCategories() {
       {modalState.open && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
-            <h2 className="text-lg font-bold mb-4">
+            <h2 className="text-lg font-bold mb-1">
               {modalState.editing ? 'Edit Category' : 'Add New Category'}
             </h2>
             <form onSubmit={handleSubmitForm} className="flex flex-col gap-5">
@@ -139,7 +161,7 @@ export default function ProductCategories() {
                 </div>
               )}
               {/* English / Arabic names */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold uppercase text-slate-500">
                     English Name <span className="text-red-500">*</span>
@@ -195,7 +217,7 @@ export default function ProductCategories() {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-slate-900/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                      <label className="px-3 py-1.5 bg-white text-slate-900 rounded-lg text-xs cursor-pointer hover:bg-slate-100">
+                      <label className="px-3 py-1.5 bg-white text-slate-900 rounded-3xl text-xs cursor-pointer hover:bg-slate-100">
                         Change
                         <input
                           type="file"
@@ -209,7 +231,7 @@ export default function ProductCategories() {
                           className="hidden"
                         />
                       </label>
-                      <button
+                      <Button
                         type="button"
                         onClick={() => {
                           setCoverFile(null);
@@ -220,10 +242,11 @@ export default function ProductCategories() {
                               .catch(() => null);
                           }
                         }}
-                        className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 border-none"
+                        variant="danger"
+                        size="sm"
                       >
                         Remove
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ) : (
@@ -258,11 +281,30 @@ export default function ProductCategories() {
 
               {/* Actions */}
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-                <Button variant="secondary" type="button" onClick={handleCloseModal}>
+                <Button
+                  type="button"
+                  onClick={handleCloseModal}
+                  variant="outline"
+                  size="sm"
+                  className="px-4 border-slate-200 text-slate-700 bg-white hover:bg-slate-50"
+                >
                   Cancel
                 </Button>
-                <Button variant="primary" type="submit" isLoading={saving}>
-                  Save Category
+                <Button
+                  type="submit"
+                  disabled={saving}
+                  variant="primary"
+                  size="sm"
+                  className="gap-2 px-5"
+                >
+                  {saving ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Saving Category...
+                    </>
+                  ) : (
+                    'Save Category'
+                  )}
                 </Button>
               </div>
             </form>

@@ -44,3 +44,16 @@ export const mockSupermarketPerformanceData: SupermarketPerformanceData = {
     conversionRate: '17.6%',
   },
 };
+
+export const BRANCH_COUNTS: Record<string, number> = {
+  'Carrefour Egypt': 69,
+  'Spinneys Egypt': 35,
+  'Metro Market': 48,
+  Kazyon: 450,
+  'Seoudi Market': 21,
+  'Lulu Hypermarket': 4,
+  'BIM Egypt': 300,
+  'Abdullah AlOthaim': 61,
+  'Awlad Ragab': 75,
+  'Gomla Market': 12,
+};

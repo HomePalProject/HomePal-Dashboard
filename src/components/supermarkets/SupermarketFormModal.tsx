@@ -3,6 +3,7 @@ import type { Supermarket } from '@typeDefs/catalogTypes';
 import { Modal } from '@components/ui/Modal';
 import { Field } from '@components/ui/Field';
 import { ModalActions } from '@components/ui/ModalActions';
+import { Button } from '@components/ui/Button';
 import { getLocalizedCulture } from '@lib/formatters';
 
 export function SupermarketFormModal({
@@ -65,11 +66,11 @@ export function SupermarketFormModal({
 
   return (
     <Modal title={initial ? 'Edit Supermarket' : 'Add Supermarket'} onClose={onClose} isOpen={true}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-1">
         {/* Logo Upload / Preview Section */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-bold text-slate-700">Supermarket Logo</label>
-          <div className="flex items-center gap-4 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+          <div className="flex items-center gap-1 p-3 bg-slate-50 border border-slate-200 rounded-xl">
             {logoPreview ? (
               <div className="relative group">
                 <img
@@ -96,7 +97,7 @@ export function SupermarketFormModal({
             )}
 
             <div className="flex flex-col gap-1 flex-1">
-              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer w-fit shadow-xs">
+              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 rounded-3xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer w-fit shadow-xs">
                 <svg
                   width="14"
                   height="14"
@@ -119,13 +120,14 @@ export function SupermarketFormModal({
               </label>
 
               {logoPreview && (
-                <button
+                <Button
                   type="button"
                   onClick={handleRemoveLogo}
-                  className="text-[11px] font-semibold text-red-600 hover:underline w-fit border-none bg-transparent cursor-pointer p-0"
+                  variant="ghost"
+                  className="text-[11px] font-semibold text-red-600 hover:underline w-fit border-none bg-transparent cursor-pointer p-0 h-auto min-h-0 hover:bg-transparent"
                 >
                   Remove Logo
-                </button>
+                </Button>
               )}
 
               <span className="text-[11px] text-slate-400">PNG, JPG or WEBP (max. 5MB)</span>
@@ -133,7 +135,7 @@ export function SupermarketFormModal({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
           <Field label="English Name" required>
             <input
               className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border"

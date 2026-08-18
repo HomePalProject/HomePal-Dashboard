@@ -15,7 +15,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        'bg-white rounded-xl border p-20 flex flex-col gap-12 relative overflow-hidden',
+        'bg-white rounded-xl border p-5 flex flex-col gap-3 relative overflow-hidden',
         highlight ? 'border-status-error shadow-[0_4px_12px_rgba(217,83,79,0.08)]' : 'border-border'
       )}
     >
@@ -24,7 +24,7 @@ export function StatCard({
       <div className="flex items-center gap-[8px]">
         <div
           className={cn(
-            'w-32 h-32 rounded-lg flex items-center justify-center',
+            'w-8 h-8 rounded-3xl flex items-center justify-center',
             highlight
               ? 'bg-status-error-container text-status-error'
               : 'bg-surface text-text-secondary'
@@ -56,7 +56,7 @@ export function StatCard({
             </svg>
           )}
         </div>
-        <span className="text-13 font-semibold text-text-secondary">{title}</span>
+        <span className="text-[13px] font-semibold text-text-secondary">{title}</span>
       </div>
 
       <div

@@ -35,8 +35,8 @@ export default function ForgotPassword() {
   return (
     <AuthLayout>
       {submitted ? (
-        <div className="text-center mt-8">
-          <div className="w-56 h-56 rounded-full bg-status-success-container flex items-center justify-center mx-auto mb-20">
+        <div className="text-center mt-2">
+          <div className="w-14 h-14 rounded-full bg-status-success-container flex items-center justify-center mx-auto mb-5">
             <svg
               className="w-7 h-7 text-status-success"
               fill="none"
@@ -48,17 +48,17 @@ export default function ForgotPassword() {
             </svg>
           </div>
           <h2 className="text-typography-h2 text-text-primary mb-[8px]">Check your inbox</h2>
-          <p className="text-typography-body text-text-secondary mb-8">
+          <p className="text-typography-body text-text-secondary mb-2">
             We've sent a password reset link to{' '}
             <strong className="text-text-primary">{email}</strong>. Check your spam folder if you
             don't see it within a few minutes.
           </p>
           <Link
             to="/login"
-            className="text-14 font-medium text-primary hover:text-primary-active transition-colors inline-flex items-center gap-1.5"
+            className="text-sm font-medium text-primary hover:text-primary-active transition-colors inline-flex items-center gap-1.5"
           >
             <svg
-              className="w-16 h-16"
+              className="w-4 h-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -76,7 +76,7 @@ export default function ForgotPassword() {
             subtitle="Enter your admin email and we'll send you a link to reset your password."
           />
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-20">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <InputField
               label="Email Address"
               type="email"
@@ -88,7 +88,7 @@ export default function ForgotPassword() {
             />
 
             {isError && (
-              <div className="p-12 bg-status-error-container text-status-error rounded-lg text-14 font-medium border border-status-error/20">
+              <div className="p-3 bg-status-error-container text-status-error rounded-3xl text-sm font-medium border border-status-error/20">
                 {getErrorMessage(error, 'Failed to send reset email. Please try again.')}
               </div>
             )}
@@ -100,13 +100,13 @@ export default function ForgotPassword() {
             </div>
           </form>
 
-          <div className="mt-24 text-center">
+          <div className="mt-6 text-center">
             <Link
               to="/login"
-              className="text-14 font-medium text-text-secondary hover:text-primary transition-colors inline-flex items-center gap-1.5"
+              className="text-sm font-medium text-text-secondary hover:text-primary transition-colors inline-flex items-center gap-1.5"
             >
               <svg
-                className="w-16 h-16"
+                className="w-4 h-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

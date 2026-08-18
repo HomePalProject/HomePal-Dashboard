@@ -47,7 +47,7 @@ export default function Login() {
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-20 motion-safe:animate-[slideUp_0.6s_ease-out_80ms_both]"
+        className="flex flex-col gap-5 motion-safe:animate-[slideUp_0.6s_ease-out_80ms_both]"
       >
         <InputField
           label="Email or Username"
@@ -69,10 +69,12 @@ export default function Login() {
             required
             fullWidth
             rightElement={
-              <button
+              <Button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="text-text-secondary hover:text-text-primary transition-colors"
+                variant="ghost"
+                size="icon"
+                className="text-text-secondary hover:text-text-primary transition-colors h-auto w-auto min-h-0 p-0"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 tabIndex={-1}
               >
@@ -108,13 +110,13 @@ export default function Login() {
                     <circle cx="12" cy="12" r="3" />
                   </svg>
                 )}
-              </button>
+              </Button>
             }
           />
           <div className="flex justify-end">
             <Link
               to="/forgot-password"
-              className="text-13 font-medium text-primary hover:text-primary-active transition-colors"
+              className="text-[13px] font-medium text-primary hover:text-primary-active transition-colors"
             >
               Forgot password?
             </Link>
@@ -122,7 +124,7 @@ export default function Login() {
         </div>
 
         {isError && (
-          <div className="p-12 bg-status-error-container text-status-error rounded-lg text-14 font-medium border border-status-error/20">
+          <div className="p-3 bg-status-error-container text-status-error rounded-3xl text-sm font-medium border border-status-error/20">
             {getErrorMessage()}
           </div>
         )}

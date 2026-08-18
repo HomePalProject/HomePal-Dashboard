@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@store/authStore';
 import { PAGE_LABELS } from '@constants/navigation';
+import { Button } from '@components/ui/Button';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -31,11 +32,13 @@ export function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="h-52 flex items-center justify-between px-16 md:px-32 bg-background border-b border-border sticky top-0 z-30 shrink-0">
-      <div className="flex items-center gap-12">
-        <button
+    <header className="h-13 flex items-center justify-between px-4 md:px-8 bg-background border-b border-border sticky top-0 z-30 shrink-0">
+      <div className="flex items-center gap-3">
+        <Button
           onClick={onMenuClick}
-          className="lg:hidden p-8 -ml-8 text-text-secondary hover:text-text-primary rounded-md hover:bg-surface-variant transition-colors"
+          variant="ghost"
+          size="icon"
+          className="lg:hidden -ml-2 text-text-secondary"
         >
           <svg
             width="20"
@@ -51,44 +54,46 @@ export function Header({ onMenuClick }: HeaderProps) {
             <line x1="3" y1="6" x2="21" y2="6" />
             <line x1="3" y1="18" x2="21" y2="18" />
           </svg>
-        </button>
-        <div className="flex items-center gap-8">
-          <span className="text-14 font-medium text-text-primary">{pageLabel}</span>
+        </Button>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-text-primary">{pageLabel}</span>
         </div>
       </div>
 
-      <div className="flex items-center gap-8">
+      <div className="flex items-center gap-2">
         <div className="relative">
-          <button
+          <Button
             onClick={() => setProfileMenuOpen((v) => !v)}
-            className="flex items-center gap-8 ps-12 pe-2.5 py-4 rounded-full border border-border bg-surface cursor-pointer hover:bg-surface-variant transition-colors"
+            variant="outline"
+            className="rounded-full py-1 px-1 sm:px-2.5 min-h-0 h-auto gap-2 bg-surface hover:bg-surface-variant border-border"
           >
-            <span className="text-12 font-medium text-text-primary hidden sm:block">
+            <span className="text-xs font-medium text-text-primary hidden sm:block">
               {user?.roles?.[0] || 'Admin'} Profile
             </span>
             <span className="w-6.5 h-6.5 rounded-full bg-primary-active text-white flex items-center justify-center text-[10px] font-bold">
               {initials}
             </span>
-          </button>
+          </Button>
 
           {profileMenuOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setProfileMenuOpen(false)} />
-              <div className="absolute right-0 top-16 mt-24 min-w-[160px] bg-surface border border-border rounded-[10px] shadow-[0_8px_24px_rgba(45,42,38,0.1)] z-20 overflow-hidden py-4">
+              <div className="absolute right-0 top-4 mt-6 min-w-40 bg-surface border border-border rounded-[10px] shadow-[0_8px_24px_rgba(45,42,38,0.1)] z-20 overflow-hidden py-1">
                 <NavLink
                   to="/dashboard/profile"
                   onClick={() => setProfileMenuOpen(false)}
-                  className="block px-12 py-2.5 text-13 text-text-primary no-underline hover:bg-surface-variant"
+                  className="block px-3 py-2.5 text-[13px] text-text-primary no-underline hover:bg-surface-variant"
                 >
                   View Profile
                 </NavLink>
-                <div className="border-t border-border my-4" />
-                <button
+                <div className="border-t border-border my-1" />
+                <Button
                   onClick={handleLogout}
-                  className="block w-full px-12 py-2.5 text-13 text-status-error bg-transparent border-none cursor-pointer text-left hover:bg-status-error-container/30"
+                  variant="ghost"
+                  className="w-full justify-start rounded-none px-3 py-2.5 text-[13px] text-status-error hover:bg-status-error-container/30 h-auto min-h-0 font-medium"
                 >
                   Sign Out
-                </button>
+                </Button>
               </div>
             </>
           )}

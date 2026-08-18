@@ -29,7 +29,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 const PageLoader = () => (
   <div className="flex h-screen w-full items-center justify-center bg-surface">
-    <div className="w-40 h-40 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+    <div className="w-10 h-10 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
   </div>
 );
 

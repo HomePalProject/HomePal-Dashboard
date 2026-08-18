@@ -61,7 +61,7 @@ export function TableHead({
   return (
     <th
       className={cn(
-        'h-48 px-24 align-middle text-12 font-bold uppercase tracking-[0.08em] text-text-disabled whitespace-nowrap',
+        'h-12 px-6 align-middle text-xs font-bold uppercase tracking-[0.08em] text-text-disabled whitespace-nowrap',
         className
       )}
       {...props}
@@ -79,7 +79,7 @@ export function TableCell({
   return (
     <td
       className={cn(
-        'px-24 py-16 align-middle text-14 text-text-secondary whitespace-nowrap',
+        'px-6 py-4 align-middle text-sm text-text-secondary whitespace-nowrap',
         className
       )}
       {...props}

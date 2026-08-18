@@ -71,3 +71,12 @@ export function getLocalizedCulture(val: unknown, lang: 'en' | 'ar'): string {
   }
   return '';
 }
+
+export function getInitials(name: string) {
+  return name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase();
+}

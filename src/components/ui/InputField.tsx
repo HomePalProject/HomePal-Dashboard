@@ -13,16 +13,16 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     const widthClass = fullWidth ? 'w-full' : '';
 
     return (
-      <div className={`flex flex-col gap-8 ${widthClass} ${className}`}>
-        <label htmlFor={inputId} className="text-14 font-semibold text-text-primary">
+      <div className={`flex flex-col gap-2 ${widthClass} ${className}`}>
+        <label htmlFor={inputId} className="text-sm font-semibold text-text-primary">
           {label}
         </label>
         <div className="relative">
           <input
             id={inputId}
             ref={ref}
-            className={`min-h-11 px-16 py-12 rounded-md border text-16 bg-surface text-text-primary transition-colors focus:outline-none focus:ring-2 w-full ${
-              rightElement ? 'pr-40' : ''
+            className={`min-h-11 px-4 py-3 rounded-2xl border text-base bg-surface text-text-primary transition-colors focus:outline-none focus:ring-2 w-full ${
+              rightElement ? 'pr-10' : ''
             } ${
               error
                 ? 'border-status-error focus:ring-status-error focus:border-status-error'
@@ -31,10 +31,10 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             {...props}
           />
           {rightElement && (
-            <div className="absolute inset-y-0 right-0 flex items-center pr-12">{rightElement}</div>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3">{rightElement}</div>
           )}
         </div>
-        {error && <span className="text-12 text-status-error font-medium">{error}</span>}
+        {error && <span className="text-xs text-status-error font-medium">{error}</span>}
       </div>
     );
   }

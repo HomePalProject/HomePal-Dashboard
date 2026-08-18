@@ -12,8 +12,8 @@ export function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-20">
-      <label className="block text-13 font-semibold text-text-primary mb-1.5">
+    <div className="mb-5">
+      <label className="block text-[13px] font-semibold text-text-primary mb-1.5">
         {label} {required && <span className="text-status-error">*</span>}
       </label>
       {children}

@@ -10,8 +10,8 @@ export function Card({ children, className, noPadding = false, ...props }: CardP
   return (
     <div
       className={cn(
-        'bg-surface border border-border rounded-md shadow-[0_2px_12px_rgba(45,42,38,0.04)]',
-        !noPadding && 'p-24',
+        'bg-surface border border-border rounded-2xl shadow-[0_2px_12px_rgba(45,42,38,0.04)]',
+        !noPadding && 'p-6',
         className
       )}
       {...props}
@@ -27,7 +27,7 @@ export function CardHeader({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('px-24 py-20 border-b border-border', className)} {...props}>
+    <div className={cn('px-6 py-5 border-b border-border', className)} {...props}>
       {children}
     </div>
   );
@@ -39,7 +39,7 @@ export function CardContent({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('p-24', className)} {...props}>
+    <div className={cn('p-6', className)} {...props}>
       {children}
     </div>
   );

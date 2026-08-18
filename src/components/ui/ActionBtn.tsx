@@ -1,4 +1,4 @@
-import { cn } from '@lib/utils';
+import { Button } from './Button';
 
 export function ActionBtn({
   icon,
@@ -14,14 +14,17 @@ export function ActionBtn({
   loading?: boolean;
 }) {
   return (
-    <button
+    <Button
       title={title}
       onClick={onClick}
       disabled={loading}
-      className={cn(
-        'w-7 h-7 rounded-md border border-border bg-white flex items-center justify-center cursor-pointer transition-colors hover:bg-surface-variant disabled:cursor-not-allowed disabled:opacity-60',
-        danger ? 'text-status-error' : 'text-text-secondary'
-      )}
+      variant={danger ? 'danger' : 'outline'}
+      size="icon"
+      className={
+        danger
+          ? 'bg-transparent text-status-error border-status-error/20 hover:bg-status-error-container hover:text-status-error'
+          : 'bg-white text-text-secondary'
+      }
     >
       {loading ? (
         <svg
@@ -60,6 +63,6 @@ export function ActionBtn({
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
         </svg>
       )}
-    </button>
+    </Button>
   );
 }

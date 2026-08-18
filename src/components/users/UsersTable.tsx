@@ -98,7 +98,7 @@ export function UsersTable({
 
         {/* Filters and count */}
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 bg-surface-variant/40 p-1 rounded-lg border border-border/60">
+          <div className="flex items-center gap-1 bg-surface-variant/40 p-1 rounded-lg border border-border/60 overflow-x-auto scrollbar-none max-w-full shrink-0">
             <button
               onClick={() => setRoleFilter('All')}
               className={cn(

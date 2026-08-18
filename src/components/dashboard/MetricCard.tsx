@@ -40,7 +40,7 @@ export function MetricCard({
       <div className="flex justify-between items-start">
         <div
           className={cn(
-            'w-40 h-40 rounded-[10px] flex items-center justify-center shrink-0',
+            'w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0',
             dark ? 'bg-white/15 text-white' : 'bg-surface-variant text-primary'
           )}
         >
@@ -56,20 +56,20 @@ export function MetricCard({
         )}
       </div>
 
-      <div className="mt-24">
+      <div className="mt-6">
         <div
-          className={`text-48 font-extrabold leading-none tracking-tight ${dark ? 'text-white' : 'text-text-primary'}`}
+          className={`text-5xl font-extrabold leading-none tracking-tight ${dark ? 'text-white' : 'text-text-primary'}`}
         >
           {value}
         </div>
         <div
-          className={`text-[11px] font-bold tracking-[0.08em] uppercase mt-8 ${dark ? 'text-white/65' : 'text-text-disabled'}`}
+          className={`text-[11px] font-bold tracking-[0.08em] uppercase mt-2 ${dark ? 'text-white/65' : 'text-text-disabled'}`}
         >
           {label}
         </div>
         {note && (
           <div
-            className={`text-[10px] italic mt-24 leading-[1.4] ${dark ? 'text-white/40' : 'text-text-disabled/70'}`}
+            className={`text-[10px] italic mt-6 leading-[1.4] ${dark ? 'text-white/40' : 'text-text-disabled/70'}`}
           >
             {note}
           </div>

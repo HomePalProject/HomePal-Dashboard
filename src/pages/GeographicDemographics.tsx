@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Circle, Tooltip, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import { cn } from '@lib/utils';
 import { getErrorMessage } from '@lib/utils';
+import { Button } from '@components/ui/Button';
 import { analyticsService } from '@services/analyticsService';
 import type { GeographicDemographicsData } from '@typeDefs/demographicsTypes';
 import type { UserDemographicsData } from '@typeDefs/analyticsTypes';
@@ -117,34 +118,33 @@ export default function GeographicDemographics() {
   };
 
   if (loading || !data) {
-    return <div className="p-40 text-text-secondary">Loading geographic data...</div>;
+    return <div className="p-10 text-text-secondary">Loading geographic data...</div>;
   }
 
   const cairoCenter: [number, number] = [30.02, 31.2];
 
   return (
-    <div className="w-full flex flex-col gap-24 pb-15">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-16">
+    <div className="w-full flex flex-col gap-6 pb-15">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-22 sm:text-[28px] text-text-primary tracking-tight mb-[8px]">
+          <h1 className="text-[22px] sm:text-[28px] text-text-primary tracking-tight mb-[8px]">
             Geographic Demographics
           </h1>
           <p className="text-typography-bodysmall text-text-secondary max-w-2xl">
             Comprehensive household data analysis across central districts.
           </p>
         </div>
-        <div className="flex gap-12 items-center flex-wrap">
-          <button
+        <div className="flex gap-3 items-center flex-wrap">
+          <Button
             onClick={handleExportCSV}
             disabled={isExporting}
-            className={cn(
-              'flex items-center gap-[8px] px-16 py-2.5 bg-surface border border-border rounded-lg text-13 font-semibold text-text-primary cursor-pointer transition-all duration-200 hover:bg-surface-variant shrink-0 shadow-sm',
-              isExporting && 'opacity-70 cursor-not-allowed'
-            )}
+            variant="outline"
+            size="sm"
+            className="gap-[8px] px-4"
           >
             {isExporting ? (
               <svg
-                className="animate-spin w-16 h-16"
+                className="animate-spin w-4 h-4"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -157,18 +157,17 @@ export default function GeographicDemographics() {
             ) : (
               'Export Report'
             )}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleUpdateData}
             disabled={isUpdating}
-            className={cn(
-              'flex items-center gap-[8px] px-16 py-2.5 bg-primary border-none rounded-lg text-13 font-semibold text-white cursor-pointer transition-all duration-200 hover:opacity-90 shrink-0 shadow-sm',
-              isUpdating && 'opacity-70 cursor-not-allowed'
-            )}
+            variant="primary"
+            size="sm"
+            className="gap-[8px] px-4"
           >
             {isUpdating ? (
               <svg
-                className="animate-spin w-16 h-16"
+                className="animate-spin w-4 h-4"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -181,24 +180,24 @@ export default function GeographicDemographics() {
             ) : (
               'Update Data'
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 mb-4 text-sm text-status-error bg-status-error-container rounded-sm border border-status-error/20">
+        <div className="p-1 mb-1 text-sm text-status-error bg-status-error-container rounded-3xl border border-status-error/20">
           {error} (Showing fallback data)
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-24 items-start">
-        <div className="bg-surface rounded-md border border-border p-24 relative">
-          <div className="flex justify-between items-start mb-24">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
+        <div className="bg-surface rounded-2xl border border-border p-6 relative">
+          <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-base font-bold text-text-primary mb-[4px]">
                 Regional Distribution Map (Egypt)
               </h2>
-              <p className="text-13 text-text-secondary">
+              <p className="text-[13px] text-text-secondary">
                 Household density heat-mapping by district.
               </p>
             </div>
@@ -208,14 +207,14 @@ export default function GeographicDemographics() {
             </div>
           </div>
 
-          <div className="relative w-full h-[400px] sm:h-[500px] rounded-sm overflow-hidden border border-border z-0">
-            <div className="absolute left-4 bottom-24 bg-surface/90 px-4 py-12 rounded-sm shadow-md z-1000 backdrop-blur-sm">
+          <div className="relative w-full h-[400px] sm:h-[500px] rounded-3xl overflow-hidden border border-border z-0">
+            <div className="absolute left-4 bottom-24 bg-surface/90 px-4 py-3 rounded-3xl shadow-md z-1000 backdrop-blur-sm">
               <div className="text-[11px] font-bold text-text-secondary mb-[8px] uppercase">
                 Density Intensity
               </div>
               <div className="flex items-center gap-[4px]">
                 <span className="text-[11px] text-text-secondary">Low</span>
-                <div className="w-15 h-[8px] bg-linear-to-r from-green-300 to-green-800 rounded-sm" />
+                <div className="w-15 h-[8px] bg-linear-to-r from-green-300 to-green-800 rounded-3xl" />
                 <span className="text-[11px] text-text-secondary">High</span>
               </div>
             </div>
@@ -249,7 +248,7 @@ export default function GeographicDemographics() {
                       <div className="text-base font-bold text-text-primary mb-[4px] text-center font-sans">
                         {district.name}
                       </div>
-                      <div className="text-13 font-bold text-primary text-center mb-12 bg-primary-container p-[4px] rounded-sm font-sans">
+                      <div className="text-[13px] font-bold text-primary text-center mb-3 bg-primary-container p-[4px] rounded-3xl font-sans">
                         {district.growth} New Households
                       </div>
                       <div className="flex flex-col gap-1.5 text-xs font-sans">
@@ -278,13 +277,13 @@ export default function GeographicDemographics() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-24">
-          <div className="bg-surface rounded-md border border-border p-24">
-            <div className="flex justify-between items-start mb-4">
+        <div className="flex flex-col gap-6">
+          <div className="bg-surface rounded-2xl border border-border p-6">
+            <div className="flex justify-between items-start mb-1">
               <div className="text-sm font-bold text-text-primary">Avg. Monthly Budget</div>
               <div className="text-text-secondary">
                 <svg
-                  className="w-20 h-20"
+                  className="w-5 h-5"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -296,33 +295,33 @@ export default function GeographicDemographics() {
                 </svg>
               </div>
             </div>
-            <div className="flex items-baseline gap-[8px] mb-24">
+            <div className="flex items-baseline gap-[8px] mb-6">
               <span className="text-4xl font-extrabold text-primary">{data.budget.value}</span>
-              <span className="text-13 text-text-secondary">/ household</span>
+              <span className="text-[13px] text-text-secondary">/ household</span>
             </div>
-            <div className="flex justify-between items-center text-13 font-semibold text-text-secondary">
+            <div className="flex justify-between items-center text-[13px] font-semibold text-text-secondary">
               <span>{data.budget.region}</span>
               <span className="text-status-success">{data.budget.change}</span>
             </div>
           </div>
 
           {userDemographics && (
-            <div className="bg-surface rounded-md border border-border p-24">
-              <div className="text-sm font-bold text-text-primary mb-12">
+            <div className="bg-surface rounded-2xl border border-border p-6">
+              <div className="text-sm font-bold text-text-primary mb-3">
                 Average User Age Breakdown
               </div>
-              <div className="grid grid-cols-2 gap-12">
-                <div className="p-12 rounded-sm bg-surface-variant/50">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-3xl bg-surface-variant/50">
                   <div className="text-xs text-text-secondary">Avg. Householder Age</div>
-                  <div className="text-xl font-bold text-primary mt-4">
+                  <div className="text-xl font-bold text-primary mt-1">
                     {userDemographics.avgAgeHouseholders
                       ? `${userDemographics.avgAgeHouseholders} yrs`
                       : '28 yrs'}
                   </div>
                 </div>
-                <div className="p-12 rounded-sm bg-surface-variant/50">
+                <div className="p-3 rounded-3xl bg-surface-variant/50">
                   <div className="text-xs text-text-secondary">Avg. Overall User Age</div>
-                  <div className="text-xl font-bold text-primary mt-4">
+                  <div className="text-xl font-bold text-primary mt-1">
                     {userDemographics.avgAgeUsers
                       ? `${userDemographics.avgAgeUsers} yrs`
                       : '26 yrs'}
@@ -332,20 +331,20 @@ export default function GeographicDemographics() {
             </div>
           )}
 
-          <div className="bg-surface rounded-md border border-border p-24 flex-1 relative overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-border p-6 flex-1 relative overflow-hidden">
             <h2 className="text-sm font-bold text-text-primary mb-[4px]">Top Grocery Category</h2>
-            <p className="text-xs text-text-secondary mb-24">By volume in Northern Region</p>
+            <p className="text-xs text-text-secondary mb-6">By volume in Northern Region</p>
 
-            <div className="flex flex-col gap-24 relative z-10">
+            <div className="flex flex-col gap-6 relative z-10">
               {data.topCategories.map((cat, i) => (
                 <div key={i}>
-                  <div className="flex justify-between text-13 font-semibold text-text-primary mb-[8px]">
+                  <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-[8px]">
                     <span>{cat.name}</span>
                     <span className="text-text-secondary">{cat.percentage}%</span>
                   </div>
-                  <div className="h-1.5 bg-surface-variant rounded-sm overflow-hidden">
+                  <div className="h-1.5 bg-surface-variant rounded-3xl overflow-hidden">
                     <div
-                      className="h-full bg-primary rounded-sm transition-all duration-500 ease-out"
+                      className="h-full bg-primary rounded-3xl transition-all duration-500 ease-out"
                       style={{ width: `${cat.percentage}%` }}
                     />
                   </div>
@@ -353,7 +352,7 @@ export default function GeographicDemographics() {
               ))}
             </div>
 
-            <div className="absolute bottom-20 right-20 opacity-5 pointer-events-none z-0">
+            <div className="absolute bottom-5 right-5 opacity-5 pointer-events-none z-0">
               <svg
                 className="w-25 h-25"
                 viewBox="0 0 24 24"
@@ -370,10 +369,61 @@ export default function GeographicDemographics() {
         </div>
       </div>
 
+      <div className="bg-surface rounded-2xl border border-border p-6 md:p-8">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-base font-bold text-text-primary">Household Size Distribution</h2>
+            <p className="text-xs text-text-disabled mt-2">
+              Percentage breakdown of enrolled household sizes
+            </p>
+          </div>
+          <div className="px-3 py-1 rounded-full border border-border text-xs font-semibold text-text-secondary bg-surface-variant/30">
+            Live Analytics
+          </div>
+        </div>
+
+        <div className="flex items-end justify-between h-16 px-3 sm:px-8 gap-3 sm:gap-6 pt-8 pb-3 border-b border-border/50">
+          {data.householdSize.map((item, i) => {
+            const maxValue = Math.max(...data.householdSize.map((d) => d.value), 1);
+            const heightPercent = Math.max(Math.round((item.value / maxValue) * 100), 12);
+            return (
+              <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group">
+                <div className="w-full flex flex-col items-center flex-1 justify-end">
+                  <span
+                    className={cn(
+                      'text-xs font-bold mb-6 transition-all group-hover:scale-110',
+                      i === 2 ? 'text-primary' : 'text-text-secondary'
+                    )}
+                  >
+                    {item.value}%
+                  </span>
+                  <div
+                    className={cn(
+                      'w-full max-w-36 rounded-t-2xl relative transition-all duration-300 group-hover:opacity-90',
+                      i === 2
+                        ? 'bg-primary shadow-sm shadow-primary/20'
+                        : 'bg-surface-variant hover:bg-surface-variant/80'
+                    )}
+                    style={{ height: `${heightPercent}%` }}
+                  />
+                </div>
+                <div
+                  className={cn(
+                    'text-xs text-center mt-3 whitespace-nowrap',
+                    i === 2 ? 'font-bold text-primary' : 'font-medium text-text-secondary'
+                  )}
+                >
+                  {item.size}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
       {toastMessage && (
-        <div className="fixed bottom-8 right-8 bg-gray-900 text-white px-24 py-12 rounded-sm text-13 font-medium shadow-lg flex items-center gap-[8px] z-9999 animate-[slideUp_0.3s_ease-out]">
+        <div className="fixed bottom-2 right-2 bg-gray-900 text-white px-6 py-3 rounded-3xl text-[13px] font-medium shadow-lg flex items-center gap-[8px] z-9999 animate-[slideUp_0.3s_ease-out]">
           <svg
-            className="w-16 h-16 text-status-success"
+            className="w-4 h-4 text-status-success"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

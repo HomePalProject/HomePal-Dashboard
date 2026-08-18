@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@store/authStore';
 import { Card } from '@components/ui/Card';
+import { Button } from '@components/ui/Button';
 import { api } from '@services/api';
 
 interface SystemHealthCardProps {
@@ -72,13 +73,17 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
         {isChecking
           ? 'Pinging API server…'
           : isOnline
-            ? 'All services reporting.'
+            ? 'All systems operational.'
             : 'Cannot reach the API.'}
       </div>
 
-      <button className="bg-white/15 border-none rounded-md text-white text-[11px] font-bold tracking-[0.08em] px-6 py-2 cursor-pointer uppercase transition-colors hover:bg-white/25">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-white hover:bg-white/10 uppercase tracking-widest text-[10px] px-6 py-2"
+      >
         Details
-      </button>
+      </Button>
     </Card>
   );
 }

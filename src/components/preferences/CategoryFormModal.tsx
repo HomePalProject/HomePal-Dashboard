@@ -58,11 +58,11 @@ export function CategoryFormModal({
 
   return (
     <Modal title={initial ? 'Edit Category' : 'Add Category'} onClose={onClose} isOpen={true}>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
           <Field label="English Name" required hint="2–100 characters">
             <input
-              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-lg text-sm text-slate-900 bg-white outline-none box-border"
+              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border"
               value={nameEn}
               onChange={(e) => setNameEn(e.target.value)}
               placeholder="e.g. Dietary Restrictions"
@@ -73,7 +73,7 @@ export function CategoryFormModal({
           </Field>
           <Field label="Arabic Name" hint="Optional if English is provided">
             <input
-              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-lg text-sm text-slate-900 bg-white outline-none box-border text-right"
+              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border text-right"
               dir="rtl"
               value={nameAr}
               onChange={(e) => setNameAr(e.target.value)}
@@ -85,10 +85,10 @@ export function CategoryFormModal({
           </Field>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
           <Field label="English Description" hint="Optional — max 300 characters">
             <textarea
-              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-lg text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px]"
+              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px]"
               value={descriptionEn}
               onChange={(e) => setDescriptionEn(e.target.value)}
               placeholder="Describe what this category covers..."
@@ -97,7 +97,7 @@ export function CategoryFormModal({
           </Field>
           <Field label="Arabic Description" hint="Optional — max 300 characters">
             <textarea
-              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-lg text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px] text-right"
+              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px] text-right"
               dir="rtl"
               value={descriptionAr}
               onChange={(e) => setDescriptionAr(e.target.value)}

@@ -235,7 +235,7 @@ export default function Preferences() {
         </button>
       </div>
 
-      <div className="flex border-b-[1.5px] border-border mb-8 sm:mb-24 overflow-x-auto">
+      <div className="flex border-b-[1.5px] border-border mb-6 overflow-x-auto">
         {(['preferences', 'categories'] as Tab[]).map((tab) => (
           <button
             key={tab}
@@ -256,7 +256,7 @@ export default function Preferences() {
         ))}
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 sm:gap-12 sm:items-center mb-8 sm:mb-20">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-12 sm:items-center mb-6">
         <div className="relative flex-1 min-w-full sm:min-w-45 sm:max-w-75">
           <svg
             width="15"

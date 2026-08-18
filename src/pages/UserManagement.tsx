@@ -113,12 +113,14 @@ export default function UserManagement() {
         </div>
         <h3 className="text-sm font-bold m-0 mb-1">Failed to Load User Directory</h3>
         <p className="m-0 text-xs text-text-secondary">{getErrorMessage(queryError)}</p>
-        <button
+        <Button
           onClick={() => refetch()}
-          className="mt-4 px-4 py-1.5 bg-surface border border-status-error/30 rounded-lg text-xs font-semibold text-status-error hover:bg-status-error/10 transition-colors cursor-pointer shadow-2xs"
+          variant="outline"
+          size="sm"
+          className="mt-4 text-status-error border-status-error/30 hover:bg-status-error/10"
         >
           Retry
-        </button>
+        </Button>
       </div>
     );
   }
@@ -149,9 +151,10 @@ export default function UserManagement() {
         </div>
 
         <Button
-          variant="primary"
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center gap-1.5 shrink-0 self-start sm:self-auto bg-[#356859] hover:bg-[#2a5347] focus-visible:ring-[#356859]"
+          variant="primary"
+          size="md"
+          className="gap-1.5 shrink-0 self-start sm:self-auto"
         >
           <svg
             className="w-3.5 h-3.5"

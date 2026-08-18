@@ -6,21 +6,28 @@ interface TableProps {
   categories: ProductCategory[];
   onEdit: (cat: ProductCategory) => void;
   onUpload: (catId: string) => void;
+  onDelete: (cat: ProductCategory) => void;
   loadingEditId?: string | null;
 }
 
-export default function TableView({ categories, onEdit, onUpload, loadingEditId }: TableProps) {
+export default function TableView({
+  categories,
+  onEdit,
+  onUpload,
+  onDelete,
+  loadingEditId,
+}: TableProps) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-              <th className="px-16 py-3">Cover</th>
-              <th className="px-16 py-3">English Name</th>
-              <th className="px-16 py-3 text-right">Arabic Name</th>
-              <th className="px-16 py-3">Items Count</th>
-              <th className="px-16 py-3 text-right">Actions</th>
+              <th className="px-16 py-3 whitespace-nowrap">Cover</th>
+              <th className="px-16 py-3 whitespace-nowrap">English Name</th>
+              <th className="px-16 py-3 text-right whitespace-nowrap">Arabic Name</th>
+              <th className="px-16 py-3 whitespace-nowrap">Items Count</th>
+              <th className="px-16 py-3 text-right whitespace-nowrap">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-xs">
@@ -31,7 +38,7 @@ export default function TableView({ categories, onEdit, onUpload, loadingEditId 
               const count = cat.itemCount || cat.productsCount || 0;
               return (
                 <tr key={cat.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="px-16 py-3">
+                  <td className="px-16 py-3 whitespace-nowrap">
                     {imgUrl ? (
                       <>
                         <img
@@ -54,12 +61,17 @@ export default function TableView({ categories, onEdit, onUpload, loadingEditId 
                       </div>
                     )}
                   </td>
-                  <td className="px-16 py-3 font-bold text-slate-900">{en}</td>
-                  <td className="px-16 py-3 text-right font-semibold text-slate-600" dir="rtl">
+                  <td className="px-16 py-3 font-bold text-slate-900 whitespace-nowrap">{en}</td>
+                  <td
+                    className="px-16 py-3 text-right font-semibold text-slate-600 whitespace-nowrap"
+                    dir="rtl"
+                  >
                     {ar || '—'}
                   </td>
-                  <td className="px-16 py-3 font-bold text-slate-800">{count} Items</td>
-                  <td className="px-16 py-3 text-right">
+                  <td className="px-16 py-3 font-bold text-slate-800 whitespace-nowrap">
+                    {count} Items
+                  </td>
+                  <td className="px-16 py-3 text-right whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => onEdit(cat)}
@@ -109,6 +121,23 @@ export default function TableView({ categories, onEdit, onUpload, loadingEditId 
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                           <polyline points="17 8 12 3 7 8" />
                           <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => onDelete(cat)}
+                        title="Delete Category"
+                        className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 border-none bg-transparent transition-colors"
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M3 6h18" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
                       </button>
                     </div>

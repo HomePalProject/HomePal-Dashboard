@@ -1,4 +1,4 @@
-import { cn } from '@lib/utils';
+import { Button } from './Button';
 
 export function ModalActions({
   onCancel,
@@ -10,24 +10,13 @@ export function ModalActions({
   label: string;
 }) {
   return (
-    <div className="flex gap-12 mt-8">
-      <button
-        type="button"
-        onClick={onCancel}
-        className="flex-1 py-2.5 bg-transparent border-[1.5px] border-border rounded-lg text-sm font-semibold text-text-secondary cursor-pointer hover:bg-surface-variant transition-colors"
-      >
+    <div className="flex gap-3 mt-6">
+      <Button variant="secondary" onClick={onCancel} type="button" fullWidth>
         Cancel
-      </button>
-      <button
-        type="submit"
-        disabled={saving}
-        className={cn(
-          'flex-1 py-2.5 bg-primary text-white border-none rounded-lg text-sm font-semibold transition-opacity',
-          saving ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:opacity-90'
-        )}
-      >
-        {saving ? 'Saving…' : label}
-      </button>
+      </Button>
+      <Button variant="primary" type="submit" isLoading={saving} fullWidth>
+        {label}
+      </Button>
     </div>
   );
 }

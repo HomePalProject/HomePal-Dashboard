@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { MapContainer, TileLayer, Circle, Tooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, Circle, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { cn } from '@lib/utils';
 import { getErrorMessage } from '@lib/utils';
@@ -7,6 +7,39 @@ import { analyticsService } from '@services/analyticsService';
 import type { GeographicDemographicsData } from '@typeDefs/demographicsTypes';
 import type { UserDemographicsData } from '@typeDefs/analyticsTypes';
 import { MOCK_DEMOGRAPHICS_DATA } from '@constants/demographicsData';
+
+function RecenterButton({ center, zoom }: { center: [number, number]; zoom: number }) {
+  const map = useMap();
+  return (
+    <div className="leaflet-top leaflet-left" style={{ top: '80px' }}>
+      <div className="leaflet-control leaflet-bar">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            map.flyTo(center, zoom, { animate: true, duration: 1.5 });
+          }}
+          className="!flex items-center justify-center bg-white hover:bg-gray-100"
+          style={{ width: '34px', height: '34px' }}
+          title="Recenter to Highest Density"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            stroke="currentColor"
+            strokeWidth="2"
+            fill="none"
+          >
+            <circle cx="12" cy="12" r="8" />
+            <circle cx="12" cy="12" r="2" fill="currentColor" />
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  );
+}
 
 export default function GeographicDemographics() {
   const [data, setData] = useState<GeographicDemographicsData | null>(null);
@@ -175,7 +208,7 @@ export default function GeographicDemographics() {
             </div>
           </div>
 
-          <div className="relative w-full h-72 sm:h-112.5 rounded-sm overflow-hidden border border-border z-0">
+          <div className="relative w-full h-[400px] sm:h-[500px] rounded-sm overflow-hidden border border-border z-0">
             <div className="absolute left-4 bottom-24 bg-surface/90 px-4 py-12 rounded-sm shadow-md z-1000 backdrop-blur-sm">
               <div className="text-[11px] font-bold text-text-secondary mb-[8px] uppercase">
                 Density Intensity
@@ -188,6 +221,13 @@ export default function GeographicDemographics() {
             </div>
 
             <MapContainer center={cairoCenter} zoom={11} className="w-full h-full">
+              {(() => {
+                const highest = [...data.districts].sort((a, b) => b.intensity - a.intensity)[0];
+                const targetCenter = highest
+                  ? ([highest.lat, highest.lng] as [number, number])
+                  : cairoCenter;
+                return <RecenterButton center={targetCenter} zoom={13} />;
+              })()}
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
                 url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
@@ -327,58 +367,6 @@ export default function GeographicDemographics() {
               </svg>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="bg-surface rounded-md border border-border p-24 md:p-32">
-        <div className="flex justify-between items-center mb-24">
-          <div>
-            <h2 className="text-base font-bold text-text-primary">Household Size Distribution</h2>
-            <p className="text-xs text-text-disabled mt-2">
-              Percentage breakdown of enrolled household sizes
-            </p>
-          </div>
-          <div className="px-12 py-4 rounded-full border border-border text-xs font-semibold text-text-secondary bg-surface-variant/30">
-            Live Analytics
-          </div>
-        </div>
-
-        <div className="flex items-end justify-between h-64 px-12 sm:px-32 gap-12 sm:gap-24 pt-32 pb-12 border-b border-border/50">
-          {data.householdSize.map((item, i) => {
-            const maxValue = Math.max(...data.householdSize.map((d) => d.value), 1);
-            const heightPercent = Math.max(Math.round((item.value / maxValue) * 100), 12);
-            return (
-              <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group">
-                <div className="w-full flex flex-col items-center flex-1 justify-end">
-                  <span
-                    className={cn(
-                      'text-xs font-bold mb-6 transition-all group-hover:scale-110',
-                      i === 2 ? 'text-primary' : 'text-text-secondary'
-                    )}
-                  >
-                    {item.value}%
-                  </span>
-                  <div
-                    className={cn(
-                      'w-full max-w-36 rounded-t-md relative transition-all duration-300 group-hover:opacity-90',
-                      i === 2
-                        ? 'bg-primary shadow-sm shadow-primary/20'
-                        : 'bg-surface-variant hover:bg-surface-variant/80'
-                    )}
-                    style={{ height: `${heightPercent}%` }}
-                  />
-                </div>
-                <div
-                  className={cn(
-                    'text-12 text-center mt-12 whitespace-nowrap',
-                    i === 2 ? 'font-bold text-primary' : 'font-medium text-text-secondary'
-                  )}
-                >
-                  {item.size}
-                </div>
-              </div>
-            );
-          })}
         </div>
       </div>
 

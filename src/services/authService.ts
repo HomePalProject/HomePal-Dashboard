@@ -25,4 +25,9 @@ export const authService = {
 
     return { token, user };
   },
+
+  async getMe(): Promise<any> {
+    const response = await api.get<ApiResponse<any>>('/auth/me');
+    return response.data;
+  },
 };

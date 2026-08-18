@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Button } from '@components/ui/Button';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { AdminFormModal } from '@components/users/AdminFormModal';
 import { UsersMetrics } from '@components/users/UsersMetrics';
@@ -16,10 +17,18 @@ export default function UserManagement() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('All');
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [search]);
 
   const {
     data: usersResponse,
@@ -27,7 +36,12 @@ export default function UserManagement() {
     isError,
     error: queryError,
     refetch,
-  } = useAdmins(page, pageSize);
+  } = useAdmins(
+    page,
+    pageSize,
+    roleFilter !== 'All' ? roleFilter : undefined,
+    debouncedSearch || undefined
+  );
   const { data: globalTotalAdmins = 0 } = useGlobalAdminsCount();
 
   const { mutateAsync: deactivateAdmin, isPending: isDeleting } = useDeactivateAdmin();
@@ -37,14 +51,8 @@ export default function UserManagement() {
   const totalPages = usersResponse?.data?.totalPages || 1;
   const totalCount = usersResponse?.data?.totalCount || 0;
 
-  const filtered = users.filter((u) => {
-    const matchSearch =
-      !search ||
-      (u.username || '').toLowerCase().includes(search.toLowerCase()) ||
-      (u.email || '').toLowerCase().includes(search.toLowerCase());
-    const matchRole = roleFilter === 'All' || (u.roles || []).includes(roleFilter);
-    return matchSearch && matchRole;
-  });
+  // We rely on backend filtering now, so filtered is just users.
+  const filtered = users;
 
   const totalActive = users.filter((u) => u.isActive).length;
   const totalSuspended = users.length - totalActive;
@@ -80,57 +88,88 @@ export default function UserManagement() {
 
   if (isLoading && users.length === 0) {
     return (
-      <div className="flex justify-center py-40">
-        <div className="w-32 h-32 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <span className="text-xs font-semibold text-text-secondary">Loading directory...</span>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="bg-status-error-container text-status-error p-20 rounded-xl">
-        <h3 className="font-bold mb-8 m-0">Failed to load</h3>
-        <p className="m-0 text-sm">{getErrorMessage(queryError)}</p>
+      <div className="bg-status-error-container/60 border border-status-error/20 text-status-error p-6 rounded-xl max-w-xl mx-auto my-10 text-center shadow-2xs">
+        <div className="w-8 h-8 rounded-full bg-status-error/10 text-status-error flex items-center justify-center mx-auto mb-3">
+          <svg
+            className="w-4 h-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <h3 className="text-sm font-bold m-0 mb-1">Failed to Load User Directory</h3>
+        <p className="m-0 text-xs text-text-secondary">{getErrorMessage(queryError)}</p>
         <button
           onClick={() => refetch()}
-          className="mt-12 px-16 py-8 bg-white border border-status-error/20 rounded-lg text-sm text-status-error cursor-pointer"
+          className="mt-4 px-4 py-1.5 bg-surface border border-status-error/30 rounded-lg text-xs font-semibold text-status-error hover:bg-status-error/10 transition-colors cursor-pointer shadow-2xs"
         >
-          Try Again
+          Retry
         </button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-24">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-16">
+    <div className="w-full flex flex-col gap-5 font-sans pb-10">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1 border-b border-border/40">
         <div>
-          <h1 className="text-24 sm:text-32 font-extrabold text-text-primary tracking-tight m-0">
+          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-md mb-1.5 border border-primary/20">
+            <svg
+              className="w-3 h-3"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            Access Control
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight m-0">
             User Management
           </h1>
-          <p className="text-sm text-text-secondary mt-4 mb-0">
-            Manage all users, including admins, household admins, and members.
+          <p className="text-xs text-text-secondary mt-0.5 mb-0">
+            Manage system administrators, household managers, and user access across HomePal.
           </p>
         </div>
-        <button
+
+        <Button
+          variant="primary"
           onClick={() => setShowAddModal(true)}
-          className="flex items-center justify-center gap-2 bg-primary text-white text-sm font-bold px-6 py-2.5 rounded-lg border-none cursor-pointer shadow-[0_4px_14px_rgba(42,74,62,0.25)] hover:opacity-90 transition-opacity"
+          className="inline-flex items-center gap-1.5 shrink-0 self-start sm:self-auto bg-[#356859] hover:bg-[#2a5347] focus-visible:ring-[#356859]"
         >
           <svg
-            width="16"
-            height="16"
+            className="w-3.5 h-3.5"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
           Add New Admin
-        </button>
+        </Button>
       </div>
 
+      {/* Metrics Section */}
       <UsersMetrics
         totalCount={totalCount}
         totalActive={totalActive}
@@ -138,6 +177,7 @@ export default function UserManagement() {
         globalTotalAdmins={globalTotalAdmins}
       />
 
+      {/* Table & Data Grid Section */}
       <UsersTable
         loading={isLoading || isDeleting}
         filtered={filtered}
@@ -154,10 +194,12 @@ export default function UserManagement() {
         setDeleteTarget={setDeleteTarget}
       />
 
+      {/* Admin Creation Modal */}
       {showAddModal && (
         <AdminFormModal onSave={handleCreateAdmin} onClose={() => setShowAddModal(false)} />
       )}
 
+      {/* Deactivation Confirmation Dialog */}
       {deleteTarget && (
         <ConfirmDialog
           title="Deactivate Admin Access"

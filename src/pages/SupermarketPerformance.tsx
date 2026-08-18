@@ -7,7 +7,8 @@ import { getImageUrl, getLocalString } from '@lib/formatters';
 import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
 import type { ShoppingTrendsData } from '@typeDefs/analyticsTypes';
 import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
-
+import { productCategoryService } from '@services/productCategoryService';
+import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 function SupermarketLogo({
   logoPath,
   name,
@@ -64,6 +65,7 @@ export default function SupermarketPerformance() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [shoppingTrends, setShoppingTrends] = useState<ShoppingTrendsData | null>(null);
   const [overviewData, setOverviewData] = useState<AnalyticsOverviewData | null>(null);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,17 +80,21 @@ export default function SupermarketPerformance() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [supermarketsRes, offersRes, trendsRes, overviewRes] = await Promise.all([
-        catalogService.getSupermarkets().catch(() => []),
-        catalogService.getOffers().catch(() => []),
-        analyticsService.getShoppingTrends().catch(() => null),
-        analyticsService.getOverview().catch(() => null),
-      ]);
+      const [supermarketsRes, offersRes, trendsRes, overviewRes, categoriesRes] = await Promise.all(
+        [
+          catalogService.getSupermarkets().catch(() => []),
+          catalogService.getOffers().catch(() => []),
+          analyticsService.getShoppingTrends().catch(() => null),
+          analyticsService.getOverview().catch(() => null),
+          productCategoryService.getCategories().catch(() => []),
+        ]
+      );
 
       setSupermarkets(supermarketsRes);
       setOffers(offersRes);
       setShoppingTrends(trendsRes);
       setOverviewData(overviewRes);
+      setCategories(categoriesRes);
     } catch (err) {
       console.error('Error loading supermarket analytics data:', err);
     } finally {
@@ -233,20 +239,42 @@ export default function SupermarketPerformance() {
             <span className="text-[13px] font-semibold text-text-secondary">
               Top Supermarket Partner
             </span>
-            <div className="w-[36px] h-[36px] rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-              <svg
-                className="w-[18px] h-[18px]"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                <polyline points="9 22 9 12 15 12 15 22" />
-              </svg>
-            </div>
+            {(() => {
+              const smName = shoppingTrends?.mostSuccessfulSupermarket || 'Carrefour';
+              const smNameStr = smName.trim().toLowerCase();
+              const sm = supermarkets.find((s) => {
+                const nameStr = getLocalString(s.name).trim().toLowerCase();
+                if (!nameStr && !s.id) return false;
+                return (
+                  s.id === smName || nameStr.includes(smNameStr) || smNameStr.includes(nameStr)
+                );
+              });
+              if (sm) {
+                return (
+                  <SupermarketLogo
+                    name={smName}
+                    logoPath={sm.logoPath}
+                    className="w-[36px] h-[36px]"
+                  />
+                );
+              }
+              return (
+                <div className="w-[36px] h-[36px] rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                  <svg
+                    className="w-[18px] h-[18px]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                </div>
+              );
+            })()}
           </div>
           <div className="text-[20px] font-bold text-text-primary tracking-tight">
             {shoppingTrends?.mostSuccessfulSupermarket || 'Carrefour'}
@@ -262,21 +290,38 @@ export default function SupermarketPerformance() {
             <span className="text-[13px] font-semibold text-text-secondary">
               Top Purchased Category
             </span>
-            <div className="w-[36px] h-[36px] rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
-              <svg
-                className="w-[18px] h-[18px]"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <path d="M16 10a4 4 0 0 1-8 0" />
-              </svg>
-            </div>
+            {(() => {
+              const catName = shoppingTrends?.mostBoughtCategory?.name || 'Dairy & Eggs';
+              const cat = categories.find((c) => {
+                const nameStr = Array.isArray(c.name) ? c.name[0]?.value : c.name;
+                return nameStr === catName;
+              });
+              const imgUrl = getImageUrl(cat?.imagePath);
+              if (imgUrl) {
+                return (
+                  <div className="w-[36px] h-[36px] rounded-lg overflow-hidden shrink-0 bg-white border border-border">
+                    <img src={imgUrl} alt={catName} className="w-full h-full object-cover" />
+                  </div>
+                );
+              }
+              return (
+                <div className="w-[36px] h-[36px] rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
+                  <svg
+                    className="w-[18px] h-[18px]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                  </svg>
+                </div>
+              );
+            })()}
           </div>
           <div className="text-[20px] font-bold text-text-primary tracking-tight truncate">
             {shoppingTrends?.mostBoughtCategory?.name || 'Dairy & Eggs'}
@@ -294,21 +339,38 @@ export default function SupermarketPerformance() {
             <span className="text-[13px] font-semibold text-text-secondary">
               Top Inventory Category
             </span>
-            <div className="w-[36px] h-[36px] rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
-              <svg
-                className="w-[18px] h-[18px]"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                <line x1="12" y1="22.08" x2="12" y2="12" />
-              </svg>
-            </div>
+            {(() => {
+              const catName = shoppingTrends?.mostCommonInventoryCategory?.name || 'Beverages';
+              const cat = categories.find((c) => {
+                const nameStr = Array.isArray(c.name) ? c.name[0]?.value : c.name;
+                return nameStr === catName;
+              });
+              const imgUrl = getImageUrl(cat?.imagePath);
+              if (imgUrl) {
+                return (
+                  <div className="w-[36px] h-[36px] rounded-lg overflow-hidden shrink-0 bg-white border border-border">
+                    <img src={imgUrl} alt={catName} className="w-full h-full object-cover" />
+                  </div>
+                );
+              }
+              return (
+                <div className="w-[36px] h-[36px] rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+                  <svg
+                    className="w-[18px] h-[18px]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                  </svg>
+                </div>
+              );
+            })()}
           </div>
           <div className="text-[20px] font-bold text-text-primary tracking-tight truncate">
             {shoppingTrends?.mostCommonInventoryCategory?.name || 'Beverages'}
@@ -355,7 +417,7 @@ export default function SupermarketPerformance() {
         {/* Partner Supermarkets Table */}
         <div className="bg-surface rounded-xl border border-border flex flex-col overflow-hidden shadow-xs">
           <div className="px-[20px] py-[14px] border-b border-border flex flex-col sm:flex-row justify-between sm:items-center gap-[10px]">
-            <div className="flex items-center gap-[8px]">
+            <div className="flex items-center gap-[8px] whitespace-nowrap">
               <h2 className="text-[15px] font-bold text-text-primary m-0">Partner Supermarkets</h2>
               <span className="px-[8px] py-[2px] rounded-full bg-primary/10 text-primary text-[11px] font-bold">
                 {supermarkets.length} Enrolled
@@ -386,16 +448,16 @@ export default function SupermarketPerformance() {
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr className="border-b border-border bg-surface-variant/30">
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase">
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
                     Supermarket Partner
                   </th>
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase">
-                    Website
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
+                    Facebook Page
                   </th>
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase">
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
                     Active Offers
                   </th>
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase text-right">
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase text-right whitespace-nowrap">
                     Status
                   </th>
                 </tr>
@@ -439,7 +501,7 @@ export default function SupermarketPerformance() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-[16px] py-[12px] text-[13px] text-text-secondary">
+                        <td className="px-[16px] py-[12px] text-[13px] text-text-secondary whitespace-nowrap">
                           {supermarket.websiteUrl ? (
                             <a
                               href={
@@ -451,13 +513,13 @@ export default function SupermarketPerformance() {
                               rel="noreferrer"
                               className="text-primary hover:underline font-medium text-[12px]"
                             >
-                              Website ↗
+                              Facebook ↗
                             </a>
                           ) : (
                             <span className="text-text-disabled">—</span>
                           )}
                         </td>
-                        <td className="px-[16px] py-[12px] text-[13px] font-semibold text-text-primary">
+                        <td className="px-[16px] py-[12px] text-[13px] font-semibold text-text-primary whitespace-nowrap">
                           <span className="px-[8px] py-[3px] rounded bg-surface-variant text-text-secondary text-[12px]">
                             {sOffersCount} Deals
                           </span>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn, getErrorMessage } from '@lib/utils';
 import { catalogService } from '@services/catalogService';
 import { scraperService } from '@services/scraperService';
+import { Button } from '@components/ui/Button';
 import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
 import type { ScraperJobStatus, ScraperHistoryItem } from '@typeDefs/scraperTypes';
 import { getLocalString, getImageUrl } from '@lib/formatters';
@@ -760,23 +761,20 @@ export default function ScrapingPipeline() {
             <span>Skip scraped &lt; 24h ago</span>
           </label>
 
-          <button
+          <Button
+            variant="primary"
             onClick={handleRunBatchScrape}
             disabled={isBatchRunning || supermarkets.length === 0}
             className={cn(
-              'flex items-center justify-center gap-2 px-4.5 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] text-white border-none rounded-xl text-xs font-bold cursor-pointer transition-all shadow-xs shrink-0 w-full sm:w-auto',
-              isBatchRunning || supermarkets.length === 0
-                ? 'opacity-70 cursor-not-allowed'
-                : 'hover:shadow-md active:scale-[0.98]'
+              'flex items-center gap-2 shrink-0 w-full sm:w-auto',
+              isBatchRunning || supermarkets.length === 0 ? '' : ''
             )}
+            isLoading={isBatchRunning}
           >
             {isBatchRunning ? (
-              <>
-                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>
-                  Scraping {batchProgress?.current}/{batchProgress?.total} ({batchProgress?.name})
-                </span>
-              </>
+              <span>
+                Scraping {batchProgress?.current}/{batchProgress?.total} ({batchProgress?.name})
+              </span>
             ) : (
               <>
                 <svg
@@ -792,11 +790,12 @@ export default function ScrapingPipeline() {
                 <span>Scrape All Chains</span>
               </>
             )}
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="secondary"
             onClick={() => navigate('/dashboard/supermarkets')}
-            className="flex items-center justify-center gap-2 px-4.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 cursor-pointer hover:bg-slate-50 hover:text-slate-900 transition-all shadow-xs hover:shadow-sm shrink-0 w-full sm:w-auto"
+            className="flex items-center gap-2 shrink-0 w-full sm:w-auto"
           >
             <svg
               width="16"
@@ -810,10 +809,11 @@ export default function ScrapingPipeline() {
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             </svg>
             <span>Manage Supermarkets</span>
-          </button>
+          </Button>
 
           {history.length > 0 && (
-            <button
+            <Button
+              variant="secondary"
               onClick={() => {
                 const csv = history
                   .map((h) => `${h.id},${h.source},${h.brand},${h.status},${h.parsedCount}`)
@@ -827,7 +827,7 @@ export default function ScrapingPipeline() {
                 link.click();
                 showToast('Logs exported successfully');
               }}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 cursor-pointer hover:bg-slate-50 transition-colors shadow-xs shrink-0 w-full sm:w-auto"
+              className="flex items-center gap-2 shrink-0 w-full sm:w-auto"
             >
               <svg
                 width="15"
@@ -842,7 +842,7 @@ export default function ScrapingPipeline() {
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
               Export Logs
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -1380,27 +1380,33 @@ export default function ScrapingPipeline() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="px-4 py-3">Job ID</th>
-                  <th className="px-4 py-3">Supermarket Brand</th>
-                  <th className="px-4 py-3">Source</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Offers Extracted</th>
-                  <th className="px-4 py-3">Time</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Job ID</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Supermarket Brand</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Source</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Status</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Offers Extracted</th>
+                  <th className="px-4 py-3 whitespace-nowrap">Time</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {history.map((h) => (
                   <tr key={h.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="px-4 py-3 font-mono text-xs font-bold text-slate-900">{h.id}</td>
-                    <td className="px-4 py-3 text-xs font-bold text-slate-900">{h.brand}</td>
-                    <td className="px-4 py-3 text-xs text-slate-600">{h.source}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 font-mono text-xs font-bold text-slate-900 whitespace-nowrap">
+                      {h.id}
+                    </td>
+                    <td className="px-4 py-3 text-xs font-bold text-slate-900 whitespace-nowrap">
+                      {h.brand}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">
+                      {h.source}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         {h.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs font-bold text-slate-900">
+                    <td className="px-4 py-3 text-xs font-bold text-slate-900 whitespace-nowrap">
                       {h.offers && h.offers.length > 0 ? (
                         <button
                           type="button"
@@ -1414,7 +1420,9 @@ export default function ScrapingPipeline() {
                         <span>{h.parsedCount} offers</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-slate-400">{h.startedAt}</td>
+                    <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+                      {h.startedAt}
+                    </td>
                   </tr>
                 ))}
               </tbody>

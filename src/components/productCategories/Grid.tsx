@@ -6,10 +6,17 @@ interface GridProps {
   categories: ProductCategory[];
   onEdit: (cat: ProductCategory) => void;
   onUpload: (catId: string) => void;
+  onDelete: (cat: ProductCategory) => void;
   loadingEditId?: string | null;
 }
 
-export default function GridView({ categories, onEdit, onUpload, loadingEditId }: GridProps) {
+export default function GridView({
+  categories,
+  onEdit,
+  onUpload,
+  onDelete,
+  loadingEditId,
+}: GridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {categories.map((cat) => {
@@ -139,10 +146,21 @@ export default function GridView({ categories, onEdit, onUpload, loadingEditId }
                   </svg>
                 </button>
                 <button
-                  onClick={() => onUpload(cat.id)}
-                  className="p-1.5 rounded-lg text-red-600 hover:bg-red-50"
+                  onClick={() => onDelete(cat)}
+                  title="Delete Category"
+                  className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors"
                 >
-                  {/* Placeholder for delete, actual delete handled by DeleteConfirmation */}
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                  >
+                    <path d="M3 6h18" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
                 </button>
               </div>
             </div>

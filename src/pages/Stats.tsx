@@ -5,12 +5,16 @@ import { analyticsService } from '@services/analyticsService';
 import { catalogService } from '@services/catalogService';
 import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
 import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
+import type { RevenueData } from '@typeDefs/analyticsTypes';
+import type { TokenUsageMetrics } from '@typeDefs/tokenUsageTypes';
 import { StatCard } from '@components/stats/StatCard';
 import { getLocalString } from '@lib/formatters';
 
 export default function Stats() {
   const navigate = useNavigate();
   const [data, setData] = useState<AnalyticsOverviewData | null>(null);
+  const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
+  const [tokenUsage, setTokenUsage] = useState<TokenUsageMetrics | null>(null);
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,14 +22,18 @@ export default function Stats() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [overviewRes, superRes, offersRes] = await Promise.all([
+      const [overviewRes, superRes, offersRes, revRes, tokenRes] = await Promise.all([
         analyticsService.getOverview().catch(() => null),
         catalogService.getSupermarkets().catch(() => []),
         catalogService.getOffers().catch(() => []),
+        analyticsService.getRevenue().catch(() => null),
+        analyticsService.getTokenUsage().catch(() => null),
       ]);
       setData(overviewRes);
       setSupermarkets(superRes);
       setOffers(offersRes);
+      setRevenueData(revRes);
+      setTokenUsage(tokenRes);
     } catch {
       setData(null);
     } finally {
@@ -51,9 +59,23 @@ export default function Stats() {
     failedPercentage: 0,
   };
 
-  const revenue = data?.revenue || { current: 0, changePercentage: 0 };
-  const serverCosts = data?.serverCosts || { current: 0, changePercentage: 0 };
-  const netMargin = data?.netMargin || { current: 0, changePercentage: 0 };
+  // ── Compute Live Financials ──
+  const liveRevenue = revenueData?.monthlyRevenue ?? 0;
+  const liveCost = tokenUsage?.totalCost ?? 0;
+
+  // Calculate Net Margin Percentage
+  // Formula: ((Revenue - Cost) / Revenue) * 100
+  let liveNetMargin = 0;
+  if (liveRevenue > 0) {
+    liveNetMargin = ((liveRevenue - liveCost) / liveRevenue) * 100;
+  } else if (liveCost > 0) {
+    liveNetMargin = -100; // 100% loss if cost exists without revenue
+  }
+
+  // Calculate change percentages (mocking for now as we don't have historical month comparison API yet)
+  const revenueChange = 0;
+  const serverCostChange = 0;
+  const netMarginChange = 0;
 
   const visionTotal =
     (visionHealth.autoParsedPercentage || 0) +
@@ -127,8 +149,8 @@ export default function Stats() {
             Platform performance and consumer metrics derived from live catalog endpoints.
           </p>
         </div>
-        <div className="flex gap-3 flex-wrap">
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#356859] hover:bg-[#2a5347] text-white border-none rounded-xl text-xs font-bold cursor-pointer transition-colors shadow-xs">
+        <div className="flex gap-3 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+          <button className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-[#356859] hover:bg-[#2a5347] text-white border-none rounded-xl text-xs font-bold cursor-pointer transition-colors shadow-xs">
             <svg
               width="14"
               height="14"
@@ -143,7 +165,7 @@ export default function Stats() {
             </svg>
             Export Report
           </button>
-          <div className="px-4 py-2 bg-white border border-[#e4e0da] rounded-xl text-xs font-bold text-[#2d2a26] shadow-xs">
+          <div className="flex-1 sm:flex-none flex justify-center items-center px-5 py-2.5 bg-white border border-[#e4e0da] rounded-xl text-xs font-bold text-[#2d2a26] shadow-xs">
             Live Synced
           </div>
         </div>
@@ -153,8 +175,8 @@ export default function Stats() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <StatCard
           title="Revenue (Current Cycle)"
-          value={revenue.current}
-          change={revenue.changePercentage}
+          value={liveRevenue}
+          change={revenueChange}
           isCurrency
           icon={
             <svg
@@ -173,8 +195,8 @@ export default function Stats() {
         />
         <StatCard
           title="AI Server Costs"
-          value={serverCosts.current}
-          change={serverCosts.changePercentage}
+          value={liveCost}
+          change={serverCostChange}
           isCurrency
           icon={
             <svg
@@ -194,8 +216,8 @@ export default function Stats() {
         />
         <StatCard
           title="Net Margin"
-          value={netMargin.current}
-          change={netMargin.changePercentage}
+          value={liveNetMargin}
+          change={netMarginChange}
           isPercent
           icon={
             <svg
@@ -246,9 +268,9 @@ export default function Stats() {
           </div>
 
           {chains.length > 0 ? (
-            <div className="flex-1 flex flex-col justify-end">
+            <div className="flex-1 flex flex-col justify-end overflow-hidden w-full">
               {/* Vertical Bar Chart Container */}
-              <div className="flex-1 relative min-h-[190px] flex items-end gap-6 px-4 pt-8 pb-3 border-b border-[#e4e0da] bg-[#faf8f3] rounded-xl">
+              <div className="flex-1 relative min-h-[190px] flex items-end justify-around gap-1 sm:gap-4 px-2 sm:px-4 pt-8 pb-3 border-b border-[#e4e0da] bg-[#faf8f3] rounded-xl">
                 {/* Background grid lines */}
                 <div className="absolute inset-x-4 top-1/4 border-b border-dashed border-[#e4e0da] pointer-events-none" />
                 <div className="absolute inset-x-4 top-2/4 border-b border-dashed border-[#e4e0da] pointer-events-none" />
@@ -265,17 +287,17 @@ export default function Stats() {
                   return (
                     <div
                       key={i}
-                      className="flex-1 flex flex-col items-center justify-end gap-2 z-10 group h-full"
+                      className="flex-1 flex flex-col items-center justify-end gap-2 z-10 group h-full max-w-[44px]"
                     >
                       {/* Percentage Tooltip Badge */}
-                      <span className="text-[11px] font-black text-[#2d2a26] bg-white px-2 py-0.5 rounded-md border border-[#e4e0da] shadow-xs mb-1 group-hover:scale-110 transition-transform">
+                      <span className="text-[10px] sm:text-[11px] font-black text-[#2d2a26] bg-white px-1.5 sm:px-2 py-0.5 rounded-md border border-[#e4e0da] shadow-xs mb-1 group-hover:scale-110 transition-transform">
                         {chain.value}%
                       </span>
 
                       {/* Dynamic Height Bar */}
                       <div
                         className={cn(
-                          'w-full max-w-[44px] rounded-t-lg transition-all duration-700 shadow-xs hover:opacity-90',
+                          'w-full rounded-t-lg transition-all duration-700 shadow-xs hover:opacity-90',
                           barColors[i % barColors.length]
                         )}
                         style={{ height: `${Math.max(chain.value * 2.2, 35)}px` }}
@@ -286,11 +308,11 @@ export default function Stats() {
               </div>
 
               {/* Bar Label Names */}
-              <div className="flex gap-6 px-4 pt-3">
+              <div className="flex justify-around gap-1 sm:gap-4 px-2 sm:px-4 pt-3 w-full">
                 {chains.map((chain, i) => (
                   <div
                     key={i}
-                    className="flex-1 text-center text-xs font-bold text-[#2d2a26] truncate"
+                    className="flex-1 text-center text-[10px] sm:text-xs font-bold text-[#2d2a26] truncate max-w-[44px]"
                     title={chain.name}
                   >
                     {chain.name}
@@ -402,67 +424,42 @@ export default function Stats() {
         {/* User Distribution Map */}
         <div
           onClick={() => navigate('/dashboard/geographic-demographics')}
-          className="rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-md group min-h-[260px] bg-[#356859] text-white"
+          className="bg-[#faf8f3] rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-md group min-h-[260px]"
         >
           {/* Header & Title */}
-          <div className="flex justify-between items-center z-10 mb-2">
+          <div className="flex justify-between items-start z-10 mb-2 gap-4">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#d99a3d]" />
-                <h2 className="text-base font-extrabold text-white m-0">
-                  User Geographic Distribution
-                </h2>
-              </div>
-              <p className="text-xs text-white/80 z-10 mt-0.5 m-0">
-                Coverage density across Egypt.
+              <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
+                Regional Distribution Map
+              </h2>
+              <p className="text-xs text-[#6d6862] z-10 mt-1 m-0">
+                Household density heat-mapping by district.
               </p>
             </div>
-            <button className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/20 cursor-pointer flex items-center gap-1.5 transition-colors">
-              <span>Explore Map</span>
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+            <button className="bg-white hover:bg-[#e4e0da]/30 text-[#356859] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#e4e0da] cursor-pointer flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 mt-0.5 shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#356859] animate-pulse" />
+              <span>Live Data</span>
             </button>
           </div>
 
-          {/* Map Vector */}
-          <div className="absolute inset-0 opacity-40 pointer-events-none">
-            <svg viewBox="0 0 500 400" className="w-full h-full object-cover">
-              <path
-                d="M 230 40 L 210 110 L 215 160 L 225 220 L 235 290 L 245 380"
-                fill="none"
-                stroke="#d99a3d"
-                strokeWidth="3"
-                strokeDasharray="4 4"
-              />
-              <path
-                d="M 80 80 Q 200 70 340 70 L 360 120 L 320 220 L 350 360 L 240 370 L 90 360 Z"
-                fill="rgba(255, 255, 255, 0.15)"
-                stroke="#d99a3d"
-                strokeWidth="1.5"
-              />
-            </svg>
+          {/* Map Image (Realistic Heatmap) */}
+          <div className="absolute inset-0 pointer-events-none mt-[72px] overflow-hidden rounded-b-2xl flex items-center justify-center">
+            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-[#faf8f3] to-transparent z-10 pointer-events-none" />
+            <img
+              src="/regional-map.jpg"
+              alt="Regional Distribution"
+              className="w-full h-[150%] object-cover object-center opacity-85 mix-blend-multiply transition-transform duration-1000 group-hover:scale-105"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#faf8f3] to-transparent z-10 pointer-events-none" />
           </div>
 
-          {/* Active Coverage Pins */}
-          <div className="relative z-10 my-4 flex-1 min-h-[120px]">
-            <div className="absolute top-[35%] left-[45%] -translate-x-1/2 -translate-y-1/2">
-              <div className="relative flex items-center justify-center">
-                <span className="w-3.5 h-3.5 rounded-full bg-[#d99a3d] border-2 border-white shadow-md" />
-              </div>
-            </div>
-
-            <div className="absolute top-[20%] left-[25%] -translate-x-1/2 -translate-y-1/2">
-              <div className="relative flex items-center justify-center">
-                <span className="w-3 h-3 rounded-full bg-white border-2 border-[#356859] shadow-md" />
-              </div>
+          {/* Active Hover / Floating Badge */}
+          <div className="relative z-10 flex-1 flex items-center justify-center pointer-events-none mt-16">
+            <div className="bg-[#fdfcf9] border border-[#e4e0da] rounded-xl px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center transition-transform duration-300 group-hover:-translate-y-1">
+              <span className="text-[#2d2a26] font-extrabold text-[13px] mb-1">
+                Central District
+              </span>
+              <span className="text-[#356859] font-bold text-xs">+12% New Households</span>
             </div>
           </div>
         </div>

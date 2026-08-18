@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { measuringUnitService } from '@services/measuringUnitService';
 import type { MeasuringUnit } from '@typeDefs/measuringUnitTypes';
-import { cn } from '@lib/utils';
+
 import { fetchBilingual } from '@lib/localization';
+import { Button } from '@components/ui/Button';
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return 'Aug 13, 2026';
@@ -290,27 +291,18 @@ export default function MeasuringUnits() {
         </div>
       )}
 
-      {/* Breadcrumb & Title Area */}
+      {/* Title Area */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-400 mb-1">
-            <span>Settings</span>
-            <span>/</span>
-            <span className="text-slate-700 font-semibold">Measuring Units</span>
-          </div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight m-0">
             Measuring Units Management
           </h1>
-          <p className="text-xs text-slate-500 m-0 mt-1">
-            Manage product units, measurement symbols, and multilingual translations (English &
-            Arabic).
-          </p>
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
           {/* Search Input */}
-          <div className="relative inline-flex items-center w-full sm:w-72">
+          <div className="relative inline-flex items-center w-full sm:w-80">
             <svg
               width="15"
               height="15"
@@ -333,9 +325,10 @@ export default function MeasuringUnits() {
           </div>
 
           {/* Add Unit Button */}
-          <button
+          <Button
+            variant="primary"
             onClick={handleOpenAddModal}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs hover:shadow-md shrink-0 border-none"
+            className="flex items-center gap-2 shrink-0"
           >
             <svg
               width="15"
@@ -349,7 +342,7 @@ export default function MeasuringUnits() {
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
             <span>Add Measuring Unit</span>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -382,11 +375,11 @@ export default function MeasuringUnits() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                  <th className="pl-6 pr-4 py-3.5">UNIT NAME (EN / AR)</th>
-                  <th className="px-4 py-3.5">SYMBOL (EN / AR)</th>
-                  <th className="px-4 py-3.5">CREATED AT</th>
-                  <th className="px-4 py-3.5">STATUS</th>
-                  <th className="pr-6 pl-4 py-3.5 text-right">ACTIONS</th>
+                  <th className="pl-6 pr-4 py-3.5 whitespace-nowrap">UNIT NAME (EN / AR)</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">SYMBOL (EN / AR)</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">CREATED AT</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">STATUS</th>
+                  <th className="pr-6 pl-4 py-3.5 text-right whitespace-nowrap">ACTIONS</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -397,7 +390,7 @@ export default function MeasuringUnits() {
                   return (
                     <tr key={unit.id} className="hover:bg-slate-50/60 transition-colors">
                       {/* UNIT NAME (EN / AR) Column */}
-                      <td className="pl-6 pr-4 py-4">
+                      <td className="pl-6 pr-4 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <span className="font-extrabold text-slate-900 text-sm">
                             {namePair.en}
@@ -409,7 +402,7 @@ export default function MeasuringUnits() {
                       </td>
 
                       {/* SYMBOL (EN / AR) Column */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <span className="font-extrabold text-slate-800 text-xs">
                             {symbolPair.en}
@@ -421,12 +414,12 @@ export default function MeasuringUnits() {
                       </td>
 
                       {/* CREATED AT Column */}
-                      <td className="px-4 py-4 text-slate-600 font-semibold text-xs">
+                      <td className="px-4 py-4 text-slate-600 font-semibold text-xs whitespace-nowrap">
                         {unit.createdAt ? formatDate(unit.createdAt) : 'Aug 13, 2026'}
                       </td>
 
                       {/* STATUS Column */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           Active
@@ -434,7 +427,7 @@ export default function MeasuringUnits() {
                       </td>
 
                       {/* ACTIONS Column */}
-                      <td className="pr-6 pl-4 py-4 text-right">
+                      <td className="pr-6 pl-4 py-4 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
                           {/* Edit Button */}
                           <button
@@ -584,23 +577,12 @@ export default function MeasuringUnits() {
 
               {/* Modal Footer Actions */}
               <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 bg-white cursor-pointer transition-colors"
-                >
+                <Button variant="secondary" type="button" onClick={() => setIsModalOpen(false)}>
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className={cn(
-                    'px-5 py-2 rounded-xl text-xs font-bold text-white bg-[#1F3D32] hover:bg-emerald-900 cursor-pointer transition-colors shadow-xs border-none',
-                    isSubmitting && 'opacity-60 cursor-not-allowed'
-                  )}
-                >
-                  {isSubmitting ? 'Saving...' : editingUnit ? 'Update Unit' : 'Save Unit'}
-                </button>
+                </Button>
+                <Button variant="primary" type="submit" isLoading={isSubmitting}>
+                  {editingUnit ? 'Update Unit' : 'Save Unit'}
+                </Button>
               </div>
             </form>
           </div>
@@ -635,20 +617,13 @@ export default function MeasuringUnits() {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 mt-2">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 border border-slate-200 bg-white cursor-pointer transition-colors"
-              >
+            <div className="flex items-center justify-end gap-3 mt-2">
+              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
                 Cancel
-              </button>
-              <button
-                onClick={handleDeleteUnit}
-                disabled={isSubmitting}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 border-none cursor-pointer transition-colors shadow-xs"
-              >
-                {isSubmitting ? 'Deleting...' : 'Delete'}
-              </button>
+              </Button>
+              <Button variant="danger" onClick={handleDeleteUnit} isLoading={isSubmitting}>
+                Delete
+              </Button>
             </div>
           </div>
         </div>

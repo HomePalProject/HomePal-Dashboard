@@ -7,6 +7,7 @@ import { getLocalString, getImageUrl } from '@lib/formatters';
 import { fetchBilingual } from '@lib/localization';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { SupermarketFormModal } from '@components/supermarkets/SupermarketFormModal';
+import { Button } from '@components/ui/Button';
 
 const BRANCH_COUNTS: Record<string, number> = {
   'Carrefour Egypt': 69,
@@ -33,7 +34,7 @@ function getInitials(name: string) {
 function SupermarketLogo({
   logoPath,
   name,
-  className = 'w-12 h-12 sm:w-14 sm:h-14',
+  className = 'w-14 h-14 sm:w-16 sm:h-16',
 }: {
   logoPath?: string | null;
   name: string;
@@ -46,7 +47,7 @@ function SupermarketLogo({
     return (
       <div
         className={cn(
-          'rounded-full overflow-hidden bg-white border-2 border-[#EAE5D9] shrink-0 shadow-xs flex items-center justify-center p-0',
+          'rounded-full overflow-hidden bg-white border-2 border-slate-200 shrink-0 shadow-xs flex items-center justify-center',
           className
         )}
       >
@@ -54,7 +55,7 @@ function SupermarketLogo({
           src={fullUrl}
           alt={name}
           onError={() => setImgError(true)}
-          className="w-full h-full object-cover rounded-full"
+          className="w-full h-full object-contain p-1"
         />
       </div>
     );
@@ -63,7 +64,7 @@ function SupermarketLogo({
   return (
     <div
       className={cn(
-        'rounded-full bg-white border-2 border-[#EAE5D9] text-[#1A2E26] font-black text-xl flex items-center justify-center shrink-0 shadow-xs',
+        'rounded-full bg-slate-50 border-2 border-slate-200 text-slate-700 font-bold text-lg flex items-center justify-center shrink-0 shadow-xs',
         className
       )}
     >
@@ -199,9 +200,9 @@ export default function Supermarkets() {
             <span>Live Sync Active</span>
           </div>
 
-          <button
+          <Button
             onClick={() => setMarketModal({ open: true })}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1F3D32] hover:bg-[#152a22] text-white border-none rounded-xl text-xs font-bold cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] shrink-0"
+            className="flex items-center gap-2"
           >
             <svg
               width="16"
@@ -215,7 +216,7 @@ export default function Supermarkets() {
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
             <span>Add Supermarket</span>
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -340,7 +341,7 @@ export default function Supermarkets() {
                     <SupermarketLogo
                       logoPath={s.logoPath}
                       name={name}
-                      className="w-12 h-12 sm:w-14 sm:h-14"
+                      className="w-14 h-14 sm:w-16 sm:h-16"
                     />
                     <div className="min-w-0">
                       <h3 className="text-base font-extrabold text-[#1A2E26] m-0 truncate leading-snug">
@@ -502,11 +503,11 @@ export default function Supermarkets() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-[#EAE5D9] bg-[#FAF8F5] text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="px-5 py-3">Supermarket Chain</th>
-                  <th className="px-5 py-3">Branches</th>
-                  <th className="px-5 py-3">Location</th>
-                  <th className="px-5 py-3">Scraper Endpoint</th>
-                  <th className="px-5 py-3 text-right">Actions</th>
+                  <th className="px-5 py-3 whitespace-nowrap">Supermarket Chain</th>
+                  <th className="px-5 py-3 whitespace-nowrap">Branches</th>
+                  <th className="px-5 py-3 whitespace-nowrap">Location</th>
+                  <th className="px-5 py-3 whitespace-nowrap">Scraper Endpoint</th>
+                  <th className="px-5 py-3 text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EAE5D9]">
@@ -517,12 +518,12 @@ export default function Supermarkets() {
 
                   return (
                     <tr key={s.id} className="hover:bg-[#FAF8F5]/60 transition-colors">
-                      <td className="px-5 py-3.5">
+                      <td className="px-5 py-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           <SupermarketLogo
                             logoPath={s.logoPath}
                             name={name}
-                            className="w-9 h-9 text-xs"
+                            className="w-10 h-10 text-sm"
                           />
                           <div>
                             <div className="text-xs font-bold text-[#1A2E26]">{name}</div>
@@ -532,32 +533,34 @@ export default function Supermarkets() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-3.5">
+                      <td className="px-5 py-3.5 whitespace-nowrap">
                         <span className="px-2.5 py-1 bg-[#F4EFE6] border border-[#E5DFD3] rounded-md text-[11px] font-bold text-[#1A2E26]">
                           {branches} Branches
                         </span>
                       </td>
-                      <td className="px-5 py-3.5 text-xs text-slate-500">
+                      <td className="px-5 py-3.5 text-xs text-slate-500 whitespace-nowrap">
                         {s.address || 'Cairo, Egypt'}
                       </td>
-                      <td className="px-5 py-3.5 font-mono text-xs text-slate-700">
+                      <td className="px-5 py-3.5 font-mono text-xs text-slate-700 whitespace-nowrap">
                         {fbUrl.replace(/^https?:\/\//, '')}
                       </td>
-                      <td className="px-5 py-3.5 text-right">
+                      <td className="px-5 py-3.5 text-right whitespace-nowrap">
                         <div className="flex items-center justify-end gap-2">
-                          <button
+                          <Button
                             onClick={() => void handleEditSupermarket(s)}
                             disabled={loadingEditId === s.id}
-                            className="px-3 py-1 rounded-lg border border-[#EAE5D9] text-xs font-bold text-[#1A2E26] bg-white hover:bg-[#FAF8F5] disabled:cursor-not-allowed disabled:opacity-50"
+                            variant="secondary"
+                            className="px-3 py-1 min-h-[32px] text-xs font-bold shadow-none"
                           >
                             {loadingEditId === s.id ? 'Loading…' : 'Edit'}
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => setDeleteTarget({ id: s.id, name })}
-                            className="px-3 py-1 rounded-lg border border-red-200 text-xs font-bold text-red-500 bg-white hover:bg-red-50"
+                            variant="danger"
+                            className="px-3 py-1 min-h-[32px] text-xs font-bold shadow-none bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
                           >
                             Delete
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>

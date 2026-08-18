@@ -93,7 +93,13 @@ export default function Header({
         </button>
       </div>
 
-      <Button onClick={onAdd} size="sm" className="w-full sm:w-auto gap-2">
+      {/* Add Category */}
+      <Button
+        variant="primary"
+        size="sm"
+        onClick={onAdd}
+        className="flex items-center gap-2 w-full sm:w-auto shrink-0"
+      >
         <svg
           width="15"
           height="15"

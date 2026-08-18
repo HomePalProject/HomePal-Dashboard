@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { cn, getErrorMessage } from '@lib/utils';
 import { analyticsService } from '@services/analyticsService';
 import type { PnLDeepDiveData, BillingLedgerRow } from '@typeDefs/pnlTypes';
-import { MOCK_PNL_DATA } from '@constants/pnlData';
+import { Button } from '@components/ui/Button';
 
 const statusStyles = {
   PAID: { bg: 'bg-status-success-container', text: 'text-status-success' },
@@ -29,12 +29,66 @@ export default function PnLDeepDive() {
     setLoading(true);
     try {
       setError(null);
-      const result = await analyticsService.getPnLDeepDive();
-      setData(result || MOCK_PNL_DATA);
+      const [revRes, tokenRes] = await Promise.all([
+        analyticsService.getRevenue().catch(() => null),
+        analyticsService.getTokenUsage().catch(() => null),
+      ]);
+
+      const rev = revRes?.monthlyRevenue ?? 0;
+      const cost = tokenRes?.totalCost ?? 0;
+      const subs = revRes?.activeSubscribers ?? 0;
+
+      // Net margin calculation
+      let netMarginPerc = 0;
+      if (rev > 0) {
+        netMarginPerc = ((rev - cost) / rev) * 100;
+      } else if (cost > 0) {
+        netMarginPerc = -100;
+      }
+
+      // Cost per subscriber
+      const costPerSub = subs > 0 ? cost / subs : 0;
+
+      // Construct dynamic chart data
+      const monthlyTrends = revRes?.monthlyTrend ?? [];
+      const revenuePoints = monthlyTrends.map((m) => m.revenue);
+      const costPoints = monthlyTrends.map(() => cost / 12);
+
+      // Fallback if no chart data
+      const finalRevPoints =
+        revenuePoints.length > 0 ? revenuePoints : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const finalCostPoints =
+        costPoints.length > 0 ? costPoints : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+      // Dynamic Ledger
+      const totalTokens = (tokenRes?.inputTokens || 0) + (tokenRes?.outputTokens || 0);
+
+      const computedData: PnLDeepDiveData = {
+        mrr: { value: `$${rev.toLocaleString()}`, change: '+0.0%' },
+        aiCosts: { value: `$${cost.toLocaleString()}`, overage: 'Live Synced' },
+        netMargin: { value: `${netMarginPerc.toFixed(1)}%` },
+        cac: { value: `$${costPerSub.toFixed(2)}`, target: 'Cost/User' },
+        chartData: {
+          revenue: finalRevPoints,
+          costs: finalCostPoints,
+        },
+        billingLedger: [
+          {
+            id: '1',
+            provider: 'OpenAI API',
+            providerIcon: 'openai',
+            category: 'LLM Inference',
+            usage: `${totalTokens > 0 ? (totalTokens / 1000000).toFixed(2) + 'M' : '0'} Tokens`,
+            cost: `$${cost.toLocaleString()}`,
+            status: 'PAID',
+          },
+        ],
+      };
+
+      setData(computedData);
     } catch (err) {
       const msg = getErrorMessage(err);
       setError(msg);
-      setData(MOCK_PNL_DATA);
     } finally {
       setLoading(false);
     }
@@ -77,7 +131,6 @@ export default function PnLDeepDive() {
   }
 
   // Generate SVG path for a smooth curve (Spline interpolation approximation)
-  const maxVal = 150; // Using 150 as max range for chart
   const months = [
     'Jan',
     'Feb',
@@ -94,13 +147,18 @@ export default function PnLDeepDive() {
   ];
 
   const generatePath = (points: number[]) => {
-    const xStep = 900 / 11;
-    let path = `M 0,${250 - (points[0] / maxVal) * 250}`;
+    if (!points || points.length === 0) return 'M 0,250';
+    // Dynamically calculate maxVal based on actual data to scale the chart appropriately
+    const actualMax = Math.max(...points, 100);
+    const scaleMax = actualMax * 1.2; // Add 20% headroom
+
+    const xStep = 900 / Math.max(1, points.length - 1);
+    let path = `M 0,${250 - (points[0] / scaleMax) * 250}`;
     for (let i = 0; i < points.length - 1; i++) {
       const x1 = i * xStep;
-      const y1 = 250 - (points[i] / maxVal) * 250;
+      const y1 = 250 - (points[i] / scaleMax) * 250;
       const x2 = (i + 1) * xStep;
-      const y2 = 250 - (points[i + 1] / maxVal) * 250;
+      const y2 = 250 - (points[i + 1] / scaleMax) * 250;
 
       const cx1 = x1 + xStep / 2;
       const cy1 = y1;
@@ -165,22 +223,22 @@ export default function PnLDeepDive() {
   };
 
   return (
-    <div className="w-full flex flex-col gap-24 pb-15 font-sans">
+    <div className="w-full flex flex-col gap-6 pb-12 font-sans">
       {/* ── Header ── */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-16">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-2">
         <div>
-          <div className="flex items-center gap-1.5 text-13 text-text-secondary mb-[8px] font-medium tracking-wider uppercase">
-            <span>Financial Operations</span>
+          <div className="flex items-center gap-1.5 text-xs text-text-secondary mb-1 font-semibold tracking-widest uppercase">
+            <span>Operations & Finance</span>
           </div>
-          <h1 className="text-22 sm:text-28 font-extrabold text-text-primary tracking-tight mb-[8px]">
-            P&L Deep-Dive
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
+            Infrastructure Ledger
           </h1>
         </div>
-        <div className="flex gap-12 items-center flex-wrap">
+        <div className="flex gap-3 items-center flex-wrap">
           <select
             value={timeFilter}
             onChange={(e) => setTimeFilter(e.target.value)}
-            className="px-16 py-2.5 rounded-lg border border-border text-13 text-text-primary bg-surface outline-none cursor-pointer appearance-none shrink-0 shadow-sm"
+            className="pl-4 pr-10 py-2.5 rounded-xl border border-border text-sm font-medium text-text-primary bg-surface outline-none cursor-pointer shadow-sm appearance-none focus:ring-2 focus:ring-primary/20 transition-all"
             style={{
               backgroundImage:
                 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
@@ -193,280 +251,173 @@ export default function PnLDeepDive() {
             <option>Last 6 Months</option>
             <option>Year to Date</option>
           </select>
-          <button
-            onClick={handleExportCSV}
-            disabled={isExporting}
-            className={cn(
-              'flex items-center gap-[8px] px-16 py-2.5 bg-primary border-none rounded-lg text-13 font-semibold text-white cursor-pointer transition-opacity duration-200 hover:opacity-90 shrink-0 shadow-sm',
-              isExporting && 'opacity-70 cursor-not-allowed'
-            )}
-          >
-            {isExporting ? (
-              <svg
-                className="animate-spin w-16 h-16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-10.42" />
-              </svg>
-            ) : (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-            )}
+          <Button onClick={handleExportCSV} disabled={isExporting} isLoading={isExporting}>
             Export Report
-          </button>
+          </Button>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 text-sm text-status-error bg-status-error-container rounded-sm border border-status-error/20">
+        <div className="p-3 text-sm text-status-error bg-status-error-container rounded-lg border border-status-error/20">
           {error} (Showing fallback data)
         </div>
       )}
 
-      {/* ── Top KPI Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-20">
-        {/* MRR */}
-        <div className="bg-surface rounded-md border border-border p-24 relative overflow-hidden">
-          <div className="absolute right-24 top-24 opacity-10">
-            <svg
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="2" y="6" width="20" height="12" rx="2" />
-              <circle cx="12" cy="12" r="2" />
-              <path d="M6 12h.01M18 12h.01" />
-            </svg>
+      {/* ── Unified Hero Panel ── */}
+      <div className="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col lg:flex-row">
+        {/* Left Side: Stats (Vertical Stack) */}
+        <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-surface-variant/10 flex flex-col">
+          {/* Net Margin (Hero Metric) */}
+          <div className="p-6 border-b border-border bg-primary text-white">
+            <div className="text-xs font-semibold uppercase tracking-wider mb-2 opacity-90">
+              Net Margin
+            </div>
+            <div className="text-4xl font-mono font-bold tracking-tight">
+              {data.netMargin.value}
+            </div>
           </div>
-          <div className="flex items-center gap-[8px] text-[11px] font-bold text-text-secondary uppercase mb-4">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            Monthly Recurring Revenue
+
+          {/* MRR */}
+          <div className="p-6 border-b border-border">
+            <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
+              Total Revenue
+            </div>
+            <div className="text-2xl font-mono font-bold text-text-primary">{data.mrr.value}</div>
           </div>
-          <div className="text-32 font-extrabold text-text-primary mb-4">{data.mrr.value}</div>
-          <div className="flex items-center gap-[8px] text-xs">
-            <span className="inline-flex items-center gap-[4px] px-[8px] py-[4px] bg-status-success-container text-status-success rounded-full font-bold">
+
+          {/* AI Costs */}
+          <div className="p-6 border-b border-border bg-status-error-container/20">
+            <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
+              AI Infrastructure
+            </div>
+            <div className="text-2xl font-mono font-bold text-status-error">
+              {data.aiCosts.value}
+            </div>
+          </div>
+
+          {/* Cost Per Subscriber */}
+          <div className="p-6">
+            <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
+              Cost Per Active Sub
+            </div>
+            <div className="text-xl font-mono font-semibold text-text-primary">
+              {data.cac.value}
+            </div>
+            <div className="text-xs text-text-secondary mt-1">Avg compute spend per user</div>
+          </div>
+        </div>
+
+        {/* Right Side: Chart */}
+        <div className="flex-1 p-6 flex flex-col">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h2 className="text-sm font-bold text-text-primary">Revenue vs Cost Trend</h2>
+              <p className="text-xs text-text-secondary mt-0.5">Rolling 12-month window</p>
+            </div>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
+                <span className="w-2.5 h-2.5 rounded-sm bg-primary" />
+                Revenue
+              </div>
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
+                <span className="w-2.5 h-2.5 rounded-sm bg-[#f59e0b]" />
+                Costs
+              </div>
+            </div>
+          </div>
+
+          <div className="relative flex-1 min-h-[220px] w-full flex flex-col">
+            {/* Y-Axis */}
+            <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-text-secondary text-[10px] font-mono font-medium pr-3 border-r border-border w-12">
+              <span>$1.5M</span>
+              <span>$1.0M</span>
+              <span>$0.5M</span>
+              <span>$0</span>
+            </div>
+
+            {/* Chart Area */}
+            <div className="flex-1 ml-12 relative">
+              {/* Grid */}
+              <div className="absolute inset-0 border-b border-surface-variant top-0" />
+              <div className="absolute inset-0 border-b border-surface-variant top-[33.33%]" />
+              <div className="absolute inset-0 border-b border-surface-variant top-[66.66%]" />
+              <div className="absolute inset-0 border-b border-border top-full" />
+
+              {/* Chart Lines */}
               <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
+                className="absolute inset-0 w-full h-full overflow-visible"
+                preserveAspectRatio="none"
+                viewBox="0 0 900 250"
               >
-                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                <polyline points="17 6 23 6 23 12" />
+                <defs>
+                  <clipPath id="chart-clip">
+                    <rect x="0" y="-50" width="900" height="350">
+                      <animate
+                        attributeName="width"
+                        from="0"
+                        to="900"
+                        dur="1.2s"
+                        fill="freeze"
+                        calcMode="spline"
+                        keyTimes="0; 1"
+                        keySplines="0.25 0.1 0.25 1"
+                      />
+                    </rect>
+                  </clipPath>
+                </defs>
+                <g clipPath="url(#chart-clip)">
+                  <path
+                    d={costsPath}
+                    fill="none"
+                    stroke="#f59e0b"
+                    strokeWidth="2"
+                    strokeDasharray="4 4"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                  <path
+                    d={revenuePath}
+                    fill="none"
+                    stroke="var(--sys-primary)"
+                    strokeWidth="2.5"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </g>
               </svg>
-              {data.mrr.change}
-            </span>
-            <span className="text-text-secondary font-medium">vs last month</span>
-          </div>
-        </div>
+            </div>
 
-        {/* AI Costs */}
-        <div className="bg-surface rounded-md border border-border p-24">
-          <div className="text-[11px] font-bold text-text-secondary uppercase mb-4">
-            AI Infrastructure Costs
-          </div>
-          <div className="text-32 font-extrabold text-text-primary mb-4">{data.aiCosts.value}</div>
-          <div className="flex items-center gap-[8px] text-xs text-status-error font-semibold">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
-            {data.aiCosts.overage}
-          </div>
-        </div>
-
-        {/* Net Margin (Solid Green) */}
-        <div className="bg-primary rounded-md p-24 flex flex-col justify-center text-white">
-          <div className="text-[11px] font-bold uppercase mb-12 opacity-90 tracking-wider">
-            Net Margin
-          </div>
-          <div className="text-32 font-extrabold">{data.netMargin.value}</div>
-        </div>
-
-        {/* CAC */}
-        <div className="bg-surface rounded-md border border-border p-24">
-          <div className="text-[11px] font-bold text-text-secondary uppercase mb-4">
-            Customer Acq. Cost
-          </div>
-          <div className="text-32 font-extrabold text-text-primary mb-4">{data.cac.value}</div>
-          <div className="flex items-center gap-[8px] text-13 text-text-secondary">
-            Target: {data.cac.target}
-            <div className="w-4.5 h-4.5 rounded-full border border-status-success flex items-center justify-center ml-auto">
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                className="text-status-success"
-                strokeWidth="3"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+            {/* X-Axis */}
+            <div className="ml-12 flex justify-between pt-2 pb-1 text-text-secondary text-[10px] font-mono font-medium">
+              {months.map((m) => (
+                <span key={m}>{m}</span>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Chart ── */}
-      <div className="bg-surface rounded-md border border-border p-8">
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <h2 className="text-lg font-bold text-text-primary mb-[4px]">
-              Revenue vs. Operational Costs
-            </h2>
-            <p className="text-13 text-text-secondary">12-Month Historical Trend Analysis</p>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
-              <span className="w-12 h-12 rounded-sm bg-primary" />
-              Revenue
-            </div>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
-              <span className="w-12 h-12 rounded-sm bg-[#f59e0b]" />
-              Costs
-            </div>
-          </div>
-        </div>
-
-        {/* Custom SVG Line Chart */}
-        <div className="relative h-70 w-full">
-          {/* Y-Axis Labels */}
-          <div className="absolute left-0 top-0 bottom-7.5 flex flex-col justify-between text-text-secondary text-[11px] font-medium pr-4 border-r border-surface-variant">
-            <span>$1.5M</span>
-            <span>$1.0M</span>
-            <span>$0.5M</span>
-            <span>$0</span>
-          </div>
-
-          <div className="ml-12.5 h-62.5 relative">
-            {/* Grid lines */}
-            <div className="absolute inset-0 border-b border-surface-variant top-0" />
-            <div className="absolute inset-0 border-b border-surface-variant top-[33.33%]" />
-            <div className="absolute inset-0 border-b border-surface-variant top-[66.66%]" />
-            <div className="absolute inset-0 border-b border-surface-variant top-full" />
-
-            {/* SVG Chart */}
-            <svg
-              className="w-full h-full overflow-visible"
-              preserveAspectRatio="none"
-              viewBox="0 0 900 250"
-            >
-              <defs>
-                <clipPath id="draw-animation-clip">
-                  <rect x="0" y="-50" width="900" height="350">
-                    <animate
-                      attributeName="width"
-                      from="0"
-                      to="900"
-                      dur="1.5s"
-                      fill="freeze"
-                      calcMode="spline"
-                      keyTimes="0; 1"
-                      keySplines="0.25 0.1 0.25 1"
-                    />
-                  </rect>
-                </clipPath>
-              </defs>
-              <g clipPath="url(#draw-animation-clip)">
-                {/* Cost Line (Dashed Orange) */}
-                <path
-                  d={costsPath}
-                  fill="none"
-                  stroke="#f59e0b"
-                  strokeWidth="2"
-                  strokeDasharray="6 4"
-                  vectorEffect="non-scaling-stroke"
-                />
-                {/* Revenue Line (Solid Green) */}
-                <path
-                  d={revenuePath}
-                  fill="none"
-                  stroke="var(--sys-primary)"
-                  strokeWidth="3"
-                  vectorEffect="non-scaling-stroke"
-                />
-              </g>
-            </svg>
-          </div>
-
-          {/* X-Axis Labels */}
-          <div className="ml-12.5 flex justify-between pt-4 text-text-secondary text-[11px] font-medium">
-            {months.map((m) => (
-              <span key={m}>{m}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Table ── */}
-      <div className="bg-surface rounded-md border border-border overflow-hidden">
-        <div className="p-24 border-b border-border flex justify-between items-center">
-          <h2 className="text-lg font-bold text-text-primary">Infrastructure Billing Ledger</h2>
-          <button className="bg-transparent border-none text-text-secondary text-13 font-semibold cursor-pointer flex items-center gap-[4px] hover:text-text-primary transition-colors">
-            View All
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
+      {/* ── Invoice Ledger Table ── */}
+      <div className="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col">
+        <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-surface-variant/30">
+          <h2 className="text-sm font-bold text-text-primary">Monthly Compute Invoices</h2>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left min-w-175">
+          <table className="w-full border-collapse text-left min-w-[700px]">
             <thead>
-              <tr className="bg-surface-variant/30 border-b border-border">
-                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
-                  Service Provider
+              <tr className="border-b border-border bg-surface">
+                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
+                  Service
                 </th>
-                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
-                  Usage / Volume
+                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
+                  Usage Volume
                 </th>
-                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
-                  Cost
+                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider text-right">
+                  Amount
                 </th>
-                <th className="px-24 py-4 text-[11px] font-bold text-text-secondary uppercase">
+                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider text-center">
                   Status
                 </th>
               </tr>
@@ -478,23 +429,25 @@ export default function PnLDeepDive() {
                   <tr
                     key={row.id}
                     onClick={() => handleRowClick(row)}
-                    className="border-b border-border cursor-pointer transition-colors hover:bg-surface-variant/50"
+                    className="border-b border-border cursor-pointer transition-colors hover:bg-surface-variant/50 even:bg-surface-variant/20"
                   >
-                    <td className="px-24 py-20 flex items-center gap-12">
-                      {getProviderIcon(row.providerIcon)}
-                      <span className="text-sm font-semibold text-text-primary">
+                    <td className="px-6 py-3 flex items-center gap-3">
+                      <div className="w-6 h-6 shrink-0 rounded-[4px] overflow-hidden">
+                        {getProviderIcon(row.providerIcon)}
+                      </div>
+                      <span className="text-xs font-semibold text-text-primary">
                         {row.provider}
                       </span>
                     </td>
-                    <td className="px-24 py-20 text-13 text-text-secondary">{row.category}</td>
-                    <td className="px-24 py-20 text-13 text-text-secondary">{row.usage}</td>
-                    <td className="px-24 py-20 text-sm font-semibold text-text-primary">
+                    <td className="px-6 py-3 text-xs text-text-secondary">{row.category}</td>
+                    <td className="px-6 py-3 text-xs font-mono text-text-secondary">{row.usage}</td>
+                    <td className="px-6 py-3 text-xs font-mono font-bold text-text-primary text-right">
                       {row.cost}
                     </td>
-                    <td className="px-24 py-20">
+                    <td className="px-6 py-3 text-center">
                       <span
                         className={cn(
-                          'inline-flex px-2.5 py-[4px] rounded-full text-[11px] font-bold tracking-wide',
+                          'inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold tracking-widest',
                           sStyle.bg,
                           sStyle.text
                         )}
@@ -512,31 +465,30 @@ export default function PnLDeepDive() {
 
       {/* ── Invoice Modal ── */}
       {selectedInvoice && (
-        <div className="fixed inset-0 z-1000 flex items-center justify-center p-4">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setSelectedInvoice(null)}
           />
-
-          {/* Modal Content */}
-          <div className="relative bg-surface rounded-lg w-full max-w-125 shadow-2xl animate-[slideUp_0.3s_ease-out] overflow-hidden">
-            {/* Header */}
-            <div className="p-24 sm:px-8 sm:py-24 border-b border-dashed border-border bg-surface-variant/30 flex justify-between items-start">
-              <div className="flex items-center gap-4">
-                {getProviderIcon(selectedInvoice.providerIcon)}
+          <div className="relative bg-surface rounded-2xl w-full max-w-md shadow-2xl animate-[slideUp_0.2s_ease-out] overflow-hidden border border-border">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-dashed border-border bg-surface-variant/30 flex justify-between items-start">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-md overflow-hidden shrink-0">
+                  {getProviderIcon(selectedInvoice.providerIcon)}
+                </div>
                 <div>
-                  <h2 className="text-xl font-extrabold text-text-primary mb-[4px]">
+                  <h2 className="text-lg font-bold text-text-primary leading-tight">
                     {selectedInvoice.provider}
                   </h2>
-                  <div className="text-13 text-text-secondary font-medium">
-                    Invoice #INV-{selectedInvoice.id}08492
+                  <div className="text-xs font-mono text-text-secondary mt-0.5">
+                    INV-{selectedInvoice.id}08492
                   </div>
                 </div>
               </div>
               <span
                 className={cn(
-                  'inline-flex px-12 py-1.5 rounded-full text-xs font-bold tracking-wide',
+                  'inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest',
                   statusStyles[selectedInvoice.status].bg,
                   statusStyles[selectedInvoice.status].text
                 )}
@@ -544,73 +496,69 @@ export default function PnLDeepDive() {
                 {selectedInvoice.status}
               </span>
             </div>
-
-            {/* Body */}
-            <div className="p-24 sm:p-8">
-              <div className="flex justify-between mb-24">
+            {/* Modal Body */}
+            <div className="p-6">
+              <div className="flex justify-between mb-6">
                 <div>
-                  <div className="text-xs text-text-secondary font-semibold uppercase mb-[4px]">
-                    Date of Issue
+                  <div className="text-[10px] text-text-secondary font-bold uppercase tracking-wider mb-1">
+                    Issue Date
                   </div>
-                  <div className="text-sm font-semibold text-text-primary">Oct 24, 2026</div>
+                  <div className="text-xs font-mono font-semibold text-text-primary">
+                    Oct 24, 2026
+                  </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-text-secondary font-semibold uppercase mb-[4px]">
-                    Billing Period
+                  <div className="text-[10px] text-text-secondary font-bold uppercase tracking-wider mb-1">
+                    Period
                   </div>
-                  <div className="text-sm font-semibold text-text-primary">
-                    Sep 1 - Sep 30, 2026
+                  <div className="text-xs font-mono font-semibold text-text-primary">
+                    Sep 1 - Sep 30
                   </div>
                 </div>
               </div>
-
-              <div className="bg-surface-variant/30 rounded-md p-20 mb-24 border border-border">
-                <div className="flex justify-between border-b border-border pb-12 mb-12">
-                  <span className="text-sm text-text-secondary font-medium">Category</span>
-                  <span className="text-sm font-semibold text-text-primary">
+              <div className="bg-surface-variant/40 rounded-xl p-4 mb-6 border border-border">
+                <div className="flex justify-between border-b border-border pb-3 mb-3">
+                  <span className="text-xs text-text-secondary font-medium">Category</span>
+                  <span className="text-xs font-semibold text-text-primary">
                     {selectedInvoice.category}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-sm text-text-secondary font-medium">Usage / Volume</span>
-                  <span className="text-sm font-semibold text-text-primary">
+                  <span className="text-xs text-text-secondary font-medium">Usage</span>
+                  <span className="text-xs font-mono font-semibold text-text-primary">
                     {selectedInvoice.usage}
                   </span>
                 </div>
               </div>
-
-              <div className="flex justify-between items-center px-20 py-4 bg-text-primary text-white rounded-md">
-                <span className="text-sm font-semibold">Total Amount</span>
-                <span className="text-2xl font-extrabold">{selectedInvoice.cost}</span>
+              <div className="flex justify-between items-center px-4 py-3 bg-text-primary text-white rounded-xl shadow-inner">
+                <span className="text-xs font-bold uppercase tracking-wide opacity-90">
+                  Total Due
+                </span>
+                <span className="text-xl font-mono font-bold">{selectedInvoice.cost}</span>
               </div>
             </div>
-
-            {/* Footer */}
-            <div className="px-8 py-20 border-t border-border flex justify-end bg-surface-variant/20">
-              <button
-                onClick={() => setSelectedInvoice(null)}
-                className="px-20 py-2.5 bg-surface border border-border rounded-sm text-13 font-semibold cursor-pointer text-text-primary transition-colors hover:bg-surface-variant"
-              >
-                Close
-              </button>
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-border flex justify-end bg-surface-variant/20">
+              <Button onClick={() => setSelectedInvoice(null)} variant="secondary">
+                Close Invoice
+              </Button>
             </div>
           </div>
         </div>
       )}
 
       {toastMessage && (
-        <div className="fixed bottom-8 right-8 bg-gray-900 text-white px-24 py-12 rounded-sm text-13 font-medium shadow-lg flex items-center gap-[8px] z-9999 animate-[slideUp_0.3s_ease-out]">
+        <div className="fixed bottom-6 right-6 bg-text-primary text-white px-4 py-3 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 z-[9999] animate-[slideUp_0.2s_ease-out]">
           <svg
-            className="w-16 h-16 text-status-success"
+            className="w-4 h-4 text-status-success"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="2"
+            strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-            <polyline points="22 4 12 14.01 9 11.01" />
+            <polyline points="20 6 9 17 4 12" />
           </svg>
           {toastMessage}
         </div>

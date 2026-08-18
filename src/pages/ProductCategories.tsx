@@ -1,10 +1,10 @@
-import { cn } from '@lib/utils';
 import { productCategoryService } from '@services/productCategoryService';
 import DeleteConfirmation from '../components/productCategories/DeleteConfirmation';
 import GridView from '../components/productCategories/Grid';
 import Header from '../components/productCategories/Header';
 import TableView from '../components/productCategories/Table';
 import useProductCategories from '../hooks/useProductCategories';
+import { Button } from '@components/ui/Button';
 
 export default function ProductCategories() {
   const {
@@ -102,6 +102,7 @@ export default function ProductCategories() {
           categories={filtered}
           onEdit={(cat) => void handleOpenModal(cat)}
           onUpload={handleTriggerUpload}
+          onDelete={setDeleteTarget}
           loadingEditId={loadingEditId}
         />
       ) : (
@@ -109,6 +110,7 @@ export default function ProductCategories() {
           categories={filtered}
           onEdit={(cat) => void handleOpenModal(cat)}
           onUpload={handleTriggerUpload}
+          onDelete={setDeleteTarget}
           loadingEditId={loadingEditId}
         />
       )}
@@ -256,30 +258,12 @@ export default function ProductCategories() {
 
               {/* Actions */}
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50"
-                >
+                <Button variant="secondary" type="button" onClick={handleCloseModal}>
                   Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className={cn(
-                    'px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#1F3D32] hover:bg-[#162D25] transition-all shadow-xs flex items-center gap-2',
-                    saving && 'opacity-70 cursor-not-allowed'
-                  )}
-                >
-                  {saving ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Saving Category...
-                    </>
-                  ) : (
-                    'Save Category'
-                  )}
-                </button>
+                </Button>
+                <Button variant="primary" type="submit" isLoading={saving}>
+                  Save Category
+                </Button>
               </div>
             </form>
           </div>

@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminService } from '@services/adminService';
 import type { CreateAdminRequest } from '@typeDefs/adminTypes';
 
-export function useAdmins(page: number, pageSize: number) {
+export function useAdmins(page: number, pageSize: number, roleFilter?: string, search?: string) {
   return useQuery({
-    queryKey: ['admins', page, pageSize],
-    queryFn: () => adminService.getAdmins(page, pageSize),
+    queryKey: ['admins', page, pageSize, roleFilter, search],
+    queryFn: () => adminService.getAdmins(page, pageSize, roleFilter, search),
   });
 }
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@store/authStore';
 import { PAGE_LABELS } from '@constants/navigation';
 import { Button } from '@components/ui/Button';
@@ -9,13 +10,14 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
+  const { t, i18n } = useTranslation(['common', 'sidebar']);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const pageLabel = PAGE_LABELS[location.pathname] ?? 'Dashboard';
+  const rawLabel = PAGE_LABELS[location.pathname] ?? 'sidebar:overview';
 
   const initials = user?.fullName
     ? user.fullName
@@ -38,7 +40,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           onClick={onMenuClick}
           variant="ghost"
           size="icon"
-          className="lg:hidden -ml-2 text-text-secondary"
+          className="lg:hidden -ms-2 text-text-secondary"
         >
           <svg
             width="20"
@@ -56,21 +58,29 @@ export function Header({ onMenuClick }: HeaderProps) {
           </svg>
         </Button>
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-text-primary">{pageLabel}</span>
+          <span className="text-sm font-medium text-text-primary">{t(rawLabel)}</span>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
+        <Button
+          onClick={() => i18n.changeLanguage(i18n.resolvedLanguage === 'en' ? 'ar' : 'en')}
+          variant="outline"
+          className="rounded-full py-1 px-3 min-h-0 h-auto bg-surface hover:bg-surface-variant border-border text-xs font-medium text-text-primary"
+        >
+          {i18n.resolvedLanguage === 'en' ? 'العربية' : 'EN'}
+        </Button>
+
         <div className="relative">
           <Button
             onClick={() => setProfileMenuOpen((v) => !v)}
             variant="outline"
-            className="rounded-full py-1 px-1 sm:px-2.5 min-h-0 h-auto gap-2 bg-surface hover:bg-surface-variant border-border"
+            className="rounded-full p-0 sm:p-1 sm:ps-2.5 min-h-0 h-auto gap-2 bg-surface hover:bg-surface-variant border-transparent sm:border-border"
           >
             <span className="text-xs font-medium text-text-primary hidden sm:block">
-              {user?.roles?.[0] || 'Admin'} Profile
+              {t('common:adminProfile', 'Admin Profile')}
             </span>
-            <span className="w-6.5 h-6.5 rounded-full bg-primary-active text-white flex items-center justify-center text-[10px] font-bold">
+            <span className="w-7 h-7 sm:w-6.5 sm:h-6.5 rounded-full bg-primary-active text-white flex items-center justify-center text-[10px] font-bold">
               {initials}
             </span>
           </Button>
@@ -78,13 +88,13 @@ export function Header({ onMenuClick }: HeaderProps) {
           {profileMenuOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setProfileMenuOpen(false)} />
-              <div className="absolute right-0 top-4 mt-6 min-w-40 bg-surface border border-border rounded-[10px] shadow-[0_8px_24px_rgba(45,42,38,0.1)] z-20 overflow-hidden py-1">
+              <div className="absolute inset-e-0 top-4 mt-6 min-w-40 bg-surface border border-border rounded-[10px] shadow-[0_8px_24px_rgba(45,42,38,0.1)] z-20 overflow-hidden py-1">
                 <NavLink
                   to="/dashboard/profile"
                   onClick={() => setProfileMenuOpen(false)}
                   className="block px-3 py-2.5 text-[13px] text-text-primary no-underline hover:bg-surface-variant"
                 >
-                  View Profile
+                  {t('common:viewProfile', 'View Profile')}
                 </NavLink>
                 <div className="border-t border-border my-1" />
                 <Button
@@ -92,7 +102,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                   variant="ghost"
                   className="w-full justify-start rounded-none px-3 py-2.5 text-[13px] text-status-error hover:bg-status-error-container/30 h-auto min-h-0 font-medium"
                 >
-                  Sign Out
+                  {t('common:logout', 'Sign Out')}
                 </Button>
               </div>
             </>

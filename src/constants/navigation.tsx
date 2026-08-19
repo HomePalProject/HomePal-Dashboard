@@ -1,6 +1,6 @@
 export const NAV_ITEMS = [
   {
-    label: 'Overview',
+    label: 'sidebar:overview',
     to: '/dashboard',
     end: true,
     icon: (
@@ -22,7 +22,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Preferences',
+    label: 'sidebar:preferences',
     to: '/dashboard/preferences',
     end: false,
     icon: (
@@ -42,7 +42,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Product Categories',
+    label: 'sidebar:categories',
     to: '/dashboard/categories',
     end: false,
     icon: (
@@ -64,7 +64,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Households',
+    label: 'sidebar:households',
     to: '/dashboard/households',
     end: false,
     icon: (
@@ -84,7 +84,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Supermarkets',
+    label: 'sidebar:supermarkets',
     to: '/dashboard/supermarkets',
     end: false,
     icon: (
@@ -103,7 +103,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Offers Management',
+    label: 'sidebar:offersNav',
     to: '/dashboard/offers',
     end: false,
     icon: (
@@ -123,7 +123,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Analytics',
+    label: 'sidebar:stats',
     to: '/dashboard/stats',
     end: false,
     icon: (
@@ -144,7 +144,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'User Management',
+    label: 'sidebar:users',
     to: '/dashboard/users',
     end: false,
     icon: (
@@ -166,7 +166,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Scraping Pipeline',
+    label: 'sidebar:scrapingNav',
     to: '/dashboard/scraping-pipeline',
     end: false,
     icon: (
@@ -185,7 +185,7 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Measuring Units',
+    label: 'sidebar:measuringUnits',
     to: '/dashboard/measuring-units',
     end: false,
     icon: (
@@ -208,16 +208,16 @@ export const NAV_ITEMS = [
 ];
 
 export const PAGE_LABELS: Record<string, string> = {
-  '/dashboard': 'Overview',
-  '/dashboard/preferences': 'Preferences',
-  '/dashboard/categories': 'Product Categories',
-  '/dashboard/households': 'Households',
-  '/dashboard/supermarkets': 'Supermarkets',
-  '/dashboard/offers': 'Offers Hub',
-  '/dashboard/stats': 'Analytics',
-  '/dashboard/users': 'User Management',
-  '/dashboard/scraping-pipeline': 'Offer Scraping Pipeline',
-  '/dashboard/measuring-units': 'Measuring Units',
-  '/dashboard/profile': 'Account Settings',
-  '/dashboard/ai-token-usage': 'AI Token Usage',
+  '/dashboard': 'sidebar:overview',
+  '/dashboard/preferences': 'sidebar:preferences',
+  '/dashboard/categories': 'sidebar:categories',
+  '/dashboard/households': 'sidebar:households',
+  '/dashboard/supermarkets': 'sidebar:supermarkets',
+  '/dashboard/offers': 'sidebar:offersPage',
+  '/dashboard/stats': 'sidebar:stats',
+  '/dashboard/users': 'sidebar:users',
+  '/dashboard/scraping-pipeline': 'sidebar:scrapingPage',
+  '/dashboard/measuring-units': 'sidebar:measuringUnits',
+  '/dashboard/profile': 'sidebar:profile',
+  '/dashboard/ai-token-usage': 'sidebar:aiToken',
 };

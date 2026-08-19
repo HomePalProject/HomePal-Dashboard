@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@store/authStore';
 import { NAV_ITEMS } from '@constants/navigation';
 
@@ -8,6 +9,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { t, i18n } = useTranslation(['common', 'sidebar']);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
@@ -26,8 +28,8 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-50 shrink-0 bg-[#2a4a3e] flex flex-col transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-0 inset-s-0 z-50 w-50 shrink-0 bg-[#2a4a3e] flex flex-col transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
+          isOpen ? 'translate-x-0' : i18n.dir() === 'rtl' ? 'translate-x-full' : '-translate-x-full'
         }`}
       >
         <div className="p-5 pb-4 border-b border-white/10 flex items-center justify-between">
@@ -38,13 +40,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 HomePal
               </div>
               <div className="text-white/40 font-bold text-[9px] tracking-[0.12em] uppercase mt-1">
-                Executive Panel
+                {t('common:executivePanel', 'Executive Panel')}
               </div>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="lg:hidden text-white/50 hover:text-white -mr-2 p-2 rounded-xl hover:bg-white/10 flex items-center justify-center shrink-0"
+            className="lg:hidden text-white/50 hover:text-white -me-2 p-2 rounded-xl hover:bg-white/10 flex items-center justify-center shrink-0"
           >
             <svg
               width="20"
@@ -78,7 +80,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               }
             >
               {item.icon}
-              {item.label}
+              {t(item.label)}
             </NavLink>
           ))}
         </nav>
@@ -113,7 +115,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <button
             onClick={handleLogout}
-            className="flex items-center justify-start gap-2.5 px-3 py-2.5 rounded-2xl text-sm text-white/45 hover:text-red-400 hover:bg-red-400/10 transition-all duration-150 w-full text-left"
+            className="flex items-center justify-start gap-2.5 px-3 py-2.5 rounded-2xl text-sm text-white/45 hover:text-red-400 hover:bg-red-400/10 transition-all duration-150 w-full text-start"
           >
             <svg
               width="18"
@@ -129,7 +131,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
-            Logout
+            {t('common:logout', 'Logout')}
           </button>
         </div>
       </aside>

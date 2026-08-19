@@ -4,6 +4,7 @@ import type { MeasuringUnit } from '@typeDefs/measuringUnitTypes';
 
 import { fetchBilingual } from '@lib/localization';
 import { Button } from '@components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return 'Aug 13, 2026';
@@ -97,6 +98,7 @@ const SEED_UNITS: MeasuringUnit[] = [
 ];
 
 export default function MeasuringUnits() {
+  const { t } = useTranslation('common');
   const [units, setUnits] = useState<MeasuringUnit[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -479,8 +481,8 @@ export default function MeasuringUnits() {
 
         {/* Table Footer */}
         <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 font-semibold">
-          <span>Total Units: {units.length}</span>
-          <span>HomePal Management System v2.4</span>
+          <span>{t('totalUnits', { count: units.length })}</span>
+          <span>{t('managementSystem')}</span>
         </div>
       </div>
 

@@ -3,8 +3,10 @@ import { getErrorMessage } from '@lib/utils';
 import { analyticsService } from '@services/analyticsService';
 import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function Households() {
+  const { t } = useTranslation('households');
   const [data, setData] = useState<HouseholdsSummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,9 +29,7 @@ export default function Households() {
   }, [fetchData]);
 
   if (loading || !data) {
-    return (
-      <div className="p-10 text-text-disabled font-sans">Loading aggregated household data...</div>
-    );
+    return <div className="p-10 text-text-disabled font-sans">{t('loading')}</div>;
   }
 
   return (
@@ -38,21 +38,20 @@ export default function Households() {
       <div>
         <div className="flex items-center gap-[8px] mb-[8px] flex-wrap">
           <h1 className="text-[22px] sm:text-[28px] font-extrabold text-text-primary tracking-tight m-0">
-            Households Analytics
+            {t('title')}
           </h1>
           <span className="bg-primary-container text-primary text-[11px] font-bold px-[8px] py-[4px] rounded-full uppercase tracking-wider">
-            Privacy Safe
+            {t('privacyBadge')}
           </span>
         </div>
         <p className="text-typography-bodysmall text-text-secondary max-w-150 m-0">
-          Aggregated platform metrics. Personally Identifiable Information (PII) is intentionally
-          restricted from this dashboard to ensure data privacy.
+          {t('privacyDesc')}
         </p>
       </div>
 
       {error && (
         <div className="p-1 text-sm text-status-error bg-status-error-container rounded-3xl border border-status-error/20">
-          {error} (Showing fallback data)
+          {error} ({t('fallbackData')})
         </div>
       )}
 
@@ -60,53 +59,57 @@ export default function Households() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
           <div className="text-[13px] font-semibold text-text-disabled mb-[8px]">
-            Total Registered
+            {t('totalRegistered')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
             {data.totalHouseholds.toLocaleString()}
           </div>
-          <div className="text-xs font-semibold text-primary mt-[4px]">{data.growthRate} YoY</div>
+          <div className="text-xs font-semibold text-primary mt-[4px]">
+            {data.growthRate} {t('yoy')}
+          </div>
         </div>
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
           <div className="text-[13px] font-semibold text-text-disabled mb-[8px]">
-            Active This Month
+            {t('activeThisMonth')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
             {data.activeHouseholds.toLocaleString()}
           </div>
           <div className="text-xs font-semibold text-text-secondary mt-[4px]">
-            94% Activity Rate
+            {t('activityRate')}
           </div>
         </div>
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
           <div className="text-[13px] font-semibold text-text-disabled mb-[8px]">
-            Avg Household Size
+            {t('avgHouseholdSize')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
             {data.avgHouseholdSize}
           </div>
           <div className="text-xs font-semibold text-text-secondary mt-[4px]">
-            Members / Household
+            {t('membersPerHousehold')}
           </div>
         </div>
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
           <div className="text-[13px] font-semibold text-text-disabled mb-[8px]">
-            Avg Monthly Income
+            {t('avgMonthlyIncome')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
             {data.avgHouseholdIncome}
           </div>
-          <div className="text-xs font-semibold text-text-secondary mt-[4px]">Self-reported</div>
+          <div className="text-xs font-semibold text-text-secondary mt-[4px]">
+            {t('selfReported')}
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ── Top Regions ── */}
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
-          <h2 className="text-base font-bold text-text-primary mb-6">Adoption by Region</h2>
+          <h2 className="text-base font-bold text-text-primary mb-6">{t('adoptionByRegion')}</h2>
 
           <div className="flex flex-col gap-5">
             {data.topRegions.map((region, i) => (
@@ -130,9 +133,7 @@ export default function Households() {
 
         {/* ── Size Distribution ── */}
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
-          <h2 className="text-base font-bold text-text-primary mb-6">
-            Household Size Demographics
-          </h2>
+          <h2 className="text-base font-bold text-text-primary mb-6">{t('sizeDemographics')}</h2>
 
           <div className="flex flex-col gap-5">
             {data.sizeDistribution.map((item, i) => {

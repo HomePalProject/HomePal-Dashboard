@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export function StatCard({
   title,
@@ -18,13 +19,13 @@ export function StatCard({
   icon: React.ReactNode;
   onClick?: () => void;
 }) {
-  const isPositive = change > 0;
+  const { t } = useTranslation('stats');
 
   // Format values
   const displayValue = isCurrency
-    ? `$${(value / 1000).toFixed(1)}k`
+    ? t('currencyFormat', { value: (value / 1000).toFixed(1) })
     : isPercent
-      ? `${value}%`
+      ? `${value.toFixed(1)}%`
       : value.toLocaleString();
 
   return (
@@ -49,10 +50,10 @@ export function StatCard({
         <span
           className={cn(
             'flex items-center gap-0.5 font-bold',
-            isPositive ? 'text-primary' : 'text-status-error'
+            change >= 0 ? 'text-primary' : 'text-status-error'
           )}
         >
-          {isPositive ? (
+          {change >= 0 ? (
             <svg
               width="12"
               height="12"
@@ -77,7 +78,7 @@ export function StatCard({
           )}
           {Math.abs(change)}%
         </span>
-        <span className="text-text-secondary">vs last month</span>
+        <span className="text-text-secondary">{t('vsLastMonth')}</span>
       </div>
     </div>
   );

@@ -11,9 +11,11 @@ import type { Supermarket } from '@typeDefs/catalogTypes';
 import type { MealPlansSummaryData } from '@typeDefs/analyticsTypes';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 
-import { getHour } from '@lib/formatters';
+import { getHour, getLocalizedCulture } from '@lib/formatters';
+import { useTranslation } from 'react-i18next';
 
 export default function Overview() {
+  const { t, i18n } = useTranslation('overview');
   const token = useAuthStore((s) => s.token);
   const [summaryData, setSummaryData] = useState<HouseholdsSummaryData | null>(null);
   const [mealPlansSummary, setMealPlansSummary] = useState<MealPlansSummaryData | null>(null);
@@ -21,7 +23,7 @@ export default function Overview() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const greeting = `Good ${getHour()}.`;
+  const greeting = t(getHour());
 
   useEffect(() => {
     let isMounted = true;
@@ -62,8 +64,7 @@ export default function Overview() {
             {greeting}
           </h1>
           <p className="text-sm text-text-secondary mt-2 m-0 leading-relaxed max-w-lg">
-            Welcome back to your operational command center. Here is the latest summary across your
-            households and catalog networks.
+            {t('subtitle')}
           </p>
         </div>
 
@@ -71,9 +72,9 @@ export default function Overview() {
           to="/dashboard/households"
           className="hidden sm:flex group relative px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-sm font-bold no-underline transition-all shadow-md hover:shadow-lg shrink-0 items-center gap-2 overflow-hidden"
         >
-          <span className="relative z-10">Manage Households</span>
+          <span className="relative z-10">{t('manageHouseholds')}</span>
           <svg
-            className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform"
+            className="w-4 h-4 relative z-10 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform rtl:rotate-180"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -101,9 +102,9 @@ export default function Overview() {
             to="/dashboard/households"
             className="w-full justify-center group relative px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl text-sm font-bold no-underline transition-all shadow-md shrink-0 flex items-center gap-2 overflow-hidden"
           >
-            <span className="relative z-10">Manage Households</span>
+            <span className="relative z-10">{t('manageHouseholds')}</span>
             <svg
-              className="w-4 h-4 relative z-10"
+              className="w-4 h-4 relative z-10 rtl:rotate-180"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -125,7 +126,7 @@ export default function Overview() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">
-                    Total Households
+                    {t('totalHouseholds')}
                   </div>
                   <div className="p-1.5 rounded-lg bg-surface-variant/50 text-text-secondary group-hover:text-primary transition-colors">
                     <svg
@@ -148,7 +149,7 @@ export default function Overview() {
                   </span>
                 </div>
                 <div className="text-xs font-semibold text-text-disabled mt-1">
-                  Enrolled across platform
+                  {t('enrolledPlatform')}
                 </div>
               </div>
             </div>
@@ -158,7 +159,7 @@ export default function Overview() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">
-                    Active Households
+                    {t('activeHouseholds')}
                   </div>
                   <div className="p-1.5 rounded-lg bg-surface-variant/50 text-text-secondary group-hover:text-status-success transition-colors">
                     <svg
@@ -189,7 +190,7 @@ export default function Overview() {
                   ) : null}
                 </div>
                 <div className="text-xs font-semibold text-text-disabled mt-1">
-                  Currently active rate
+                  {t('activeRateDesc')}
                 </div>
               </div>
             </div>
@@ -199,7 +200,7 @@ export default function Overview() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">
-                    Meal Plans
+                    {t('mealPlans')}
                   </div>
                   <div className="p-1.5 rounded-lg bg-surface-variant/50 text-text-secondary group-hover:text-amber-600 transition-colors">
                     <svg
@@ -222,7 +223,7 @@ export default function Overview() {
                   </span>
                 </div>
                 <div className="text-xs font-semibold text-text-disabled mt-1">
-                  Generated by AI assistant
+                  {t('generatedByAi')}
                 </div>
               </div>
             </div>
@@ -230,11 +231,9 @@ export default function Overview() {
 
           <div className="flex flex-col gap-1">
             <h2 className="text-lg md:text-xl font-black text-text-primary tracking-tight m-0">
-              Network Demographics
+              {t('networkDemographics')}
             </h2>
-            <p className="text-xs font-medium text-text-secondary m-0">
-              Averages across all enrolled users.
-            </p>
+            <p className="text-xs font-medium text-text-secondary m-0">{t('averagesEnrolled')}</p>
           </div>
 
           {loading ? (
@@ -247,23 +246,27 @@ export default function Overview() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 p-6 rounded-2xl bg-surface-variant/40 border border-border/40 hover:bg-surface-variant/60 transition-colors">
                   <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">
-                    Avg. Household Size
+                    {t('avgHouseholdSize')}
                   </div>
                   <div className="text-2xl font-black text-text-primary tracking-tight">
-                    {summaryData?.avgHouseholdSize
-                      ? `${Math.round(summaryData.avgHouseholdSize)} members`
-                      : '1 member'}
+                    {t('members', {
+                      count: summaryData?.avgHouseholdSize
+                        ? Math.round(summaryData.avgHouseholdSize)
+                        : 1,
+                    })}
                   </div>
                 </div>
 
                 <div className="flex-1 p-6 rounded-2xl bg-surface-variant/40 border border-border/40 hover:bg-surface-variant/60 transition-colors">
                   <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">
-                    Avg. Plans / Household
+                    {t('avgPlansPerHousehold')}
                   </div>
                   <div className="text-2xl font-black text-text-primary tracking-tight">
-                    {mealPlansSummary?.mealPlansPerHousehold
-                      ? `${Math.round(mealPlansSummary.mealPlansPerHousehold)} plans`
-                      : '0 plans'}
+                    {t('plans', {
+                      count: mealPlansSummary?.mealPlansPerHousehold
+                        ? Math.round(mealPlansSummary.mealPlansPerHousehold)
+                        : 0,
+                    })}
                   </div>
                 </div>
               </div>
@@ -272,10 +275,10 @@ export default function Overview() {
               <div className="bg-surface rounded-2xl border border-border/60 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-sm font-black text-text-primary tracking-tight m-0">
-                    Partner Supermarket Chains
+                    {t('partnerChains')}
                   </h3>
                   <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20 uppercase tracking-wider">
-                    {realSupermarkets.length} Integrated
+                    {t('integrated', { count: realSupermarkets.length })}
                   </span>
                 </div>
 
@@ -287,12 +290,9 @@ export default function Overview() {
                       const remainder = 100 - baseShare * total;
 
                       return realSupermarkets.map((s, idx) => {
-                        const nameStr = Array.isArray(s.name)
-                          ? s.name[0]?.value || 'Supermarket'
-                          : typeof s.name === 'string'
-                            ? s.name
-                            : 'Supermarket';
-
+                        const nameStr =
+                          getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                          t('supermarket');
                         const shareVal = baseShare + (idx === 0 ? remainder : 0);
 
                         return (
@@ -332,7 +332,7 @@ export default function Overview() {
                 ) : (
                   <div className="py-6 text-center">
                     <span className="text-xs font-medium text-text-disabled">
-                      No partner supermarkets integrated yet.
+                      {t('noPartners')}
                     </span>
                   </div>
                 )}
@@ -347,16 +347,16 @@ export default function Overview() {
             <div className="p-6 border-b border-border/40 flex items-center justify-between bg-surface-variant/20">
               <div>
                 <h3 className="text-sm font-black text-text-primary tracking-tight m-0">
-                  Global Categories
+                  {t('globalCategories')}
                 </h3>
                 <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider mt-1 block">
-                  {categories.length} Total
+                  {t('total', { count: categories.length })}
                 </span>
               </div>
               <Link
                 to="/dashboard/categories"
                 className="w-8 h-8 rounded-full bg-surface-variant hover:bg-primary/10 hover:text-primary flex items-center justify-center transition-colors text-text-secondary"
-                title="Manage Categories"
+                title={t('manageCategories')}
               >
                 <svg
                   className="w-4 h-4"
@@ -376,26 +376,22 @@ export default function Overview() {
               {categories.length > 0 ? (
                 <div className="space-y-1.5">
                   {categories.slice(0, 8).map((cat, i) => {
-                    const catName = Array.isArray(cat.name)
-                      ? cat.name[0]?.value || 'Category'
-                      : typeof cat.name === 'string'
-                        ? cat.name
-                        : 'Category';
                     return (
                       <div
                         key={cat.id}
                         className="group p-3 rounded-xl hover:bg-surface-variant/50 transition-colors flex items-center justify-between cursor-default"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-bold text-text-disabled w-4 text-right">
+                          <span className="text-[10px] font-bold text-text-disabled w-4 text-end">
                             {String(i + 1).padStart(2, '0')}
                           </span>
                           <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
-                            {catName}
+                            {getLocalizedCulture(cat.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                              'Category'}
                           </span>
                         </div>
                         <svg
-                          className="w-3.5 h-3.5 text-text-disabled opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="w-3.5 h-3.5 text-text-disabled opacity-0 group-hover:opacity-100 transition-opacity rtl:rotate-180"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -411,14 +407,13 @@ export default function Overview() {
                 </div>
               ) : (
                 <div className="h-full min-h-[200px] flex items-center justify-center text-xs font-medium text-text-disabled">
-                  {loading ? 'Loading...' : 'No categories found.'}
+                  {loading ? t('loading') : t('noCategories')}
                 </div>
               )}
             </div>
 
             <div className="p-5 bg-surface-variant/20 border-t border-border/40 text-[11px] font-medium text-text-secondary leading-relaxed">
-              Explore the categories section to organize product rules and household dietary
-              constraints.
+              {t('exploreCategoriesDesc')}
             </div>
           </div>
         </div>

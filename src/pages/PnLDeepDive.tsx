@@ -3,6 +3,7 @@ import { cn, getErrorMessage } from '@lib/utils';
 import { analyticsService } from '@services/analyticsService';
 import type { PnLDeepDiveData, BillingLedgerRow } from '@typeDefs/pnlTypes';
 import { Button } from '@components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 const statusStyles = {
   PAID: { bg: 'bg-status-success-container', text: 'text-status-success' },
@@ -10,13 +11,16 @@ const statusStyles = {
 };
 
 export default function PnLDeepDive() {
+  const { t, i18n } = useTranslation('stats');
   const [data, setData] = useState<PnLDeepDiveData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [isExporting, setIsExporting] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [timeFilter, setTimeFilter] = useState('Last 12 Months');
+  const [timeFilter, setTimeFilter] = useState<'last12Months' | 'last6Months' | 'yearToDate'>(
+    'last12Months'
+  );
 
   const [selectedInvoice, setSelectedInvoice] = useState<BillingLedgerRow | null>(null);
 
@@ -64,10 +68,16 @@ export default function PnLDeepDive() {
       const totalTokens = (tokenRes?.inputTokens || 0) + (tokenRes?.outputTokens || 0);
 
       const computedData: PnLDeepDiveData = {
-        mrr: { value: `$${rev.toLocaleString()}`, change: '+0.0%' },
-        aiCosts: { value: `$${cost.toLocaleString()}`, overage: 'Live Synced' },
+        mrr: { value: t('currencyValue', { value: rev.toLocaleString() }), change: '+0.0%' },
+        aiCosts: {
+          value: t('currencyValue', { value: cost.toLocaleString() }),
+          overage: t('liveSynced'),
+        },
         netMargin: { value: `${netMarginPerc.toFixed(1)}%` },
-        cac: { value: `$${costPerSub.toFixed(2)}`, target: 'Cost/User' },
+        cac: {
+          value: t('currencyValue', { value: costPerSub.toFixed(2) }),
+          target: t('costPerActiveSub'),
+        },
         chartData: {
           revenue: finalRevPoints,
           costs: finalCostPoints,
@@ -77,9 +87,9 @@ export default function PnLDeepDive() {
             id: '1',
             provider: 'OpenAI API',
             providerIcon: 'openai',
-            category: 'LLM Inference',
-            usage: `${totalTokens > 0 ? (totalTokens / 1000000).toFixed(2) + 'M' : '0'} Tokens`,
-            cost: `$${cost.toLocaleString()}`,
+            category: t('categoryLlmInference'),
+            usage: `${totalTokens > 0 ? (totalTokens / 1000000).toFixed(2) + 'M' : '0'} ${t('tokensLabel')}`,
+            cost: t('currencyValue', { value: cost.toLocaleString() }),
             status: 'PAID',
           },
         ],
@@ -92,7 +102,7 @@ export default function PnLDeepDive() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchData();
@@ -102,7 +112,13 @@ export default function PnLDeepDive() {
     setIsExporting(true);
     await new Promise((r) => setTimeout(r, 800)); // Simulate processing
     if (!data) return;
-    const headers = ['Service Provider', 'Category', 'Usage / Volume', 'Cost', 'Status'];
+    const headers = [
+      t('thServiceProviderCsv'),
+      t('thCategory'),
+      t('thUsageVolumeCsv'),
+      t('thCostCsv'),
+      t('thStatus'),
+    ];
     const csvContent = [
       headers.join(','),
       ...data.billingLedger.map((r) =>
@@ -119,7 +135,7 @@ export default function PnLDeepDive() {
     link.click();
     document.body.removeChild(link);
     setIsExporting(false);
-    showToast('Report exported successfully');
+    showToast(t('toastReportExported'));
   };
 
   const handleRowClick = (row: BillingLedgerRow) => {
@@ -127,24 +143,11 @@ export default function PnLDeepDive() {
   };
 
   if (loading || !data) {
-    return <div className="p-40 text-text-secondary">Loading analytics...</div>;
+    return <div className="p-40 text-text-secondary">{t('loadingLedger')}</div>;
   }
 
   // Generate SVG path for a smooth curve (Spline interpolation approximation)
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
+  const months = t('months', { returnObjects: true }) as string[];
 
   const generatePath = (points: number[]) => {
     if (!points || points.length === 0) return 'M 0,250';
@@ -228,38 +231,41 @@ export default function PnLDeepDive() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-2">
         <div>
           <div className="flex items-center gap-1.5 text-xs text-text-secondary mb-1 font-semibold tracking-widest uppercase">
-            <span>Operations & Finance</span>
+            <span>{t('operationsAndFinance')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight">
-            Infrastructure Ledger
+            {t('infrastructureLedger')}
           </h1>
         </div>
         <div className="flex gap-3 items-center flex-wrap">
           <select
             value={timeFilter}
-            onChange={(e) => setTimeFilter(e.target.value)}
+            onChange={(e) =>
+              setTimeFilter(e.target.value as 'last12Months' | 'last6Months' | 'yearToDate')
+            }
             className="pl-4 pr-10 py-2.5 rounded-xl border border-border text-sm font-medium text-text-primary bg-surface outline-none cursor-pointer shadow-sm appearance-none focus:ring-2 focus:ring-primary/20 transition-all"
             style={{
               backgroundImage:
                 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
               backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 12px top 50%',
+              backgroundPosition:
+                i18n.resolvedLanguage === 'ar' ? 'left 12px top 50%' : 'right 12px top 50%',
               backgroundSize: '10px auto',
             }}
           >
-            <option>Last 12 Months</option>
-            <option>Last 6 Months</option>
-            <option>Year to Date</option>
+            <option value="last12Months">{t('last12Months')}</option>
+            <option value="last6Months">{t('last6Months')}</option>
+            <option value="yearToDate">{t('yearToDate')}</option>
           </select>
           <Button onClick={handleExportCSV} disabled={isExporting} isLoading={isExporting}>
-            Export Report
+            {t('exportReport')}
           </Button>
         </div>
       </div>
 
       {error && (
         <div className="p-3 text-sm text-status-error bg-status-error-container rounded-lg border border-status-error/20">
-          {error} (Showing fallback data)
+          {t('errFallback', { error })}
         </div>
       )}
 
@@ -270,7 +276,7 @@ export default function PnLDeepDive() {
           {/* Net Margin (Hero Metric) */}
           <div className="p-6 border-b border-border bg-primary text-white">
             <div className="text-xs font-semibold uppercase tracking-wider mb-2 opacity-90">
-              Net Margin
+              {t('netMarginTitle')}
             </div>
             <div className="text-4xl font-mono font-bold tracking-tight">
               {data.netMargin.value}
@@ -280,7 +286,7 @@ export default function PnLDeepDive() {
           {/* MRR */}
           <div className="p-6 border-b border-border">
             <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
-              Total Revenue
+              {t('totalRevenue')}
             </div>
             <div className="text-2xl font-mono font-bold text-text-primary">{data.mrr.value}</div>
           </div>
@@ -288,7 +294,7 @@ export default function PnLDeepDive() {
           {/* AI Costs */}
           <div className="p-6 border-b border-border bg-status-error-container/20">
             <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
-              AI Infrastructure
+              {t('aiInfrastructure')}
             </div>
             <div className="text-2xl font-mono font-bold text-status-error">
               {data.aiCosts.value}
@@ -298,12 +304,12 @@ export default function PnLDeepDive() {
           {/* Cost Per Subscriber */}
           <div className="p-6">
             <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
-              Cost Per Active Sub
+              {t('costPerActiveSub')}
             </div>
             <div className="text-xl font-mono font-semibold text-text-primary">
               {data.cac.value}
             </div>
-            <div className="text-xs text-text-secondary mt-1">Avg compute spend per user</div>
+            <div className="text-xs text-text-secondary mt-1">{t('avgComputeSpend')}</div>
           </div>
         </div>
 
@@ -311,24 +317,24 @@ export default function PnLDeepDive() {
         <div className="flex-1 p-6 flex flex-col">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h2 className="text-sm font-bold text-text-primary">Revenue vs Cost Trend</h2>
-              <p className="text-xs text-text-secondary mt-0.5">Rolling 12-month window</p>
+              <h2 className="text-sm font-bold text-text-primary">{t('revenueVsCostTrend')}</h2>
+              <p className="text-xs text-text-secondary mt-0.5">{t('rolling12MonthWindow')}</p>
             </div>
             <div className="flex gap-4">
               <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
                 <span className="w-2.5 h-2.5 rounded-sm bg-primary" />
-                Revenue
+                {t('revenueLabel')}
               </div>
               <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary">
                 <span className="w-2.5 h-2.5 rounded-sm bg-[#f59e0b]" />
-                Costs
+                {t('costsLabel')}
               </div>
             </div>
           </div>
 
           <div className="relative flex-1 min-h-[220px] w-full flex flex-col">
             {/* Y-Axis */}
-            <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-text-secondary text-[10px] font-mono font-medium pr-3 border-r border-border w-12">
+            <div className="absolute start-0 top-0 bottom-8 flex flex-col justify-between text-text-secondary text-[10px] font-mono font-medium pe-3 border-e border-border w-12">
               <span>$1.5M</span>
               <span>$1.0M</span>
               <span>$0.5M</span>
@@ -336,7 +342,7 @@ export default function PnLDeepDive() {
             </div>
 
             {/* Chart Area */}
-            <div className="flex-1 ml-12 relative">
+            <div className="flex-1 ms-12 relative">
               {/* Grid */}
               <div className="absolute inset-0 border-b border-surface-variant top-0" />
               <div className="absolute inset-0 border-b border-surface-variant top-[33.33%]" />
@@ -398,27 +404,27 @@ export default function PnLDeepDive() {
       {/* ── Invoice Ledger Table ── */}
       <div className="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col">
         <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-surface-variant/30">
-          <h2 className="text-sm font-bold text-text-primary">Monthly Compute Invoices</h2>
+          <h2 className="text-sm font-bold text-text-primary">{t('monthlyComputeInvoices')}</h2>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left min-w-[700px]">
+          <table className="w-full border-collapse text-start min-w-[700px]">
             <thead>
               <tr className="border-b border-border bg-surface">
                 <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                  Service
+                  {t('thService')}
                 </th>
                 <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                  Category
+                  {t('thCategory')}
                 </th>
                 <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
-                  Usage Volume
+                  {t('thUsageVolume')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider text-right">
-                  Amount
+                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider text-end">
+                  {t('thAmount')}
                 </th>
                 <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider text-center">
-                  Status
+                  {t('thStatus')}
                 </th>
               </tr>
             </thead>
@@ -441,7 +447,7 @@ export default function PnLDeepDive() {
                     </td>
                     <td className="px-6 py-3 text-xs text-text-secondary">{row.category}</td>
                     <td className="px-6 py-3 text-xs font-mono text-text-secondary">{row.usage}</td>
-                    <td className="px-6 py-3 text-xs font-mono font-bold text-text-primary text-right">
+                    <td className="px-6 py-3 text-xs font-mono font-bold text-text-primary text-end">
                       {row.cost}
                     </td>
                     <td className="px-6 py-3 text-center">
@@ -501,15 +507,15 @@ export default function PnLDeepDive() {
               <div className="flex justify-between mb-6">
                 <div>
                   <div className="text-[10px] text-text-secondary font-bold uppercase tracking-wider mb-1">
-                    Issue Date
+                    {t('issueDate')}
                   </div>
                   <div className="text-xs font-mono font-semibold text-text-primary">
                     Oct 24, 2026
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <div className="text-[10px] text-text-secondary font-bold uppercase tracking-wider mb-1">
-                    Period
+                    {t('period')}
                   </div>
                   <div className="text-xs font-mono font-semibold text-text-primary">
                     Sep 1 - Sep 30
@@ -518,13 +524,13 @@ export default function PnLDeepDive() {
               </div>
               <div className="bg-surface-variant/40 rounded-xl p-4 mb-6 border border-border">
                 <div className="flex justify-between border-b border-border pb-3 mb-3">
-                  <span className="text-xs text-text-secondary font-medium">Category</span>
+                  <span className="text-xs text-text-secondary font-medium">{t('thCategory')}</span>
                   <span className="text-xs font-semibold text-text-primary">
                     {selectedInvoice.category}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-text-secondary font-medium">Usage</span>
+                  <span className="text-xs text-text-secondary font-medium">{t('usageLabel')}</span>
                   <span className="text-xs font-mono font-semibold text-text-primary">
                     {selectedInvoice.usage}
                   </span>
@@ -532,7 +538,7 @@ export default function PnLDeepDive() {
               </div>
               <div className="flex justify-between items-center px-4 py-3 bg-text-primary text-white rounded-xl shadow-inner">
                 <span className="text-xs font-bold uppercase tracking-wide opacity-90">
-                  Total Due
+                  {t('totalDue')}
                 </span>
                 <span className="text-xl font-mono font-bold">{selectedInvoice.cost}</span>
               </div>
@@ -540,7 +546,7 @@ export default function PnLDeepDive() {
             {/* Modal Footer */}
             <div className="px-6 py-4 border-t border-border flex justify-end bg-surface-variant/20">
               <Button onClick={() => setSelectedInvoice(null)} variant="secondary">
-                Close Invoice
+                {t('closeInvoice')}
               </Button>
             </div>
           </div>
@@ -548,7 +554,7 @@ export default function PnLDeepDive() {
       )}
 
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 bg-text-primary text-white px-4 py-3 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 z-[9999] animate-[slideUp_0.2s_ease-out]">
+        <div className="fixed bottom-6 inset-e-6 bg-text-primary text-white px-4 py-3 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 z-[9999] animate-[slideUp_0.2s_ease-out]">
           <svg
             className="w-4 h-4 text-status-success"
             viewBox="0 0 24 24"

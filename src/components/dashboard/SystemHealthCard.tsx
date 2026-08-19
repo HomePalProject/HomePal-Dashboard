@@ -3,12 +3,14 @@ import { useAuthStore } from '@store/authStore';
 import { Card } from '@components/ui/Card';
 import { Button } from '@components/ui/Button';
 import { api } from '@services/api';
+import { useTranslation } from 'react-i18next';
 
 interface SystemHealthCardProps {
   delay?: number;
 }
 
 export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
+  const { t } = useTranslation('overview');
   const [vis, setVis] = useState(false);
   const [status, setStatus] = useState<'checking' | 'online' | 'offline'>('checking');
 
@@ -42,7 +44,7 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
       }`}
     >
       <div className="text-[10px] font-bold tracking-[0.12em] text-white/55 uppercase mb-6">
-        System Health
+        {t('systemHealth')}
       </div>
 
       <div className="relative w-28 h-28 mb-6 flex items-center justify-center">
@@ -67,14 +69,10 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
       </div>
 
       <div className="text-sm font-bold text-white mb-2">
-        {isChecking ? 'Checking…' : isOnline ? 'Stable & Online' : 'Service Offline'}
+        {isChecking ? t('checking') : isOnline ? t('stableAndOnline') : t('serviceOffline')}
       </div>
       <div className="text-xs text-white/55 mb-6">
-        {isChecking
-          ? 'Pinging API server…'
-          : isOnline
-            ? 'All systems operational.'
-            : 'Cannot reach the API.'}
+        {isChecking ? t('pingingApi') : isOnline ? t('allOperational') : t('cannotReachApi')}
       </div>
 
       <Button
@@ -82,7 +80,7 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
         size="sm"
         className="text-white hover:bg-white/10 uppercase tracking-widest text-[10px] px-6 py-2"
       >
-        Details
+        {t('details')}
       </Button>
     </Card>
   );

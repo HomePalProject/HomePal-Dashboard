@@ -8,9 +8,11 @@ import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
 import type { RevenueData } from '@typeDefs/analyticsTypes';
 import type { TokenUsageMetrics } from '@typeDefs/tokenUsageTypes';
 import { StatCard } from '@components/stats/StatCard';
-import { getLocalString } from '@lib/formatters';
+import { getLocalString, getLocalizedCulture } from '@lib/formatters';
+import { useTranslation } from 'react-i18next';
 
 export default function Stats() {
+  const { t, i18n } = useTranslation('stats');
   const navigate = useNavigate();
   const [data, setData] = useState<AnalyticsOverviewData | null>(null);
   const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
@@ -48,7 +50,7 @@ export default function Stats() {
   if (loading) {
     return (
       <div className="p-12 text-center text-xs font-bold text-[#6d6862] bg-white rounded-2xl border border-[#e4e0da]">
-        Loading analytics overview...
+        {t('loadingOverview')}
       </div>
     );
   }
@@ -104,7 +106,10 @@ export default function Stats() {
 
     if (totalOffersCount > 0) {
       const computed = supermarkets.map((s) => {
-        const nameStr = getLocalString(s.name) || 'Supermarket';
+        const nameStr =
+          getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+          getLocalString(s.name) ||
+          'Supermarket';
         const sOffers = offers.filter(
           (o) => o.supermarketId === s.id || o.supermarketName === nameStr
         ).length;
@@ -128,7 +133,10 @@ export default function Stats() {
     const remainder = 100 - equalShare * supermarkets.length;
 
     return supermarkets.map((s, idx) => ({
-      name: getLocalString(s.name) || 'Supermarket',
+      name:
+        getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+        getLocalString(s.name) ||
+        'Supermarket',
       value: equalShare + (idx === 0 ? remainder : 0),
     }));
   };
@@ -143,11 +151,9 @@ export default function Stats() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-[#2d2a26] tracking-tight m-0">
-            Analytics Overview
+            {t('title')}
           </h1>
-          <p className="text-xs text-[#6d6862] mt-1 m-0">
-            Platform performance and consumer metrics derived from live catalog endpoints.
-          </p>
+          <p className="text-xs text-[#6d6862] mt-1 m-0">{t('subtitle')}</p>
         </div>
         <div className="flex gap-3 flex-wrap sm:flex-nowrap w-full sm:w-auto">
           <button className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-[#356859] hover:bg-[#2a5347] text-white border-none rounded-xl text-xs font-bold cursor-pointer transition-colors shadow-xs">
@@ -158,15 +164,16 @@ export default function Stats() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              className="rtl:rotate-180"
             >
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            Export Report
+            {t('exportReport')}
           </button>
           <div className="flex-1 sm:flex-none flex justify-center items-center px-5 py-2.5 bg-white border border-[#e4e0da] rounded-xl text-xs font-bold text-[#2d2a26] shadow-xs">
-            Live Synced
+            {t('liveSynced')}
           </div>
         </div>
       </div>
@@ -174,7 +181,7 @@ export default function Stats() {
       {/* ── Stat Cards ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <StatCard
-          title="Revenue (Current Cycle)"
+          title={t('revenueTitle')}
           value={liveRevenue}
           change={revenueChange}
           isCurrency
@@ -194,7 +201,7 @@ export default function Stats() {
           onClick={() => navigate('/dashboard/pnl-deep-dive')}
         />
         <StatCard
-          title="AI Server Costs"
+          title={t('aiServerCostsTitle')}
           value={liveCost}
           change={serverCostChange}
           isCurrency
@@ -215,7 +222,7 @@ export default function Stats() {
           }
         />
         <StatCard
-          title="Net Margin"
+          title={t('netMarginTitle')}
           value={liveNetMargin}
           change={netMarginChange}
           isPercent
@@ -243,17 +250,17 @@ export default function Stats() {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
-                Top Supermarket Chains
+                {t('topSupermarketChainsTitle')}
               </h2>
               <p className="text-xs text-[#6d6862] m-0 mt-0.5">
-                Calculated from live supermarket catalog offers.
+                {t('topSupermarketChainsSubtitle')}
               </p>
             </div>
             <button
               onClick={() => navigate('/dashboard/supermarket-performance')}
               className="bg-transparent border-none text-[#356859] text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
             >
-              View All
+              {t('viewAll')}
               <svg
                 width="12"
                 height="12"
@@ -261,6 +268,7 @@ export default function Stats() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
+                className="rtl:rotate-180"
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
@@ -322,14 +330,12 @@ export default function Stats() {
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#faf8f3] rounded-xl border border-dashed border-[#e4e0da] text-center space-y-2">
-              <span className="text-xs font-bold text-[#6d6862]">
-                No partner supermarkets registered yet.
-              </span>
+              <span className="text-xs font-bold text-[#6d6862]">{t('noChains')}</span>
               <button
                 onClick={() => navigate('/dashboard/supermarket-performance')}
                 className="px-3 py-1.5 bg-[#356859] text-white text-xs font-bold rounded-lg border-none cursor-pointer"
               >
-                Add Supermarket
+                {t('addSupermarket')}
               </button>
             </div>
           )}
@@ -339,13 +345,13 @@ export default function Stats() {
         <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs">
           <div className="flex justify-between items-start mb-1">
             <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
-              Receipt Parsing Accuracy
+              {t('receiptParsingAccuracyTitle')}
             </h2>
             <button
               onClick={() => navigate('/dashboard/ai-token-usage')}
               className="bg-transparent border-none text-[#356859] text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
             >
-              Logs
+              {t('logs')}
               <svg
                 width="12"
                 height="12"
@@ -353,14 +359,13 @@ export default function Stats() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
+                className="rtl:rotate-180"
               >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </button>
           </div>
-          <p className="text-xs text-[#6d6862] mb-6 mt-0">
-            Receipt image processing accuracy & fallback rates.
-          </p>
+          <p className="text-xs text-[#6d6862] mb-6 mt-0">{t('receiptParsingAccuracySubtitle')}</p>
 
           <div className="flex gap-6 items-center">
             {/* Donut Chart via CSS in HomePal Brand Colors */}
@@ -375,7 +380,7 @@ export default function Stats() {
                   {(visionHealth.autoParsedPercentage || 100).toFixed(0)}%
                 </span>
                 <span className="text-[9px] font-bold text-[#6d6862] uppercase tracking-wider">
-                  Success
+                  {t('success')}
                 </span>
               </div>
             </div>
@@ -383,17 +388,17 @@ export default function Stats() {
             <div className="flex-1 flex flex-col gap-3">
               {[
                 {
-                  label: 'Auto-Parsed',
+                  label: t('autoParsed'),
                   val: visionHealth.autoParsedPercentage || 100,
                   color: '#356859',
                 },
                 {
-                  label: 'Manual Fallback',
+                  label: t('manualFallback'),
                   val: visionHealth.manualFallbackPercentage || 0,
                   color: '#d99a3d',
                 },
                 {
-                  label: 'Failed',
+                  label: t('failed'),
                   val: visionHealth.failedPercentage || 0,
                   color: '#d9534f',
                 },
@@ -430,15 +435,15 @@ export default function Stats() {
           <div className="flex justify-between items-start z-10 mb-2 gap-4">
             <div>
               <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
-                Regional Distribution Map
+                {t('regionalDistributionTitle')}
               </h2>
               <p className="text-xs text-[#6d6862] z-10 mt-1 m-0">
-                Household density heat-mapping by district.
+                {t('regionalDistributionSubtitle')}
               </p>
             </div>
             <button className="bg-white hover:bg-[#e4e0da]/30 text-[#356859] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#e4e0da] cursor-pointer flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 mt-0.5 shadow-xs">
               <span className="w-1.5 h-1.5 rounded-full bg-[#356859] animate-pulse" />
-              <span>Live Data</span>
+              <span>{t('liveData')}</span>
             </button>
           </div>
 
@@ -448,7 +453,7 @@ export default function Stats() {
             <img
               src="/regional-map.jpg"
               alt="Regional Distribution"
-              className="w-full h-[150%] object-cover object-center opacity-85 mix-blend-multiply transition-transform duration-1000 group-hover:scale-105"
+              className="w-full h-[150%] object-cover object-center opacity-85 mix-blinset-e-multiply transition-transform duration-1000 group-hover:scale-105"
             />
             <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#faf8f3] to-transparent z-10 pointer-events-none" />
           </div>
@@ -457,9 +462,9 @@ export default function Stats() {
           <div className="relative z-10 flex-1 flex items-center justify-center pointer-events-none mt-16">
             <div className="bg-[#fdfcf9] border border-[#e4e0da] rounded-xl px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center transition-transform duration-300 group-hover:-translate-y-1">
               <span className="text-[#2d2a26] font-extrabold text-[13px] mb-1">
-                Central District
+                {t('centralDistrict')}
               </span>
-              <span className="text-[#356859] font-bold text-xs">+12% New Households</span>
+              <span className="text-[#356859] font-bold text-xs">{t('newHouseholds')}</span>
             </div>
           </div>
         </div>
@@ -468,11 +473,9 @@ export default function Stats() {
         <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <h2 className="text-base font-extrabold text-[#2d2a26] m-0 mb-1">
-              Top Grocery Categories
+              {t('topGroceryCategoriesTitle')}
             </h2>
-            <p className="text-xs text-[#6d6862] m-0 mb-6">
-              Household demand distribution by product category.
-            </p>
+            <p className="text-xs text-[#6d6862] m-0 mb-6">{t('topGroceryCategoriesSubtitle')}</p>
           </div>
 
           {categories.length > 0 ? (
@@ -482,7 +485,8 @@ export default function Stats() {
                   <div className="flex justify-between text-xs font-bold text-[#2d2a26]">
                     <span className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-[#356859]" />
-                      {cat.name}
+                      {getLocalizedCulture(cat.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                        getLocalString(cat.name)}
                     </span>
                     <span className="text-[#356859] font-extrabold">{cat.percentage}%</span>
                   </div>
@@ -497,7 +501,7 @@ export default function Stats() {
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center p-6 bg-[#faf8f3] rounded-xl text-xs text-[#6d6862]">
-              No category analytics data yet.
+              {t('noCategories')}
             </div>
           )}
         </div>

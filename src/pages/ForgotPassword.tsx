@@ -7,8 +7,10 @@ import { api } from '@services/api';
 import { AuthLayout } from '@components/auth/AuthLayout';
 import { AuthHeader } from '@components/auth/AuthHeader';
 import { getErrorMessage } from '@lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function ForgotPassword() {
+  const { t } = useTranslation('auth');
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
@@ -47,18 +49,17 @@ export default function ForgotPassword() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-typography-h2 text-text-primary mb-[8px]">Check your inbox</h2>
+          <h2 className="text-typography-h2 text-text-primary mb-2">{t('checkInbox')}</h2>
           <p className="text-typography-body text-text-secondary mb-2">
-            We've sent a password reset link to{' '}
-            <strong className="text-text-primary">{email}</strong>. Check your spam folder if you
-            don't see it within a few minutes.
+            {t('resetSentDesc1')} <strong className="text-text-primary">{email}</strong>.{' '}
+            {t('resetSentDesc2')}
           </p>
           <Link
             to="/login"
             className="text-sm font-medium text-primary hover:text-primary-active transition-colors inline-flex items-center gap-1.5"
           >
             <svg
-              className="w-4 h-4"
+              className="w-4 h-4 rtl:rotate-180"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -66,36 +67,33 @@ export default function ForgotPassword() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Sign In
+            {t('backToSignIn')}
           </Link>
         </div>
       ) : (
         <>
-          <AuthHeader
-            title="Forgot password?"
-            subtitle="Enter your admin email and we'll send you a link to reset your password."
-          />
+          <AuthHeader title={t('forgotPasswordTitle')} subtitle={t('forgotPasswordSubtitle')} />
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-6">
             <InputField
-              label="Email Address"
+              label={t('emailAddress')}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@homepal.com"
+              placeholder={t('emailAddressPlaceholder')}
               required
               fullWidth
             />
 
             {isError && (
               <div className="p-3 bg-status-error-container text-status-error rounded-3xl text-sm font-medium border border-status-error/20">
-                {getErrorMessage(error, 'Failed to send reset email. Please try again.')}
+                {getErrorMessage(error, t('failedSendReset'))}
               </div>
             )}
 
-            <div className="pt-[8px]">
+            <div className="pt-2">
               <Button type="submit" fullWidth isLoading={isPending}>
-                Send Reset Link
+                {t('sendResetLink')}
               </Button>
             </div>
           </form>
@@ -106,7 +104,7 @@ export default function ForgotPassword() {
               className="text-sm font-medium text-text-secondary hover:text-primary transition-colors inline-flex items-center gap-1.5"
             >
               <svg
-                className="w-4 h-4"
+                className="w-4 h-4 rtl:rotate-180"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -118,7 +116,7 @@ export default function ForgotPassword() {
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              Back to Sign In
+              {t('backToSignIn')}
             </Link>
           </div>
         </>

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface JarSpec {
   height: number;
   fill: number;
@@ -45,13 +47,17 @@ function Shelf({ jars }: { jars: JarSpec[] }) {
 }
 
 export function PantryShelfCard() {
+  const { t } = useTranslation('auth');
+
   return (
     <div className="mt-10 w-full max-w-xs bg-surface rounded-3xl shadow-xl p-5 motion-safe:animate-[slideUp_0.6s_ease-out_240ms_both]">
       <div className="flex items-center justify-between mb-4">
         <span className="text-typography-label text-text-secondary uppercase tracking-widest">
-          Pantry
+          {t('pantry')}
         </span>
-        <span className="text-typography-caption text-text-disabled">12 items</span>
+        <span className="text-typography-caption text-text-disabled">
+          {t('pantryItems', { count: 12 })}
+        </span>
       </div>
 
       <div className="flex flex-col gap-5">
@@ -60,8 +66,10 @@ export function PantryShelfCard() {
       </div>
 
       <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-        <span className="text-typography-caption text-text-disabled">2 running low</span>
-        <span className="text-typography-label text-primary">HomePal</span>
+        <span className="text-typography-caption text-text-disabled">
+          {t('runningLow', { count: 2 })}
+        </span>
+        <span className="text-typography-label text-primary">{t('common:homepal')}</span>
       </div>
     </div>
   );

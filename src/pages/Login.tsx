@@ -5,35 +5,33 @@ import { Button } from '@components/ui/Button';
 import { useAuth } from '@hooks/useAuth';
 import { AuthLayout } from '@components/auth/AuthLayout';
 import { AuthHeader } from '@components/auth/AuthHeader';
+import { useTranslation } from 'react-i18next';
 
 import { isAxiosError } from 'axios';
 
 export default function Login() {
+  const { t } = useTranslation('auth');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { mutate: login, isPending, isError, error } = useAuth();
 
   const getErrorMessage = () => {
-    if (!error) return 'Login failed. Please try again.';
+    if (!error) return t('loginFailed');
     if (!navigator.onLine || (isAxiosError(error) && error.code === 'ERR_NETWORK')) {
-      return 'Network Error: Unable to connect to the server. Please check your internet connection.';
+      return t('networkError');
     }
     if (isAxiosError(error)) {
       const status = error.response?.status;
       if (status === 401 || status === 400) {
-        return 'Invalid credentials. Please check your email/username and password.';
+        return t('invalidCredentials');
       }
-      return (
-        error.response?.data?.message ||
-        error.response?.data?.title ||
-        'Login failed. Please check your credentials and try again.'
-      );
+      return error.response?.data?.message || error.response?.data?.title || t('loginFailed');
     }
     if (error instanceof Error) {
       return error.message;
     }
-    return 'Login failed. Please check your credentials and try again.';
+    return t('loginFailed');
   };
 
   const handleSubmit = (e: React.SyntheticEvent) => {
@@ -43,29 +41,29 @@ export default function Login() {
 
   return (
     <AuthLayout>
-      <AuthHeader title="Hi, Welcome Back!" subtitle="Sign in to your admin account." />
+      <AuthHeader title={t('welcomeBack')} subtitle={t('signInSubtitle')} />
 
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-5 motion-safe:animate-[slideUp_0.6s_ease-out_80ms_both]"
+        className="flex flex-col gap-4 mt-6 motion-safe:animate-[slideUp_0.6s_ease-out_80ms_both]"
       >
         <InputField
-          label="Email or Username"
+          label={t('emailOrUsername')}
           type="text"
           value={identifier}
           onChange={(e) => setIdentifier(e.target.value)}
-          placeholder="admin@homepal.com or admin123"
+          placeholder={t('emailOrUsernamePlaceholder')}
           required
           fullWidth
         />
 
         <div className="flex flex-col gap-1.5">
           <InputField
-            label="Password"
+            label={t('password')}
             type={showPassword ? 'text' : 'password'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
+            placeholder={t('passwordPlaceholder')}
             required
             fullWidth
             rightElement={
@@ -118,7 +116,7 @@ export default function Login() {
               to="/forgot-password"
               className="text-[13px] font-medium text-primary hover:text-primary-active transition-colors"
             >
-              Forgot password?
+              {t('forgotPassword')}
             </Link>
           </div>
         </div>
@@ -129,9 +127,9 @@ export default function Login() {
           </div>
         )}
 
-        <div className="pt-[8px]">
+        <div className="pt-2">
           <Button type="submit" fullWidth isLoading={isPending}>
-            Sign In
+            {t('signIn')}
           </Button>
         </div>
       </form>

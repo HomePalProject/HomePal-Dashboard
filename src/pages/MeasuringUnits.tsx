@@ -4,7 +4,26 @@ import type { MeasuringUnit } from '@typeDefs/measuringUnitTypes';
 
 import { fetchBilingual } from '@lib/localization';
 import { Button } from '@components/ui/Button';
+import { Skeleton } from '@components/ui/Skeleton';
 import { useTranslation } from 'react-i18next';
+
+function MeasuringUnitsTableSkeleton() {
+  return (
+    <div className="divide-y divide-slate-100">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 pl-6 pr-6 py-4">
+          <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+            <Skeleton className="h-3 rounded w-1/3" />
+            <Skeleton className="h-2.5 rounded w-1/4" />
+          </div>
+          <Skeleton className="h-3 w-10 rounded hidden sm:block" />
+          <Skeleton className="h-3 w-20 rounded hidden sm:block" />
+          <Skeleton className="h-5 w-16 rounded-2xl shrink-0" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return 'Aug 13, 2026';
@@ -98,7 +117,7 @@ const SEED_UNITS: MeasuringUnit[] = [
 ];
 
 export default function MeasuringUnits() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation(['measuringUnits', 'common']);
   const [units, setUnits] = useState<MeasuringUnit[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -149,7 +168,7 @@ export default function MeasuringUnits() {
     } finally {
       setLoading(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, i18n.language]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -187,7 +206,7 @@ export default function MeasuringUnits() {
           ],
         };
       } catch {
-        showToast('Could not load both languages — showing available data only.');
+        showToast(t('toastBilingualLoadError'));
       } finally {
         setLoadingEditId(null);
       }
@@ -206,7 +225,7 @@ export default function MeasuringUnits() {
   const handleSaveUnit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!nameEn.trim() && !nameAr.trim()) {
-      showToast('Please enter at least one unit name (English or Arabic)');
+      showToast(t('toastRequiredName'));
       return;
     }
 
@@ -225,7 +244,7 @@ export default function MeasuringUnits() {
     try {
       if (editingUnit && !editingUnit.id.startsWith('seed-')) {
         await measuringUnitService.updateUnit(editingUnit.id, payload);
-        showToast('Measuring unit updated successfully!');
+        showToast(t('toastUpdateSuccess'));
       } else if (editingUnit && editingUnit.id.startsWith('seed-')) {
         // Local seed update simulation
         setUnits((prev) =>
@@ -233,10 +252,10 @@ export default function MeasuringUnits() {
             u.id === editingUnit.id ? { ...u, name: payload.name, symbol: payload.symbol } : u
           )
         );
-        showToast('Measuring unit updated!');
+        showToast(t('toastUpdateSuccess'));
       } else {
         const created = await measuringUnitService.createUnit(payload);
-        showToast('New measuring unit created successfully!');
+        showToast(t('toastAddSuccess'));
         if (created?.id) {
           setUnits((prev) => [created, ...prev]);
         }
@@ -258,7 +277,7 @@ export default function MeasuringUnits() {
         setUnits((prev) => [newUnit, ...prev]);
       }
       setIsModalOpen(false);
-      showToast('Unit saved successfully!');
+      showToast(editingUnit ? t('toastUpdateSuccess') : t('toastAddSuccess'));
     } finally {
       setIsSubmitting(false);
     }
@@ -272,11 +291,11 @@ export default function MeasuringUnits() {
         await measuringUnitService.deleteUnit(deleteTarget.id);
       }
       setUnits((prev) => prev.filter((u) => u.id !== deleteTarget.id));
-      showToast('Measuring unit deleted successfully');
+      showToast(t('toastDeleteSuccess'));
     } catch (err) {
       console.error('Failed to delete unit:', err);
       setUnits((prev) => prev.filter((u) => u.id !== deleteTarget.id));
-      showToast('Measuring unit deleted');
+      showToast(t('toastDeleteSuccess'));
     } finally {
       setIsSubmitting(false);
       setDeleteTarget(null);
@@ -296,9 +315,7 @@ export default function MeasuringUnits() {
       {/* Title Area */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight m-0">
-            Measuring Units Management
-          </h1>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight m-0">{t('title')}</h1>
         </div>
 
         {/* Action Controls */}
@@ -321,7 +338,7 @@ export default function MeasuringUnits() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search unit by name or symbol..."
+              placeholder={t('searchPlaceholder')}
               className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none hover:border-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-[#1F3D32]/10 transition-all shadow-2xs"
             />
           </div>
@@ -343,7 +360,7 @@ export default function MeasuringUnits() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            <span>Add Measuring Unit</span>
+            <span>{t('addUnit')}</span>
           </Button>
         </div>
       </div>
@@ -351,9 +368,7 @@ export default function MeasuringUnits() {
       {/* Measuring Units Table Container Card */}
       <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs flex flex-col">
         {loading ? (
-          <div className="p-16 text-center text-slate-400 text-xs font-semibold">
-            Loading measuring units...
-          </div>
+          <MeasuringUnitsTableSkeleton />
         ) : units.length === 0 ? (
           <div className="p-16 text-center flex flex-col items-center justify-center gap-2">
             <svg
@@ -367,21 +382,21 @@ export default function MeasuringUnits() {
             >
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
             </svg>
-            <p className="text-sm font-bold text-slate-700 m-0">No measuring units found</p>
-            <p className="text-xs text-slate-400 m-0">
-              Click "Add Measuring Unit" above to create product units.
-            </p>
+            <p className="text-sm font-bold text-slate-700 m-0">{t('noUnitsFound')}</p>
+            <p className="text-xs text-slate-400 m-0">{t('noUnitsDesc')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                  <th className="pl-6 pr-4 py-3.5 whitespace-nowrap">UNIT NAME (EN / AR)</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">SYMBOL (EN / AR)</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">CREATED AT</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">STATUS</th>
-                  <th className="pr-6 pl-4 py-3.5 text-right whitespace-nowrap">ACTIONS</th>
+                  <th className="pl-6 pr-4 py-3.5 whitespace-nowrap">{t('thName')}</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thSymbol')}</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thCreated')}</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thStatus')}</th>
+                  <th className="pr-6 pl-4 py-3.5 text-right whitespace-nowrap">
+                    {t('thActions')}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -424,7 +439,7 @@ export default function MeasuringUnits() {
                       <td className="px-4 py-4 whitespace-nowrap">
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          Active
+                          {t('statusActive')}
                         </span>
                       </td>
 
@@ -435,7 +450,7 @@ export default function MeasuringUnits() {
                           <button
                             onClick={() => void handleOpenEditModal(unit)}
                             disabled={loadingEditId === unit.id}
-                            title="Edit Unit"
+                            title={t('editUnitTitle')}
                             className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-none bg-transparent cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <svg
@@ -454,7 +469,7 @@ export default function MeasuringUnits() {
                           {/* Delete Button */}
                           <button
                             onClick={() => setDeleteTarget(unit)}
-                            title="Delete Unit"
+                            title={t('deleteUnitTitle')}
                             className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 border-none bg-transparent cursor-pointer transition-colors"
                           >
                             <svg
@@ -493,7 +508,7 @@ export default function MeasuringUnits() {
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
               <h3 className="text-sm font-extrabold text-slate-900 m-0">
-                {editingUnit ? 'Edit Measuring Unit' : 'Add New Measuring Unit'}
+                {editingUnit ? t('modalTitleEdit') : t('modalTitleAdd')}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -519,13 +534,13 @@ export default function MeasuringUnits() {
                 {/* ENGLISH UNIT NAME */}
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
-                    ENGLISH UNIT NAME
+                    {t('labelNameEn')}
                   </label>
                   <input
                     type="text"
                     value={nameEn}
                     onChange={(e) => setNameEn(e.target.value)}
-                    placeholder="e.g. Kilogram"
+                    placeholder={t('placeholderNameEn')}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-colors shadow-2xs"
                   />
                 </div>
@@ -533,14 +548,14 @@ export default function MeasuringUnits() {
                 {/* ARABIC UNIT NAME */}
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
-                    ARABIC UNIT NAME
+                    {t('labelNameAr')}
                   </label>
                   <input
                     type="text"
                     dir="rtl"
                     value={nameAr}
                     onChange={(e) => setNameAr(e.target.value)}
-                    placeholder="مثال: كيلوجرام"
+                    placeholder={t('placeholderNameAr')}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-colors shadow-2xs text-right"
                   />
                 </div>
@@ -550,13 +565,13 @@ export default function MeasuringUnits() {
                 {/* ENGLISH SYMBOL */}
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
-                    ENGLISH SYMBOL
+                    {t('labelSymbolEn')}
                   </label>
                   <input
                     type="text"
                     value={symbolEn}
                     onChange={(e) => setSymbolEn(e.target.value)}
-                    placeholder="e.g. kg"
+                    placeholder={t('placeholderSymbolEn')}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-colors shadow-2xs"
                   />
                 </div>
@@ -564,14 +579,14 @@ export default function MeasuringUnits() {
                 {/* ARABIC SYMBOL */}
                 <div className="flex flex-col gap-1">
                   <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
-                    ARABIC SYMBOL
+                    {t('labelSymbolAr')}
                   </label>
                   <input
                     type="text"
                     dir="rtl"
                     value={symbolAr}
                     onChange={(e) => setSymbolAr(e.target.value)}
-                    placeholder="مثال: كجم"
+                    placeholder={t('placeholderSymbolAr')}
                     className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 outline-none focus:border-slate-400 transition-colors shadow-2xs text-right"
                   />
                 </div>
@@ -580,10 +595,10 @@ export default function MeasuringUnits() {
               {/* Modal Footer Actions */}
               <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
                 <Button variant="secondary" type="button" onClick={() => setIsModalOpen(false)}>
-                  Cancel
+                  {t('common:cancel', 'Cancel')}
                 </Button>
                 <Button variant="primary" type="submit" isLoading={isSubmitting}>
-                  {editingUnit ? 'Update Unit' : 'Save Unit'}
+                  {editingUnit ? t('btnUpdate') : t('btnSave')}
                 </Button>
               </div>
             </form>
@@ -611,20 +626,18 @@ export default function MeasuringUnits() {
               </div>
               <div className="flex flex-col">
                 <h3 className="text-sm font-extrabold text-slate-900 m-0">
-                  Delete Measuring Unit?
+                  {t('deleteModalTitle')}
                 </h3>
-                <p className="text-xs text-slate-500 m-0 mt-0.5">
-                  Are you sure you want to delete this measuring unit? This action cannot be undone.
-                </p>
+                <p className="text-xs text-slate-500 m-0 mt-0.5">{t('deleteModalDesc')}</p>
               </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 mt-2">
               <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
-                Cancel
+                {t('common:cancel', 'Cancel')}
               </Button>
               <Button variant="danger" onClick={handleDeleteUnit} isLoading={isSubmitting}>
-                Delete
+                {t('delete')}
               </Button>
             </div>
           </div>

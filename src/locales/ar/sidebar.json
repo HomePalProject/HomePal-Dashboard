@@ -1,0 +1,16 @@
+{
+  "overview": "نظرة عامة",
+  "preferences": "التفضيلات",
+  "categories": "فئات المنتجات",
+  "households": "الأسر",
+  "supermarkets": "السوبر ماركت",
+  "offersNav": "إدارة العروض",
+  "offersPage": "مركز العروض",
+  "stats": "التحليلات",
+  "users": "إدارة المستخدمين",
+  "scrapingNav": "مراقبة العروض",
+  "scrapingPage": "خط أنابيب سحب العروض",
+  "measuringUnits": "وحدات القياس",
+  "profile": "إعدادات الحساب",
+  "aiToken": "استهلاك الذكاء الاصطناعي"
+}

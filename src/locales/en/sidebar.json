@@ -1,0 +1,16 @@
+{
+  "overview": "Overview",
+  "preferences": "Preferences",
+  "categories": "Product Categories",
+  "households": "Households",
+  "supermarkets": "Supermarkets",
+  "offersNav": "Offers Management",
+  "offersPage": "Offers Hub",
+  "stats": "Analytics",
+  "users": "User Management",
+  "scrapingNav": "Scraping Pipeline",
+  "scrapingPage": "Offer Scraping Pipeline",
+  "measuringUnits": "Measuring Units",
+  "profile": "Account Settings",
+  "aiToken": "AI Token Usage"
+}

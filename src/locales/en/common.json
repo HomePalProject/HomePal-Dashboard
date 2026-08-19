@@ -1,0 +1,14 @@
+{
+  "homepal": "HomePal",
+  "logout": "Sign Out",
+  "cancel": "Cancel",
+  "save": "Save",
+  "loading": "Loading...",
+  "viewProfile": "View Profile",
+  "adminProfile": "Admin Profile",
+  "executivePanel": "Executive Panel",
+  "grid": "Grid",
+  "table": "Table",
+  "totalUnits": "Total Units: {{count}}",
+  "managementSystem": "HomePal Management System v2.4"
+}

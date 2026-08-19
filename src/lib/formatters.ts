@@ -59,7 +59,7 @@ export function getHour(): 'morning' | 'afternoon' | 'evening' {
 
 export function getLocalizedCulture(val: unknown, lang: 'en' | 'ar'): string {
   if (!val) return '';
-  if (typeof val === 'string') return lang === 'en' ? val : '';
+  if (typeof val === 'string') return val;
   if (Array.isArray(val)) {
     const match = val.find((item: any) => {
       const code = (item.culture || item.languageCode || '').toLowerCase();

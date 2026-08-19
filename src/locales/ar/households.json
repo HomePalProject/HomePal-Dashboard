@@ -1,0 +1,17 @@
+{
+  "loading": "جاري تحميل بيانات الأسر المجمعة...",
+  "title": "تحليلات الأسر",
+  "privacyBadge": "أمن الخصوصية",
+  "privacyDesc": "مقاييس المنصة المجمعة. يتم تقييد معلومات الهوية الشخصية (PII) عمداً من لوحة التحكم هذه لضمان خصوصية البيانات.",
+  "fallbackData": "عرض البيانات الاحتياطية",
+  "totalRegistered": "إجمالي المسجلين",
+  "yoy": "مقارنة بالعام الماضي",
+  "activeThisMonth": "النشطين هذا الشهر",
+  "activityRate": "معدل النشاط 94%",
+  "avgHouseholdSize": "متوسط حجم الأسرة",
+  "membersPerHousehold": "أفراد / أسرة",
+  "avgMonthlyIncome": "متوسط الدخل الشهري",
+  "selfReported": "تقرير ذاتي",
+  "adoptionByRegion": "الاعتماد حسب المنطقة",
+  "sizeDemographics": "التركيبة السكانية لحجم الأسرة"
+}

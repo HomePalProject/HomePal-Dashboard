@@ -1,0 +1,17 @@
+{
+  "loading": "Loading aggregated household data...",
+  "title": "Households Analytics",
+  "privacyBadge": "Privacy Safe",
+  "privacyDesc": "Aggregated platform metrics. Personally Identifiable Information (PII) is intentionally restricted from this dashboard to ensure data privacy.",
+  "fallbackData": "Showing fallback data",
+  "totalRegistered": "Total Registered",
+  "yoy": "YoY",
+  "activeThisMonth": "Active This Month",
+  "activityRate": "94% Activity Rate",
+  "avgHouseholdSize": "Avg Household Size",
+  "membersPerHousehold": "Members / Household",
+  "avgMonthlyIncome": "Avg Monthly Income",
+  "selfReported": "Self-reported",
+  "adoptionByRegion": "Adoption by Region",
+  "sizeDemographics": "Household Size Demographics"
+}

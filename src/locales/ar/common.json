@@ -1,0 +1,14 @@
+{
+  "homepal": "هوم بال",
+  "logout": "تسجيل الخروج",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "loading": "جاري التحميل...",
+  "viewProfile": "عرض الملف الشخصي",
+  "adminProfile": "ملف المسؤول",
+  "executivePanel": "لوحة الإدارة",
+  "grid": "شبكة",
+  "table": "جدول",
+  "totalUnits": "إجمالي الوحدات: {{count}}",
+  "managementSystem": "نظام إدارة هوم بال إصدار 2.4"
+}

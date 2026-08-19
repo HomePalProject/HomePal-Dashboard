@@ -14,6 +14,10 @@ api.interceptors.request.use(
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    const currentLang = localStorage.getItem('hp-language') || 'en';
+    if (config.headers) {
+      config.headers['Accept-Language'] = currentLang;
+    }
     return config;
   },
   (error) => Promise.reject(error)

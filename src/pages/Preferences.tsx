@@ -235,7 +235,7 @@ export default function Preferences() {
         </button>
       </div>
 
-      <div className="overflow-x-auto mb-6">
+      <div className="overflow-x-auto overflow-y-hidden scrollbar-none mb-6">
         <div className="flex border-b-[1.5px] border-border min-w-max">
           {(['preferences', 'categories'] as Tab[]).map((tab) => (
             <button

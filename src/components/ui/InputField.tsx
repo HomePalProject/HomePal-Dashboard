@@ -22,7 +22,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             id={inputId}
             ref={ref}
             className={`min-h-11 px-4 py-3 rounded-2xl border text-base bg-surface text-text-primary transition-colors focus:outline-none focus:ring-2 w-full ${
-              rightElement ? 'pr-10' : ''
+              rightElement ? 'pe-10' : ''
             } ${
               error
                 ? 'border-status-error focus:ring-status-error focus:border-status-error'
@@ -31,7 +31,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             {...props}
           />
           {rightElement && (
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3">{rightElement}</div>
+            <div className="absolute inset-y-0 inset-e-0 flex items-center pe-3">
+              {rightElement}
+            </div>
           )}
         </div>
         {error && <span className="text-xs text-status-error font-medium">{error}</span>}

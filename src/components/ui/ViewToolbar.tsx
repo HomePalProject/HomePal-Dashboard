@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Button } from './Button';
 import { cn } from '@lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export interface ViewToolbarProps {
   searchQuery?: string;
@@ -23,6 +24,8 @@ export function ViewToolbar({
   metaContent,
   primaryAction,
 }: ViewToolbarProps) {
+  const { t } = useTranslation('common');
+
   return (
     <div className="bg-white border border-border rounded-2xl p-3 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 shadow-xs">
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -83,7 +86,7 @@ export function ViewToolbar({
                   <rect x="14" y="14" width="7" height="7" rx="1" />
                   <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
-                <span className="hidden sm:inline">Grid</span>
+                <span className="hidden sm:inline">{t('grid')}</span>
               </Button>
               <Button
                 onClick={() => onViewModeChange('table')}
@@ -111,7 +114,7 @@ export function ViewToolbar({
                   <line x1="3" y1="12" x2="3.01" y2="12" />
                   <line x1="3" y1="18" x2="3.01" y2="18" />
                 </svg>
-                <span className="hidden sm:inline">Table</span>
+                <span className="hidden sm:inline">{t('table')}</span>
               </Button>
             </div>
           )}

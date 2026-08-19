@@ -13,6 +13,7 @@ type Tab = 'preferences' | 'categories';
 import { getCategoryColor, getLocalString, getLocalizedCulture } from '@lib/formatters';
 import { fetchBilingual } from '@lib/localization';
 import { Button } from '@components/ui/Button';
+import { Skeleton } from '@components/ui/Skeleton';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { PreferenceFormModal } from '@components/preferences/PreferenceFormModal';
 import { CategoryFormModal } from '@components/preferences/CategoryFormModal';
@@ -59,7 +60,7 @@ export default function Preferences() {
     } finally {
       setLoadingCats(false);
     }
-  }, []);
+  }, [i18n.language]);
 
   const fetchPreferences = useCallback(async () => {
     setLoadingPrefs(true);
@@ -72,7 +73,7 @@ export default function Preferences() {
     } finally {
       setLoadingPrefs(false);
     }
-  }, [searchQuery, filterCategoryId]);
+  }, [searchQuery, filterCategoryId, i18n.language]);
 
   useEffect(() => {
     void fetchCategories();
@@ -323,9 +324,31 @@ export default function Preferences() {
             ))}
           </div>
 
-          {loading && (
-            <div className="p-12 text-center text-text-secondary text-sm">{t('loading')}</div>
-          )}
+          {loading &&
+            Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  'grid px-5 py-4 items-center gap-4',
+                  i < 5 && 'border-b border-border',
+                  cols
+                )}
+              >
+                {headers.map((h, j) => (
+                  <Skeleton
+                    key={h}
+                    className={cn(
+                      'h-3 rounded',
+                      j === headers.length - 1
+                        ? 'h-6 w-6 rounded-lg justify-self-end'
+                        : j === 1 && isPrefsTab
+                          ? 'h-5 w-16 rounded-full'
+                          : 'w-3/4'
+                    )}
+                  />
+                ))}
+              </div>
+            ))}
 
           {!loading && displayedItems.length === 0 && (
             <div className="p-12 text-center text-text-secondary text-sm">

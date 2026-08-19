@@ -4,8 +4,44 @@ import GridView from '../components/productCategories/Grid';
 import TableView from '../components/productCategories/Table';
 import { ViewToolbar } from '../components/ui/ViewToolbar';
 import { Button } from '../components/ui/Button';
+import { Skeleton } from '../components/ui/Skeleton';
 import useProductCategories from '../hooks/useProductCategories';
 import { useTranslation } from 'react-i18next';
+
+function CategoryGridSkeleton() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div
+          key={i}
+          className="bg-white rounded-[20px] overflow-hidden shadow-sm border border-slate-100"
+        >
+          <Skeleton className="w-full aspect-4/3 rounded-none" />
+          <div className="p-5 flex flex-col gap-2">
+            <Skeleton className="h-3.5 rounded w-3/4" />
+            <Skeleton className="h-3 rounded w-1/2 ms-auto" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CategoryTableSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+      <div className="divide-y divide-slate-100">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 px-16 py-3">
+            <Skeleton className="w-10 h-10 rounded-3xl shrink-0" />
+            <Skeleton className="h-3 rounded w-1/4" />
+            <Skeleton className="h-3 rounded w-1/4 ms-auto" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ProductCategories() {
   const { t } = useTranslation(['categories', 'common']);
@@ -95,7 +131,11 @@ export default function ProductCategories() {
 
       {/* Main content */}
       {loading ? (
-        <div className="py-5 text-center text-slate-400 text-sm font-medium">{t('loading')}</div>
+        viewMode === 'grid' ? (
+          <CategoryGridSkeleton />
+        ) : (
+          <CategoryTableSkeleton />
+        )
       ) : filtered.length === 0 ? (
         <div className="py-5 border-2 border-dashed border-slate-200 rounded-2xl text-center flex flex-col items-center justify-center gap-3">
           <div className="w-3 h-3 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">

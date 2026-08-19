@@ -102,7 +102,7 @@ export default function PnLDeepDive() {
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [t, i18n.language]);
 
   useEffect(() => {
     fetchData();

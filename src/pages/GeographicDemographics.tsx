@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Circle, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { cn } from '@lib/utils';
@@ -43,6 +44,7 @@ function RecenterButton({ center, zoom }: { center: [number, number]; zoom: numb
 }
 
 export default function GeographicDemographics() {
+  const { i18n } = useTranslation();
   const [data, setData] = useState<GeographicDemographicsData | null>(null);
   const [userDemographics, setUserDemographics] = useState<UserDemographicsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,7 +74,7 @@ export default function GeographicDemographics() {
       // Fallback to mock data on error for demo purposes
       setData(MOCK_DEMOGRAPHICS_DATA);
     }
-  }, []);
+  }, [i18n.language]);
 
   useEffect(() => {
     fetchData().then(() => setLoading(false));

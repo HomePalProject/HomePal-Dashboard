@@ -4,8 +4,48 @@ import { GridView } from '@components/supermarkets/GridView';
 import { TableView } from '@components/supermarkets/TableView';
 import { ViewToolbar } from '@components/ui/ViewToolbar';
 import { Button } from '@components/ui/Button';
+import { Skeleton } from '@components/ui/Skeleton';
 import { useSupermarkets } from '@hooks/useSupermarkets';
 import { useTranslation } from 'react-i18next';
+
+function SupermarketGridSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div key={i} className="bg-white rounded-2xl border border-border p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <Skeleton className="w-10 h-10 sm:w-14 sm:h-14 rounded-full shrink-0" />
+            <div className="flex-1 min-w-0">
+              <Skeleton className="h-3.5 rounded w-3/4 mb-2" />
+              <Skeleton className="h-2.5 rounded w-1/2" />
+            </div>
+          </div>
+          <Skeleton className="h-9 rounded-xl" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SupermarketTableSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="divide-y divide-[#EAE5D9]">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 px-5 py-3.5">
+            <Skeleton className="w-9 h-9 rounded-full shrink-0" />
+            <div className="flex-1 min-w-0">
+              <Skeleton className="h-3 rounded w-1/3 mb-1.5" />
+              <Skeleton className="h-2.5 rounded w-1/5" />
+            </div>
+            <Skeleton className="h-5 w-16 rounded-2xl shrink-0" />
+            <Skeleton className="h-3 w-24 rounded shrink-0 hidden sm:block" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Supermarkets() {
   const { t } = useTranslation('supermarkets');
@@ -85,20 +125,11 @@ export default function Supermarkets() {
       />
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-border p-5 animate-pulse">
-              <div className="flex items-center gap-1 mb-1">
-                <div className="w-3 h-3 rounded-xl bg-slate-100" />
-                <div className="flex-1">
-                  <div className="h-1 bg-slate-100 rounded mb-2 w-3/4" />
-                  <div className="h-3 bg-slate-100 rounded w-1/2" />
-                </div>
-              </div>
-              <div className="h-10 bg-slate-100 rounded" />
-            </div>
-          ))}
-        </div>
+        viewMode === 'grid' ? (
+          <SupermarketGridSkeleton />
+        ) : (
+          <SupermarketTableSkeleton />
+        )
       ) : viewMode === 'grid' ? (
         <GridView
           supermarkets={filtered}

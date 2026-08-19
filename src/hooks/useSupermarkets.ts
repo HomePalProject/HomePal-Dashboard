@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '@lib/utils';
 import { getLocalString } from '@lib/formatters';
 import { fetchBilingual } from '@lib/localization';
@@ -7,6 +8,7 @@ import { catalogService } from '@services/catalogService';
 import type { Supermarket } from '@typeDefs/catalogTypes';
 
 export function useSupermarkets() {
+  const { i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export function useSupermarkets() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [i18n.language]);
 
   useEffect(() => {
     void fetchData();

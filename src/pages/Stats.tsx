@@ -41,7 +41,7 @@ export default function Stats() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [i18n.language]);
 
   useEffect(() => {
     void fetchData();

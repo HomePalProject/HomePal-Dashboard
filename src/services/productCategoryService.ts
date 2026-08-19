@@ -2,17 +2,24 @@ import api from './api';
 import type { ProductCategory, CreateUpdateCategoryPayload } from '@typeDefs/productCategoryTypes';
 
 export const productCategoryService = {
-  getCategories: async (): Promise<ProductCategory[]> => {
-    const response = await api.get('/products/categories');
+  getCategories: async (acceptLanguage?: 'en' | 'ar'): Promise<ProductCategory[]> => {
+    const response = await api.get(
+      '/products/categories',
+      acceptLanguage ? { headers: { 'Accept-Language': acceptLanguage } } : undefined
+    );
     const data = response.data?.data !== undefined ? response.data.data : response.data;
     if (data?.items && Array.isArray(data.items)) return data.items;
     if (Array.isArray(data)) return data;
     return [];
   },
 
-  searchCategories: async (query: string): Promise<ProductCategory[]> => {
+  searchCategories: async (
+    query: string,
+    acceptLanguage?: 'en' | 'ar'
+  ): Promise<ProductCategory[]> => {
     const response = await api.get(`/products/categories/search`, {
       params: { query },
+      ...(acceptLanguage ? { headers: { 'Accept-Language': acceptLanguage } } : undefined),
     });
     const data = response.data?.data !== undefined ? response.data.data : response.data;
     if (data?.items && Array.isArray(data.items)) return data.items;

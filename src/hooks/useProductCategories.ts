@@ -41,10 +41,61 @@ export default function useProductCategories() {
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const res = searchQuery.trim()
-        ? await productCategoryService.searchCategories(searchQuery.trim()).catch(() => [])
-        : await productCategoryService.getCategories().catch(() => []);
-      setCategories(res || []);
+      const q = searchQuery.trim();
+      const [enList, arList] = await Promise.all([
+        (q
+          ? productCategoryService.searchCategories(q, 'en')
+          : productCategoryService.getCategories('en')
+        ).catch(() => []),
+        (q
+          ? productCategoryService.searchCategories(q, 'ar')
+          : productCategoryService.getCategories('ar')
+        ).catch(() => []),
+      ]);
+      const arById = new Map(arList.map((c) => [c.id, c]));
+      const merged = enList.map((enCat) => {
+        const arCat = arById.get(enCat.id);
+        return {
+          ...enCat,
+          name: [
+            {
+              culture: 'en',
+              languageCode: 'en',
+              value:
+                typeof enCat.name === 'string' ? enCat.name : getLocalizedName(enCat.name, 'en'),
+            },
+            {
+              culture: 'ar',
+              languageCode: 'ar',
+              value: arCat
+                ? typeof arCat.name === 'string'
+                  ? arCat.name
+                  : getLocalizedName(arCat.name, 'ar')
+                : '',
+            },
+          ],
+          description: [
+            {
+              culture: 'en',
+              languageCode: 'en',
+              value:
+                typeof enCat.description === 'string'
+                  ? enCat.description
+                  : getLocalizedName(enCat.description ?? undefined, 'en'),
+            },
+            {
+              culture: 'ar',
+              languageCode: 'ar',
+              value: arCat
+                ? typeof arCat.description === 'string'
+                  ? arCat.description
+                  : getLocalizedName(arCat.description ?? undefined, 'ar')
+                : '',
+            },
+          ],
+        };
+      });
+      setCategories(merged);
     } catch (e) {
       console.error('Failed to fetch categories:', e);
       setCategories([]);
@@ -136,11 +187,11 @@ export default function useProductCategories() {
     const payload: CreateUpdateCategoryPayload = {
       name: [
         { culture: 'en-US', languageCode: 'en-US', value: enName.trim() },
-        { culture: 'ar-EG', languageCode: 'ar-EG', value: arName.trim() || enName.trim() },
+        { culture: 'ar', languageCode: 'ar', value: arName.trim() || enName.trim() },
       ],
       description: [
         { culture: 'en-US', languageCode: 'en-US', value: description.trim() },
-        { culture: 'ar-EG', languageCode: 'ar-EG', value: description.trim() },
+        { culture: 'ar', languageCode: 'ar', value: description.trim() },
       ],
       imagePath: modalState.editing?.imagePath || null,
     };

@@ -54,7 +54,7 @@ export function SupermarketFormModal({
     const err = await onSave({
       name: [
         { culture: 'en-US', languageCode: 'en-US', value: nameEn.trim() || nameAr.trim() },
-        { culture: 'ar-EG', languageCode: 'ar-EG', value: nameAr.trim() || nameEn.trim() },
+        { culture: 'ar', languageCode: 'ar', value: nameAr.trim() || nameEn.trim() },
       ],
       address: address.trim() || null,
       websiteUrl: websiteUrl.trim() || null,

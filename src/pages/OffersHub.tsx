@@ -10,7 +10,27 @@ import { getImageUrl, getLocalString, getLocalizedCulture } from '@lib/formatter
 import { fetchBilingual } from '@lib/localization';
 import { Modal } from '@components/ui/Modal';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
+import { Skeleton } from '@components/ui/Skeleton';
 import { useTranslation } from 'react-i18next';
+
+function OffersTableSkeleton() {
+  return (
+    <div className="divide-y divide-slate-100">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-3 ps-6 pe-6 py-4">
+          <Skeleton className="w-10 h-10 rounded-full shrink-0" />
+          <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+            <Skeleton className="h-3 rounded w-1/4" />
+            <Skeleton className="h-2.5 rounded w-1/6" />
+          </div>
+          <Skeleton className="h-3 w-16 rounded hidden sm:block" />
+          <Skeleton className="h-3 w-16 rounded hidden sm:block" />
+          <Skeleton className="h-5 w-16 rounded-2xl shrink-0" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 type FilterTab = 'all' | 'unverified' | 'expiring';
 
@@ -112,7 +132,7 @@ export default function OffersHub() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [i18n.language]);
 
   useEffect(() => {
     void loadInitialData();
@@ -207,7 +227,7 @@ export default function OffersHub() {
 
     const titlePayload = [
       { culture: 'en-US', languageCode: 'en-US', value: titleEn.trim() || titleAr.trim() },
-      { culture: 'ar-EG', languageCode: 'ar-EG', value: titleAr.trim() || titleEn.trim() },
+      { culture: 'ar', languageCode: 'ar', value: titleAr.trim() || titleEn.trim() },
     ];
 
     const descriptionPayload =
@@ -219,8 +239,8 @@ export default function OffersHub() {
               value: descriptionEn.trim() || descriptionAr.trim(),
             },
             {
-              culture: 'ar-EG',
-              languageCode: 'ar-EG',
+              culture: 'ar',
+              languageCode: 'ar',
               value: descriptionAr.trim() || descriptionEn.trim(),
             },
           ]
@@ -739,9 +759,7 @@ export default function OffersHub() {
 
         {/* Offers Table */}
         {loading ? (
-          <div className="p-16 text-center text-slate-400 text-xs font-semibold">
-            {t('loadingOffers')}
-          </div>
+          <OffersTableSkeleton />
         ) : paginatedOffers.length === 0 ? (
           <div className="p-16 text-center flex flex-col items-center justify-center gap-2">
             <p className="text-sm font-bold text-slate-700 m-0">{t('noOffers')}</p>

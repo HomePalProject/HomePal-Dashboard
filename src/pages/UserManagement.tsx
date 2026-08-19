@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@components/ui/Button';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { AdminFormModal } from '@components/users/AdminFormModal';
@@ -6,14 +5,17 @@ import { UsersMetrics } from '@components/users/UsersMetrics';
 import { UsersTable } from '@components/users/UsersTable';
 import {
   useAdmins,
-  useGlobalAdminsCount,
-  useDeactivateAdmin,
   useCreateAdmin,
+  useDeactivateAdmin,
+  useGlobalAdminsCount,
 } from '@hooks/useUserManagement';
 import { getErrorMessage } from '@lib/utils';
 import type { AdminUser, CreateAdminRequest } from '@typeDefs/adminTypes';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function UserManagement() {
+  const { t } = useTranslation(['users', 'common']);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
@@ -62,7 +64,7 @@ export default function UserManagement() {
     try {
       const res = await deactivateAdmin(deleteTarget.id);
       if (!res.success) {
-        alert(res.message || 'Failed to deactivate user.');
+        alert(res.message || t('deactivateFailed', 'Failed to deactivate user.'));
       }
     } catch (err) {
       alert(getErrorMessage(err));
@@ -79,7 +81,7 @@ export default function UserManagement() {
         setShowAddModal(false);
         return null;
       } else {
-        return res.message || 'Failed to create user.';
+        return res.message || t('createFailed', 'Failed to create user.');
       }
     } catch (err) {
       return getErrorMessage(err);
@@ -90,7 +92,7 @@ export default function UserManagement() {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
         <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-        <span className="text-xs font-semibold text-text-secondary">Loading directory...</span>
+        <span className="text-xs font-semibold text-text-secondary">{t('loadingDirectory')}</span>
       </div>
     );
   }
@@ -111,7 +113,7 @@ export default function UserManagement() {
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
         </div>
-        <h3 className="text-sm font-bold m-0 mb-1">Failed to Load User Directory</h3>
+        <h3 className="text-sm font-bold m-0 mb-1">{t('failedLoad')}</h3>
         <p className="m-0 text-xs text-text-secondary">{getErrorMessage(queryError)}</p>
         <Button
           onClick={() => refetch()}
@@ -119,7 +121,7 @@ export default function UserManagement() {
           size="sm"
           className="mt-4 text-status-error border-status-error/30 hover:bg-status-error/10"
         >
-          Retry
+          {t('retry')}
         </Button>
       </div>
     );
@@ -127,10 +129,9 @@ export default function UserManagement() {
 
   return (
     <div className="w-full flex flex-col gap-5 font-sans pb-10">
-      {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1 border-b border-border/40">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-md mb-1.5 border border-primary/20">
+          {/* <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-md mb-1.5 border border-primary/20">
             <svg
               className="w-3 h-3"
               viewBox="0 0 24 24"
@@ -140,14 +141,12 @@ export default function UserManagement() {
             >
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            Access Control
-          </div>
+            {t('accessControl')}
+          </div> */}
           <h1 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight m-0">
-            User Management
+            {t('title')}
           </h1>
-          <p className="text-xs text-text-secondary mt-0.5 mb-0">
-            Manage system administrators, household managers, and user access across HomePal.
-          </p>
+          <p className="text-xs text-text-secondary mt-0.5 mb-0">{t('subtitle')}</p>
         </div>
 
         <Button
@@ -168,11 +167,10 @@ export default function UserManagement() {
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          Add New Admin
+          {t('addNewAdmin')}
         </Button>
       </div>
 
-      {/* Metrics Section */}
       <UsersMetrics
         totalCount={totalCount}
         totalActive={totalActive}
@@ -180,7 +178,6 @@ export default function UserManagement() {
         globalTotalAdmins={globalTotalAdmins}
       />
 
-      {/* Table & Data Grid Section */}
       <UsersTable
         loading={isLoading || isDeleting}
         filtered={filtered}
@@ -197,17 +194,15 @@ export default function UserManagement() {
         setDeleteTarget={setDeleteTarget}
       />
 
-      {/* Admin Creation Modal */}
       {showAddModal && (
         <AdminFormModal onSave={handleCreateAdmin} onClose={() => setShowAddModal(false)} />
       )}
 
-      {/* Deactivation Confirmation Dialog */}
       {deleteTarget && (
         <ConfirmDialog
-          title="Deactivate Admin Access"
-          confirmLabel="Deactivate"
-          message={`Are you sure you want to deactivate access for @${deleteTarget.username || deleteTarget.fullName}?`}
+          title={t('deactivateTitle')}
+          confirmLabel={t('deactivateConfirm')}
+          message={t('deactivateMessage', { name: deleteTarget.username || deleteTarget.fullName })}
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}
           loading={isDeleting}

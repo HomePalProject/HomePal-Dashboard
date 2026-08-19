@@ -1,4 +1,5 @@
 import { cn } from '@lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface UsersMetricsProps {
   totalCount: number;
@@ -13,15 +14,16 @@ export function UsersMetrics({
   totalSuspended,
   globalTotalAdmins,
 }: UsersMetricsProps) {
+  const { t } = useTranslation('users');
   const activeRate = totalCount > 0 ? Math.round((totalActive / totalCount) * 100) : 100;
   const suspendedRate = totalCount > 0 ? Math.round((totalSuspended / totalCount) * 100) : 0;
 
   const metrics = [
     {
       id: 'total',
-      label: 'Total Accounts',
+      label: t('totalAccounts'),
       value: totalCount,
-      subtext: 'Filtered',
+      subtext: t('filtered'),
       color: 'text-text-primary',
       bgIcon: 'bg-primary/10 text-primary',
       badgeBg: 'bg-primary/10 text-primary',
@@ -44,9 +46,9 @@ export function UsersMetrics({
     },
     {
       id: 'active',
-      label: 'Active Users',
+      label: t('activeUsers'),
       value: totalActive,
-      subtext: `${activeRate}% active`,
+      subtext: t('activeRate', { rate: activeRate }),
       color: 'text-status-success',
       bgIcon: 'bg-status-success/10 text-status-success',
       badgeBg: 'bg-status-success/10 text-status-success',
@@ -67,9 +69,9 @@ export function UsersMetrics({
     },
     {
       id: 'suspended',
-      label: 'Suspended Users',
+      label: t('suspendedUsers'),
       value: totalSuspended,
-      subtext: `${suspendedRate}% suspended`,
+      subtext: t('suspendedRate', { rate: suspendedRate }),
       color: 'text-status-error',
       bgIcon: 'bg-status-error/10 text-status-error',
       badgeBg: 'bg-status-error/10 text-status-error',
@@ -90,9 +92,9 @@ export function UsersMetrics({
     },
     {
       id: 'admins',
-      label: 'System Admins',
+      label: t('systemAdmins'),
       value: globalTotalAdmins,
-      subtext: 'Root access',
+      subtext: t('rootAccess'),
       color: 'text-amber-600 dark:text-amber-400',
       bgIcon: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
       badgeBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',

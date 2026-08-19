@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { cn } from '@lib/utils';
 import { getImageUrl } from '@lib/formatters';
-import { ActionBtn } from '@components/ui/ActionBtn';
+import { Button } from '@components/ui/Button';
 import { ROLE_OPTIONS, getRoleBadgeClass, getInitials } from '@/utils/userUtils';
 import type { AdminUser } from '@typeDefs/adminTypes';
+import { useTranslation } from 'react-i18next';
 
 interface UsersTableProps {
   loading: boolean;
@@ -36,6 +37,7 @@ export function UsersTable({
   totalCount,
   setDeleteTarget,
 }: UsersTableProps) {
+  const { t } = useTranslation('users');
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
@@ -71,7 +73,7 @@ export function UsersTable({
           </svg>
           <input
             type="text"
-            placeholder="Search username or email..."
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-8 py-2 rounded-lg border border-border text-xs text-text-primary bg-surface outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-text-disabled"
@@ -80,7 +82,7 @@ export function UsersTable({
             <button
               onClick={() => setSearch('')}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-disabled hover:text-text-primary p-0.5 rounded transition-colors cursor-pointer"
-              title="Clear search"
+              title={t('clearSearch')}
             >
               <svg
                 className="w-3.5 h-3.5"
@@ -108,7 +110,7 @@ export function UsersTable({
                   : 'text-text-secondary hover:text-text-primary'
               )}
             >
-              All
+              {t('all')}
             </button>
             {ROLE_OPTIONS.map((r) => (
               <button
@@ -121,7 +123,7 @@ export function UsersTable({
                     : 'text-text-secondary hover:text-text-primary'
                 )}
               >
-                {r}
+                {t('role_' + r.toLowerCase().replace(/\s+/g, '_'), r)}
               </button>
             ))}
           </div>
@@ -138,7 +140,9 @@ export function UsersTable({
           <div className="absolute inset-0 bg-surface/60 backdrop-blur-[1px] flex items-center justify-center z-20">
             <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-xl border border-border shadow-md">
               <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-              <span className="text-xs font-medium text-text-secondary">Loading directory...</span>
+              <span className="text-xs font-medium text-text-secondary">
+                {t('loadingDirectory')}
+              </span>
             </div>
           </div>
         )}
@@ -146,11 +150,11 @@ export function UsersTable({
         <table className="w-full border-collapse text-left align-middle text-xs">
           <thead>
             <tr className="bg-surface-variant/20 border-b border-border/70 text-[11px] font-bold text-text-secondary uppercase tracking-wider">
-              <th className="px-3.5 py-2.5 whitespace-nowrap">User</th>
-              <th className="px-3 py-2.5 text-center whitespace-nowrap">Role</th>
-              <th className="px-3 py-2.5 text-center whitespace-nowrap">Status</th>
-              <th className="px-3 py-2.5 text-center whitespace-nowrap">Joined</th>
-              <th className="px-3.5 py-2.5 text-right whitespace-nowrap">Actions</th>
+              <th className="px-3.5 py-2.5 whitespace-nowrap">{t('thUser')}</th>
+              <th className="px-3 py-2.5 text-center whitespace-nowrap">{t('thRole')}</th>
+              <th className="px-3 py-2.5 text-center whitespace-nowrap">{t('thStatus')}</th>
+              <th className="px-3 py-2.5 text-center whitespace-nowrap">{t('thJoined')}</th>
+              <th className="px-3.5 py-2.5 text-right whitespace-nowrap">{t('thActions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/40">
@@ -171,11 +175,13 @@ export function UsersTable({
                       </svg>
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-text-primary">No matching users</div>
+                      <div className="text-xs font-bold text-text-primary">
+                        {t('noMatchingUsers')}
+                      </div>
                       <p className="text-[11px] text-text-secondary mt-0.5 mb-0">
                         {search || roleFilter !== 'All'
-                          ? `No user matched your filters.`
-                          : 'No user accounts recorded.'}
+                          ? t('noMatchingUsersDesc')
+                          : t('noUsersRecorded')}
                       </p>
                     </div>
                     {(search || roleFilter !== 'All') && (
@@ -183,7 +189,7 @@ export function UsersTable({
                         onClick={clearFilters}
                         className="mt-1 px-3 py-1 bg-surface border border-border text-xs font-semibold text-primary rounded-lg hover:bg-surface-variant/40 transition-colors cursor-pointer shadow-2xs"
                       >
-                        Reset filters
+                        {t('resetFilters')}
                       </button>
                     )}
                   </div>
@@ -214,12 +220,12 @@ export function UsersTable({
                               src={avatarUrl}
                               alt={u.username}
                               onError={() => setImgErrors((prev) => ({ ...prev, [u.id]: true }))}
-                              className="w-14 h-14 rounded-full object-cover shadow-2xs border-2 border-border/60"
+                              className="w-12 h-12 rounded-full object-cover shadow-2xs border-2 border-border/60"
                             />
                           ) : (
                             <div
                               className={cn(
-                                'w-14 h-14 rounded-full text-base font-bold flex items-center justify-center shadow-2xs',
+                                'w-12 h-12 rounded-full text-base font-bold flex items-center justify-center shadow-2xs',
                                 isMainAdmin
                                   ? 'bg-amber-600 text-white border-2 border-amber-700/20'
                                   : roles.includes('Admin')
@@ -250,7 +256,7 @@ export function UsersTable({
                             <button
                               onClick={() => handleCopyEmail(u.email)}
                               className="opacity-0 group-hover/email:opacity-100 text-text-disabled hover:text-primary transition-opacity p-0.5 cursor-pointer"
-                              title="Copy email"
+                              title={t('copyEmail')}
                             >
                               {copiedEmail === u.email ? (
                                 <span className="text-[9px] font-bold text-status-success">✓</span>
@@ -281,11 +287,11 @@ export function UsersTable({
                             getRoleBadgeClass(roles)
                           )}
                         >
-                          {primaryRole}
+                          {t('role_' + primaryRole.toLowerCase().replace(/\s+/g, '_'), primaryRole)}
                         </span>
                         {roles.length > 1 && (
                           <span className="text-[9px] font-medium text-text-disabled">
-                            +{roles.length - 1} more
+                            {t('moreRoles', { count: roles.length - 1 })}
                           </span>
                         )}
                       </div>
@@ -306,7 +312,7 @@ export function UsersTable({
                             isActive ? 'text-status-success' : 'text-status-error'
                           )}
                         >
-                          {isActive ? 'Active' : 'Suspended'}
+                          {isActive ? t('statusActive') : t('statusSuspended')}
                         </span>
                       </div>
                     </td>
@@ -324,19 +330,32 @@ export function UsersTable({
                     <td className="px-3.5 py-2.5 text-right align-middle whitespace-nowrap">
                       <div className="flex items-center justify-end gap-1.5">
                         {isActive && !isMainAdmin ? (
-                          <ActionBtn
-                            icon="delete"
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title={t('deactivateTitle')}
                             onClick={() => setDeleteTarget(u)}
-                            danger
-                            title="Deactivate Admin"
-                          />
+                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                          >
+                            <svg
+                              width="15"
+                              height="15"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                          </Button>
                         ) : isMainAdmin ? (
                           <span className="text-[10px] text-text-disabled italic px-1.5 py-0.5 bg-surface-variant/40 rounded">
-                            Protected
+                            {t('roleProtected')}
                           </span>
                         ) : (
                           <span className="text-[10px] text-status-error/80 italic px-1.5 py-0.5 bg-status-error/10 rounded">
-                            Suspended
+                            {t('statusSuspended')}
                           </span>
                         )}
                       </div>
@@ -351,14 +370,11 @@ export function UsersTable({
 
       {/* Pagination Footer */}
       <div className="p-3 border-t border-border/70 flex flex-wrap gap-2.5 items-center justify-between bg-surface-variant/15 text-xs">
-        <div className="text-text-secondary">
-          Page <span className="text-text-primary font-bold">{page}</span> of{' '}
-          <span className="text-text-primary font-bold">{totalPages}</span> ({totalCount} total)
-        </div>
+        <div className="text-text-secondary">{t('pageOf', { page, totalPages, totalCount })}</div>
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <span className="text-text-secondary text-[11px]">Rows:</span>
+            <span className="text-text-secondary text-[11px]">{t('rows')}</span>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -379,7 +395,7 @@ export function UsersTable({
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               className="px-2.5 py-1 rounded text-xs font-semibold text-text-primary bg-surface hover:bg-surface-variant/40 disabled:opacity-40 transition-all cursor-pointer disabled:cursor-not-allowed"
             >
-              Prev
+              {t('prev')}
             </button>
             <span className="px-1.5 text-xs font-bold text-primary">{page}</span>
             <button
@@ -387,7 +403,7 @@ export function UsersTable({
               onClick={() => setPage((p) => p + 1)}
               className="px-2.5 py-1 rounded text-xs font-semibold text-text-primary bg-surface hover:bg-surface-variant/40 disabled:opacity-40 transition-all cursor-pointer disabled:cursor-not-allowed"
             >
-              Next
+              {t('next')}
             </button>
           </div>
         </div>

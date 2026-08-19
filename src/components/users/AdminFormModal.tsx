@@ -5,6 +5,7 @@ import { cn } from '@lib/utils';
 import type { CreateAdminRequest } from '@typeDefs/adminTypes';
 import { useState } from 'react';
 import { useGovernorates, useCitiesByGovernorate } from '@hooks/useLocations';
+import { useTranslation } from 'react-i18next';
 
 interface AdminFormModalProps {
   onSave: (data: CreateAdminRequest) => Promise<string | null>;
@@ -12,6 +13,7 @@ interface AdminFormModalProps {
 }
 
 export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
+  const { t } = useTranslation('users');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,7 +48,7 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!username || !email || !password) {
-      setError('Please fill in all required fields.');
+      setError(t('errorRequiredFields'));
       return;
     }
     setSaving(true);
@@ -69,7 +71,7 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
   };
 
   return (
-    <Modal title="Create New Admin Account" onClose={onClose} isOpen={true} maxWidth="max-w-md">
+    <Modal title={t('modalTitle')} onClose={onClose} isOpen={true} maxWidth="max-w-md">
       <div className="flex items-center gap-2.5 mb-4 -mt-1 pb-3 border-b border-border/60">
         <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20">
           <svg
@@ -86,22 +88,20 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
           </svg>
         </div>
         <div>
-          <div className="text-xs font-bold text-text-primary">Admin Credentials</div>
-          <p className="text-[11px] text-text-secondary m-0">
-            Set login details for the new system admin.
-          </p>
+          <div className="text-xs font-bold text-text-primary">{t('modalCredentialsTitle')}</div>
+          <p className="text-[11px] text-text-secondary m-0">{t('modalCredentialsDesc')}</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3.5" autoComplete="off">
-        <Field label="Admin Username" required>
+        <Field label={t('labelUsername')} required>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-text-disabled">
               @
             </span>
             <input
               type="text"
-              placeholder="e.g. admin_ops"
+              placeholder={t('placeholderUsername')}
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '_'))}
               className="w-full pl-7 pr-3 py-1.5 rounded-lg border border-border text-xs outline-none bg-surface text-text-primary focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all shadow-2xs"
@@ -111,10 +111,10 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
           </div>
         </Field>
 
-        <Field label="Email Address" required>
+        <Field label={t('labelEmail')} required>
           <input
             type="email"
-            placeholder="e.g. admin@company.com"
+            placeholder={t('placeholderEmail')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full px-3 py-1.5 rounded-lg border border-border text-xs outline-none bg-surface text-text-primary focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all shadow-2xs"
@@ -123,13 +123,13 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
           />
         </Field>
 
-        <Field label="Initial Password" required>
+        <Field label={t('labelPassword')} required>
           <div className="flex flex-col gap-1.5">
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••••••"
+                  placeholder={t('placeholderPassword')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-3 py-1.5 pr-8 rounded-lg border border-border text-xs outline-none bg-surface text-text-primary focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all font-mono shadow-2xs"
@@ -140,7 +140,7 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-text-disabled hover:text-text-primary p-1 cursor-pointer"
-                  title={showPassword ? 'Hide' : 'Show'}
+                  title={showPassword ? t('hide') : t('show')}
                 >
                   {showPassword ? (
                     <svg
@@ -176,7 +176,7 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
                   'text-text-primary hover:bg-border/60 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 shadow-2xs'
                 )}
               >
-                <span>Auto</span>
+                <span>{t('btnAuto')}</span>
               </button>
             </div>
 
@@ -188,7 +188,7 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
                   onClick={handleCopyPassword}
                   className="text-[11px] font-bold text-primary hover:underline cursor-pointer shrink-0 ml-2"
                 >
-                  {copiedPass ? '✓ Copied' : 'Copy'}
+                  {copiedPass ? t('copied') : t('copy')}
                 </button>
               </div>
             )}
@@ -213,7 +213,7 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
         )}
 
         <div className="pt-2">
-          <ModalActions onCancel={onClose} saving={saving} label="Create Admin" />
+          <ModalActions onCancel={onClose} saving={saving} label={t('btnCreateAdmin')} />
         </div>
       </form>
     </Modal>

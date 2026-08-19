@@ -5,8 +5,10 @@ import TableView from '../components/productCategories/Table';
 import { ViewToolbar } from '../components/ui/ViewToolbar';
 import { Button } from '../components/ui/Button';
 import useProductCategories from '../hooks/useProductCategories';
+import { useTranslation } from 'react-i18next';
 
 export default function ProductCategories() {
+  const { t } = useTranslation(['categories', 'common']);
   const {
     loading,
     searchQuery,
@@ -47,7 +49,7 @@ export default function ProductCategories() {
     <div className="w-full flex flex-col gap-6 font-sans pb-4 px-1 sm:px-0">
       {/* Toast */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-3 border border-slate-700 animate-fade-in">
+        <div className="fixed top-6 inset-e-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-3 border border-slate-700 animate-fade-in">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>{toastMessage}</span>
         </div>
@@ -66,7 +68,7 @@ export default function ProductCategories() {
       <ViewToolbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="Search categories..."
+        searchPlaceholder={t('searchPlaceholder')}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         primaryAction={
@@ -86,16 +88,14 @@ export default function ProductCategories() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Add New Category
+            {t('addNewCategory')}
           </Button>
         }
       />
 
       {/* Main content */}
       {loading ? (
-        <div className="py-5 text-center text-slate-400 text-sm font-medium">
-          Loading product categories...
-        </div>
+        <div className="py-5 text-center text-slate-400 text-sm font-medium">{t('loading')}</div>
       ) : filtered.length === 0 ? (
         <div className="py-5 border-2 border-dashed border-slate-200 rounded-2xl text-center flex flex-col items-center justify-center gap-3">
           <div className="w-3 h-3 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
@@ -109,14 +109,14 @@ export default function ProductCategories() {
               strokeWidth="1.75"
             />
           </div>
-          <p className="text-sm font-bold text-slate-700 m-0">No categories found</p>
+          <p className="text-sm font-bold text-slate-700 m-0">{t('noCategories')}</p>
           <Button
             onClick={() => void handleOpenModal()}
             variant="ghost"
             size="sm"
             className="text-emerald-700 hover:underline h-auto min-h-0 p-0 bg-transparent hover:bg-transparent"
           >
-            Create first category →
+            {t('createFirst')}
           </Button>
         </div>
       ) : viewMode === 'grid' ? (
@@ -152,7 +152,7 @@ export default function ProductCategories() {
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
             <h2 className="text-lg font-bold mb-1">
-              {modalState.editing ? 'Edit Category' : 'Add New Category'}
+              {modalState.editing ? t('editCategory') : t('addNewCategory')}
             </h2>
             <form onSubmit={handleSubmitForm} className="flex flex-col gap-5">
               {formError && (
@@ -164,20 +164,20 @@ export default function ProductCategories() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold uppercase text-slate-500">
-                    English Name <span className="text-red-500">*</span>
+                    {t('englishName')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={enName}
                     onChange={(e) => setEnName(e.target.value)}
-                    placeholder="e.g. Meat & Seafood"
+                    placeholder={t('namePlaceholder')}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white focus:border-slate-400"
                     required
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[11px] font-bold uppercase text-slate-500">
-                    Arabic Name
+                    {t('arabicName')}
                   </label>
                   <input
                     type="text"
@@ -185,7 +185,7 @@ export default function ProductCategories() {
                     value={arName}
                     onChange={(e) => setArName(e.target.value)}
                     placeholder="مثال: لحوم وأسماك"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white font-arabic text-right focus:border-slate-400"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white font-arabic text-end focus:border-slate-400"
                   />
                 </div>
               </div>
@@ -193,13 +193,13 @@ export default function ProductCategories() {
               {/* Description */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase text-slate-500">
-                  Category Description
+                  {t('description')}
                 </label>
                 <textarea
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g. Premium cuts of beef, poultry, and fresh ocean catches."
+                  placeholder={t('descPlaceholder')}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white focus:border-slate-400"
                 />
               </div>
@@ -207,7 +207,7 @@ export default function ProductCategories() {
               {/* Cover Image */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase text-slate-500">
-                  Cover Image
+                  {t('coverImage')}
                 </label>
                 {coverPreview ? (
                   <div className="relative w-full sm:w-auto sm:min-w-[220px] h-36 rounded-xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center">
@@ -218,7 +218,7 @@ export default function ProductCategories() {
                     />
                     <div className="absolute inset-0 bg-slate-900/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                       <label className="px-3 py-1.5 bg-white text-slate-900 rounded-3xl text-xs cursor-pointer hover:bg-slate-100">
-                        Change
+                        {t('change')}
                         <input
                           type="file"
                           accept="image/*"
@@ -245,7 +245,7 @@ export default function ProductCategories() {
                         variant="danger"
                         size="sm"
                       >
-                        Remove
+                        {t('remove')}
                       </Button>
                     </div>
                   </div>
@@ -260,10 +260,8 @@ export default function ProductCategories() {
                       strokeWidth="1.75"
                       className="text-slate-400"
                     />
-                    <span className="text-xs font-bold text-slate-700">
-                      Click to select cover image
-                    </span>
-                    <span className="text-[11px] text-slate-400">PNG, JPG, WEBP recommended</span>
+                    <span className="text-xs font-bold text-slate-700">{t('uploadDesc')}</span>
+                    <span className="text-[11px] text-slate-400">{t('uploadFormats')}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -288,7 +286,7 @@ export default function ProductCategories() {
                   size="sm"
                   className="px-4 border-slate-200 text-slate-700 bg-white hover:bg-slate-50"
                 >
-                  Cancel
+                  {t('common:cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -300,10 +298,10 @@ export default function ProductCategories() {
                   {saving ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Saving Category...
+                      {t('saving')}
                     </>
                   ) : (
-                    'Save Category'
+                    t('save')
                   )}
                 </Button>
               </div>

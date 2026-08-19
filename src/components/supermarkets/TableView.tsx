@@ -1,8 +1,9 @@
-import { getLocalString } from '@lib/formatters';
+import { getLocalString, getLocalizedCulture } from '@lib/formatters';
 import { BRANCH_COUNTS } from '@constants/supermarketData';
 import type { Supermarket } from '@typeDefs/catalogTypes';
 import { SupermarketLogo } from './SupermarketLogo';
 import { Button } from '@components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 interface TableViewProps {
   supermarkets: Supermarket[];
@@ -12,22 +13,25 @@ interface TableViewProps {
 }
 
 export function TableView({ supermarkets, loadingEditId, onEdit, onDelete }: TableViewProps) {
+  const { t, i18n } = useTranslation(['supermarkets', 'common']);
   return (
     <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-start border-collapse">
           <thead>
             <tr className="border-b border-border bg-surface text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-              <th className="px-5 py-3">Supermarket Chain</th>
-              <th className="px-5 py-3">Branches</th>
-              <th className="px-5 py-3">Location</th>
-              <th className="px-5 py-3">Scraper Endpoint</th>
-              <th className="px-5 py-3 text-right">Actions</th>
+              <th className="px-5 py-3">{t('tableHeaderChain')}</th>
+              <th className="px-5 py-3">{t('tableHeaderBranches')}</th>
+              <th className="px-5 py-3">{t('tableHeaderLocation')}</th>
+              <th className="px-5 py-3">{t('tableHeaderEndpoint')}</th>
+              <th className="px-5 py-3 text-end">{t('tableHeaderActions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#EAE5D9]">
             {supermarkets.map((s) => {
-              const name = getLocalString(s.name);
+              const name =
+                getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                getLocalString(s.name);
               const branches = s.branches ?? BRANCH_COUNTS[name] ?? 0;
               const fbUrl = s.websiteUrl || 'facebook.com/supermarket/offers';
 
@@ -43,14 +47,15 @@ export function TableView({ supermarkets, loadingEditId, onEdit, onDelete }: Tab
                       <div>
                         <div className="text-xs font-bold text-text-primary">{name}</div>
                         <div className="text-[11px] text-slate-400 font-mono">
-                          ID: {s.id.substring(0, 8)}
+                          {t('idPrefix')}
+                          {s.id.substring(0, 8)}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-5 py-3.5">
                     <span className="px-2.5 py-1 bg-surface-variant border border-border rounded-2xl text-[11px] font-bold text-text-primary whitespace-nowrap">
-                      {branches} Branches
+                      {t('branches', { count: branches })}
                     </span>
                   </td>
                   <td className="px-5 py-3.5 text-xs text-slate-500">
@@ -59,7 +64,7 @@ export function TableView({ supermarkets, loadingEditId, onEdit, onDelete }: Tab
                   <td className="px-5 py-3.5 font-mono text-xs text-slate-700">
                     {fbUrl.replace(/^https?:\/\//, '')}
                   </td>
-                  <td className="px-5 py-3.5 text-right">
+                  <td className="px-5 py-3.5 text-end">
                     <div className="flex items-center justify-end gap-2">
                       <Button
                         onClick={() => onEdit(s)}
@@ -67,14 +72,14 @@ export function TableView({ supermarkets, loadingEditId, onEdit, onDelete }: Tab
                         variant="outline"
                         size="sm"
                       >
-                        {loadingEditId === s.id ? 'Loading…' : 'Edit'}
+                        {loadingEditId === s.id ? t('common:loading', 'Loading…') : t('edit')}
                       </Button>
                       <Button
                         onClick={() => onDelete({ id: s.id, name })}
                         variant="danger"
                         size="sm"
                       >
-                        Delete
+                        {t('delete')}
                       </Button>
                     </div>
                   </td>

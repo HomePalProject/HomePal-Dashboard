@@ -9,6 +9,8 @@ import type { ShoppingTrendsData } from '@typeDefs/analyticsTypes';
 import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
 import { productCategoryService } from '@services/productCategoryService';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
+import { useTranslation } from 'react-i18next';
+import { getLocalizedCulture } from '@lib/formatters';
 function SupermarketLogo({
   logoPath,
   name,
@@ -60,6 +62,7 @@ function SupermarketLogo({
 }
 
 export default function SupermarketPerformance() {
+  const { t, i18n } = useTranslation('stats');
   const navigate = useNavigate();
   const [supermarkets, setSupermarkets] = useState<Supermarket[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -110,9 +113,15 @@ export default function SupermarketPerformance() {
     setIsExporting(true);
     await new Promise((r) => setTimeout(r, 600));
 
-    const headers = ['Supermarket Name', 'Website', 'Offers Count', 'Status'];
+    const headers = [
+      t('thSupermarketPartner'),
+      t('thFacebook'),
+      t('thActiveOffers'),
+      t('thStatus'),
+    ];
     const rows = supermarkets.map((s) => {
-      const name = getLocalString(s.name);
+      const name =
+        getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') || getLocalString(s.name);
       const sOffers = offers.filter(
         (o) => o.supermarketId === s.id || o.supermarketName === name
       ).length;
@@ -120,7 +129,7 @@ export default function SupermarketPerformance() {
         `"${name}"`,
         `"${s.websiteUrl || '—'}"`,
         sOffers,
-        s.isActive !== false ? 'Active' : 'Inactive',
+        s.isActive !== false ? t('statusActive') : t('statusInactive'),
       ];
     });
 
@@ -135,11 +144,13 @@ export default function SupermarketPerformance() {
     document.body.removeChild(link);
 
     setIsExporting(false);
-    showToast('Supermarket performance report exported successfully');
+    showToast(t('toastExportSuccess'));
   };
 
   const filteredSupermarkets = supermarkets.filter((s) => {
-    const name = getLocalString(s.name).toLowerCase();
+    const name = (
+      getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') || getLocalString(s.name)
+    ).toLowerCase();
     return name.includes(searchQuery.toLowerCase());
   });
 
@@ -148,7 +159,7 @@ export default function SupermarketPerformance() {
       <div className="p-[40px] text-center flex flex-col items-center justify-center min-h-[300px]">
         <div className="w-[32px] h-[32px] border-4 border-primary border-t-transparent rounded-full animate-spin mb-[16px]" />
         <span className="text-[14px] font-medium text-text-secondary">
-          Loading live supermarket analytics...
+          {t('loadingSupermarketAnalytics')}
         </span>
       </div>
     );
@@ -160,9 +171,9 @@ export default function SupermarketPerformance() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-[12px]">
         <div>
           <div className="flex items-center gap-[6px] text-[13px] text-text-secondary mb-[4px] font-medium">
-            <span>HomePal Admin</span>
+            <span>{t('homepalAdmin')}</span>
             <svg
-              className="w-[12px] h-[12px]"
+              className="w-[12px] h-[12px] rtl:rotate-180"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -172,15 +183,12 @@ export default function SupermarketPerformance() {
             >
               <path d="m9 18 6-6-6-6" />
             </svg>
-            <span className="text-text-primary">Analytics</span>
+            <span className="text-text-primary">{t('analytics')}</span>
           </div>
           <h1 className="text-[24px] font-extrabold text-text-primary tracking-tight m-0">
-            Supermarket Performance & Trends
+            {t('titlePerformance')}
           </h1>
-          <p className="text-[13px] text-text-secondary m-0 mt-[2px]">
-            Live partner supermarket operations, active catalog offers, and consumer preference
-            trends.
-          </p>
+          <p className="text-[13px] text-text-secondary m-0 mt-[2px]">{t('subtitlePerformance')}</p>
         </div>
         <div className="flex gap-[10px] items-center flex-wrap">
           <button
@@ -208,7 +216,7 @@ export default function SupermarketPerformance() {
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
             )}
-            Export CSV
+            {t('exportCsv')}
           </button>
           <button
             onClick={() => navigate('/dashboard/supermarkets?openAdd=true')}
@@ -226,7 +234,7 @@ export default function SupermarketPerformance() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Add Partner
+            {t('addPartner')}
           </button>
         </div>
       </div>
@@ -237,7 +245,7 @@ export default function SupermarketPerformance() {
         <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
           <div className="flex justify-between items-center mb-[8px]">
             <span className="text-[13px] font-semibold text-text-secondary">
-              Top Supermarket Partner
+              {t('topSupermarketPartner')}
             </span>
             {(() => {
               const smName = shoppingTrends?.mostSuccessfulSupermarket || 'Carrefour';
@@ -280,7 +288,7 @@ export default function SupermarketPerformance() {
             {shoppingTrends?.mostSuccessfulSupermarket || 'Carrefour'}
           </div>
           <div className="text-[12px] text-primary font-medium mt-[4px]">
-            Highest consumer engagement
+            {t('highestConsumerEngagement')}
           </div>
         </div>
 
@@ -288,12 +296,13 @@ export default function SupermarketPerformance() {
         <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
           <div className="flex justify-between items-center mb-[8px]">
             <span className="text-[13px] font-semibold text-text-secondary">
-              Top Purchased Category
+              {t('topPurchasedCategory')}
             </span>
             {(() => {
               const catName = shoppingTrends?.mostBoughtCategory?.name || 'Dairy & Eggs';
               const cat = categories.find((c) => {
-                const nameStr = Array.isArray(c.name) ? c.name[0]?.value : c.name;
+                const nameStr =
+                  getLocalizedCulture(c.name, 'en') || (typeof c.name === 'string' ? c.name : '');
                 return nameStr === catName;
               });
               const imgUrl = getImageUrl(cat?.imagePath);
@@ -324,12 +333,17 @@ export default function SupermarketPerformance() {
             })()}
           </div>
           <div className="text-[20px] font-bold text-text-primary tracking-tight truncate">
-            {shoppingTrends?.mostBoughtCategory?.name || 'Dairy & Eggs'}
+            {getLocalizedCulture(
+              shoppingTrends?.mostBoughtCategory?.name,
+              i18n.resolvedLanguage as 'en' | 'ar'
+            ) ||
+              shoppingTrends?.mostBoughtCategory?.name ||
+              'Dairy & Eggs'}
           </div>
           <div className="text-[12px] text-emerald-600 font-semibold mt-[4px]">
             {shoppingTrends?.mostBoughtCategory?.percentage
-              ? `${shoppingTrends.mostBoughtCategory.percentage}% of purchases`
-              : 'High volume demand'}
+              ? t('pctOfPurchases', { percentage: shoppingTrends.mostBoughtCategory.percentage })
+              : t('highVolumeDemand')}
           </div>
         </div>
 
@@ -337,12 +351,13 @@ export default function SupermarketPerformance() {
         <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
           <div className="flex justify-between items-center mb-[8px]">
             <span className="text-[13px] font-semibold text-text-secondary">
-              Top Inventory Category
+              {t('topInventoryCategory')}
             </span>
             {(() => {
               const catName = shoppingTrends?.mostCommonInventoryCategory?.name || 'Beverages';
               const cat = categories.find((c) => {
-                const nameStr = Array.isArray(c.name) ? c.name[0]?.value : c.name;
+                const nameStr =
+                  getLocalizedCulture(c.name, 'en') || (typeof c.name === 'string' ? c.name : '');
                 return nameStr === catName;
               });
               const imgUrl = getImageUrl(cat?.imagePath);
@@ -373,12 +388,19 @@ export default function SupermarketPerformance() {
             })()}
           </div>
           <div className="text-[20px] font-bold text-text-primary tracking-tight truncate">
-            {shoppingTrends?.mostCommonInventoryCategory?.name || 'Beverages'}
+            {getLocalizedCulture(
+              shoppingTrends?.mostCommonInventoryCategory?.name,
+              i18n.resolvedLanguage as 'en' | 'ar'
+            ) ||
+              shoppingTrends?.mostCommonInventoryCategory?.name ||
+              'Beverages'}
           </div>
           <div className="text-[12px] text-amber-600 font-semibold mt-[4px]">
             {shoppingTrends?.mostCommonInventoryCategory?.percentage
-              ? `${shoppingTrends.mostCommonInventoryCategory.percentage}% of total stock`
-              : 'Most stocked'}
+              ? t('pctOfTotalStock', {
+                  percentage: shoppingTrends.mostCommonInventoryCategory.percentage,
+                })
+              : t('mostStocked')}
           </div>
         </div>
 
@@ -386,7 +408,7 @@ export default function SupermarketPerformance() {
         <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
           <div className="flex justify-between items-center mb-[8px]">
             <span className="text-[13px] font-semibold text-text-secondary">
-              Active Offers Catalog
+              {t('activeOffersCatalog')}
             </span>
             <div className="w-[36px] h-[36px] rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0">
               <svg
@@ -404,10 +426,10 @@ export default function SupermarketPerformance() {
             </div>
           </div>
           <div className="text-[20px] font-bold text-text-primary tracking-tight">
-            {offers.length.toLocaleString()} Active
+            {t('activeCount', { count: offers.length })}
           </div>
           <div className="text-[12px] text-indigo-600 font-semibold mt-[4px]">
-            Verified partner deals
+            {t('verifiedPartnerDeals')}
           </div>
         </div>
       </div>
@@ -418,21 +440,23 @@ export default function SupermarketPerformance() {
         <div className="bg-surface rounded-xl border border-border flex flex-col overflow-hidden shadow-xs">
           <div className="px-[20px] py-[14px] border-b border-border flex flex-col sm:flex-row justify-between sm:items-center gap-[10px]">
             <div className="flex items-center gap-[8px] whitespace-nowrap">
-              <h2 className="text-[15px] font-bold text-text-primary m-0">Partner Supermarkets</h2>
+              <h2 className="text-[15px] font-bold text-text-primary m-0">
+                {t('partnerSupermarkets')}
+              </h2>
               <span className="px-[8px] py-[2px] rounded-full bg-primary/10 text-primary text-[11px] font-bold">
-                {supermarkets.length} Enrolled
+                {t('enrolledCount', { count: supermarkets.length })}
               </span>
             </div>
             <div className="relative w-full sm:w-[220px]">
               <input
                 type="text"
-                placeholder="Search partner..."
+                placeholder={t('searchPartner')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-[10px] py-[6px] pl-[30px] text-[13px] bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:border-primary h-[34px]"
+                className="w-full px-[10px] py-[6px] ps-[30px] text-[13px] bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:border-primary h-[34px]"
               />
               <svg
-                className="w-[14px] h-[14px] absolute left-[10px] top-1/2 -translate-y-1/2 text-text-disabled"
+                className="w-[14px] h-[14px] absolute start-[10px] top-1/2 -translate-y-1/2 text-text-disabled"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -445,20 +469,20 @@ export default function SupermarketPerformance() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
+            <table className="w-full border-collapse text-start">
               <thead>
                 <tr className="border-b border-border bg-surface-variant/30">
                   <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
-                    Supermarket Partner
+                    {t('thSupermarketPartner')}
                   </th>
                   <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
-                    Facebook Page
+                    {t('thFacebookPage')}
                   </th>
                   <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
-                    Active Offers
+                    {t('thActiveOffers')}
                   </th>
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase text-right whitespace-nowrap">
-                    Status
+                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase text-end whitespace-nowrap">
+                    {t('thStatus')}
                   </th>
                 </tr>
               </thead>
@@ -469,7 +493,7 @@ export default function SupermarketPerformance() {
                       colSpan={4}
                       className="px-[20px] py-[32px] text-center text-text-disabled text-[13px]"
                     >
-                      No matching supermarkets found.
+                      {t('noMatchingSupermarkets')}
                     </td>
                   </tr>
                 ) : (
@@ -493,10 +517,13 @@ export default function SupermarketPerformance() {
                             />
                             <div>
                               <div className="text-[13px] font-semibold text-text-primary">
-                                {name}
+                                {getLocalizedCulture(
+                                  supermarket.name,
+                                  i18n.resolvedLanguage as 'en' | 'ar'
+                                ) || getLocalString(supermarket.name)}
                               </div>
                               <div className="text-[11px] text-text-disabled">
-                                {supermarket.address || 'Partner Chain'}
+                                {supermarket.address || t('partnerChain')}
                               </div>
                             </div>
                           </div>
@@ -513,7 +540,7 @@ export default function SupermarketPerformance() {
                               rel="noreferrer"
                               className="text-primary hover:underline font-medium text-[12px]"
                             >
-                              Facebook ↗
+                              {t('facebookLink')}
                             </a>
                           ) : (
                             <span className="text-text-disabled">—</span>
@@ -521,10 +548,10 @@ export default function SupermarketPerformance() {
                         </td>
                         <td className="px-[16px] py-[12px] text-[13px] font-semibold text-text-primary whitespace-nowrap">
                           <span className="px-[8px] py-[3px] rounded bg-surface-variant text-text-secondary text-[12px]">
-                            {sOffersCount} Deals
+                            {t('dealsCount', { count: sOffersCount })}
                           </span>
                         </td>
-                        <td className="px-[16px] py-[12px] text-right">
+                        <td className="px-[16px] py-[12px] text-end">
                           <span
                             className={cn(
                               'inline-flex items-center gap-[5px] px-[8px] py-[2px] rounded-full text-[11px] font-bold',
@@ -541,7 +568,9 @@ export default function SupermarketPerformance() {
                                   : 'bg-text-disabled'
                               )}
                             />
-                            {supermarket.isActive !== false ? 'Active' : 'Inactive'}
+                            {supermarket.isActive !== false
+                              ? t('statusActive')
+                              : t('statusInactive')}
                           </span>
                         </td>
                       </tr>
@@ -558,10 +587,10 @@ export default function SupermarketPerformance() {
           {/* Preference Ranking Breakdown (From GET /api/analytics/shopping-trends) */}
           <div className="bg-surface rounded-xl border border-border p-[18px] shadow-xs">
             <h3 className="text-[14px] font-bold text-text-primary m-0 mb-[2px]">
-              Consumer Preference Ranking
+              {t('consumerPreferenceRanking')}
             </h3>
             <p className="text-[11px] text-text-disabled m-0 mb-[14px]">
-              Ranked dietary preferences across households
+              {t('rankedDietaryPreferences')}
             </p>
 
             {shoppingTrends?.preferenceRanking && shoppingTrends.preferenceRanking.length > 0 ? (
@@ -573,7 +602,14 @@ export default function SupermarketPerformance() {
                   >
                     <div className="flex justify-between items-center text-[12px]">
                       <span className="font-semibold text-text-primary">
-                        {pref.preference} ({pref.category})
+                        {getLocalizedCulture(
+                          pref.preference,
+                          i18n.resolvedLanguage as 'en' | 'ar'
+                        ) || getLocalString(pref.preference)}{' '}
+                        (
+                        {getLocalizedCulture(pref.category, i18n.resolvedLanguage as 'en' | 'ar') ||
+                          getLocalString(pref.category)}
+                        )
                       </span>
                       <span className="font-bold text-primary">{pref.percentage}%</span>
                     </div>
@@ -593,25 +629,43 @@ export default function SupermarketPerformance() {
                   { pref: 'Low Sodium / Sugar-Free', cat: 'Pantry', pct: 31 },
                   { pref: 'Halal Certified', cat: 'Meat & Poultry', pct: 88 },
                   { pref: 'Gluten-Free Options', cat: 'Bakery', pct: 24 },
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    className="flex flex-col gap-[4px] p-[8px] rounded-lg bg-surface-variant/40 border border-border/50"
-                  >
-                    <div className="flex justify-between items-center text-[12px]">
-                      <span className="font-semibold text-text-primary">
-                        {item.pref} ({item.cat})
-                      </span>
-                      <span className="font-bold text-primary">{item.pct}%</span>
+                ].map((item, i) => {
+                  const displayPref =
+                    item.pref === 'Organic / Non-GMO'
+                      ? t('prefOrganic')
+                      : item.pref === 'Low Sodium / Sugar-Free'
+                        ? t('prefLowSodium')
+                        : item.pref === 'Halal Certified'
+                          ? t('prefHalal')
+                          : t('prefGlutenFree');
+                  const displayCat =
+                    item.cat === 'Produce'
+                      ? t('catProduce')
+                      : item.cat === 'Pantry'
+                        ? t('catPantry')
+                        : item.cat === 'Meat & Poultry'
+                          ? t('catMeat')
+                          : t('catBakery');
+                  return (
+                    <div
+                      key={i}
+                      className="flex flex-col gap-[4px] p-[8px] rounded-lg bg-surface-variant/40 border border-border/50"
+                    >
+                      <div className="flex justify-between items-center text-[12px]">
+                        <span className="font-semibold text-text-primary">
+                          {displayPref} ({displayCat})
+                        </span>
+                        <span className="font-bold text-primary">{item.pct}%</span>
+                      </div>
+                      <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full"
+                          style={{ width: `${item.pct}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
-                      <div
-                        className="h-full bg-primary rounded-full"
-                        style={{ width: `${item.pct}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -619,10 +673,10 @@ export default function SupermarketPerformance() {
           {/* Top Supermarket Chains Distribution (From GET /api/analytics/overview) */}
           <div className="bg-surface rounded-xl border border-border p-[18px] shadow-xs">
             <h3 className="text-[14px] font-bold text-text-primary m-0 mb-[2px]">
-              Supermarket Chain Share
+              {t('supermarketChainShare')}
             </h3>
             <p className="text-[11px] text-text-disabled m-0 mb-[14px]">
-              Aggregated catalog volume share
+              {t('aggregatedCatalogVolumeShare')}
             </p>
 
             {overviewData?.topSupermarketChains && overviewData.topSupermarketChains.length > 0 ? (
@@ -630,7 +684,10 @@ export default function SupermarketPerformance() {
                 {overviewData.topSupermarketChains.map((chain, i) => (
                   <div key={i} className="flex flex-col gap-[4px]">
                     <div className="flex justify-between text-[12px]">
-                      <span className="text-text-primary font-semibold">{chain.name}</span>
+                      <span className="text-text-primary font-semibold">
+                        {getLocalizedCulture(chain.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                          getLocalString(chain.name)}
+                      </span>
                       <span className="text-text-secondary font-bold">{chain.value}%</span>
                     </div>
                     <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
@@ -644,7 +701,7 @@ export default function SupermarketPerformance() {
               </div>
             ) : (
               <div className="text-[12px] text-text-disabled text-center py-[10px]">
-                No chain share data available.
+                {t('noChainShareData')}
               </div>
             )}
           </div>
@@ -653,7 +710,7 @@ export default function SupermarketPerformance() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-[16px] right-[16px] bg-gray-900 text-white px-[16px] py-[8px] rounded-lg text-[13px] font-medium shadow-lg z-50 animate-bounce">
+        <div className="fixed bottom-[16px] inset-e-[16px] bg-gray-900 text-white px-[16px] py-[8px] rounded-lg text-[13px] font-medium shadow-lg z-50 animate-bounce">
           {toastMessage}
         </div>
       )}

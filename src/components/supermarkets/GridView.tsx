@@ -1,8 +1,9 @@
-import { getLocalString } from '@lib/formatters';
+import { getLocalString, getLocalizedCulture } from '@lib/formatters';
 import { BRANCH_COUNTS } from '@constants/supermarketData';
 import type { Supermarket } from '@typeDefs/catalogTypes';
 import { SupermarketLogo } from './SupermarketLogo';
 import { Button } from '@components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 interface GridViewProps {
   supermarkets: Supermarket[];
@@ -13,10 +14,13 @@ interface GridViewProps {
 }
 
 export function GridView({ supermarkets, loadingEditId, onEdit, onDelete, onAdd }: GridViewProps) {
+  const { t, i18n } = useTranslation('supermarkets');
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
       {supermarkets.map((s) => {
-        const name = getLocalString(s.name);
+        const name =
+          getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+          getLocalString(s.name);
         const branches = s.branches ?? BRANCH_COUNTS[name] ?? 0;
         const fbUrl = s.websiteUrl || 'facebook.com/supermarket/offers';
 
@@ -55,7 +59,7 @@ export function GridView({ supermarkets, loadingEditId, onEdit, onDelete, onAdd 
               </div>
 
               <span className="px-2.5 py-1 bg-surface-variant border border-border rounded-2xl text-[11px] font-bold text-text-primary shrink-0">
-                {branches} Branches
+                {t('branches', { count: branches })}
               </span>
             </div>
 
@@ -63,7 +67,7 @@ export function GridView({ supermarkets, loadingEditId, onEdit, onDelete, onAdd 
 
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                SCRAPER ENDPOINT
+                {t('endpointLabel')}
               </span>
               <div className="bg-surface border border-border rounded-xl px-3 py-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
@@ -139,7 +143,7 @@ export function GridView({ supermarkets, loadingEditId, onEdit, onDelete, onAdd 
                     <path d="m18.5 2.5 2 2L10 15H8v-2z" />
                   </svg>
                 )}
-                Edit
+                {t('edit')}
               </Button>
 
               <Button
@@ -177,10 +181,10 @@ export function GridView({ supermarkets, loadingEditId, onEdit, onDelete, onAdd 
         </div>
         <div>
           <h3 className="text-base font-extrabold text-text-primary m-0 mb-1 group-hover:text-[#1B4332]">
-            Register New Chain
+            {t('registerNew')}
           </h3>
           <p className="text-xs text-slate-500 m-0 max-w-[220px] leading-relaxed">
-            Add a new supermarket configuration to the ingestion pipeline.
+            {t('registerNewDesc')}
           </p>
         </div>
       </div>

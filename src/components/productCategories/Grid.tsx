@@ -2,6 +2,7 @@ import { getLocalizedName } from '@/utils/categoryHelpers';
 import { getImageUrl } from '@lib/formatters';
 import { Button } from '@components/ui/Button';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
+import { useTranslation } from 'react-i18next';
 
 interface GridProps {
   categories: ProductCategory[];
@@ -18,6 +19,7 @@ export default function GridView({
   onDelete,
   loadingEditId,
 }: GridProps) {
+  const { t } = useTranslation('categories');
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {categories.map((cat) => {
@@ -82,11 +84,11 @@ export default function GridView({
             <div className="p-5 flex-1 flex flex-col justify-between gap-1 bg-white">
               <div>
                 <h3 className="text-[15px] font-black text-slate-900 truncate" title={en}>
-                  {en || 'Untitled Category'}
+                  {en || t('untitledCategory')}
                 </h3>
                 {ar && (
                   <p
-                    className="text-[13px] font-bold text-slate-400 mt-1 text-right font-arabic"
+                    className="text-[13px] font-bold text-slate-400 mt-1 text-end font-arabic"
                     dir="rtl"
                   >
                     {ar}
@@ -99,7 +101,7 @@ export default function GridView({
                 <Button
                   onClick={() => onEdit(cat)}
                   disabled={loadingEditId === cat.id}
-                  title="Edit Category"
+                  title={t('editCategory')}
                   variant="ghost"
                   size="icon"
                 >
@@ -131,7 +133,7 @@ export default function GridView({
                 </Button>
                 <Button
                   onClick={() => onUpload(cat.id)}
-                  title="Upload Cover Image"
+                  title={t('uploadCover')}
                   variant="ghost"
                   size="icon"
                 >
@@ -150,7 +152,7 @@ export default function GridView({
                 </Button>
                 <Button
                   onClick={() => onDelete(cat)}
-                  title="Delete Category"
+                  title={t('deleteCategory')}
                   variant="ghost"
                   size="icon"
                   className="text-red-600 hover:bg-red-50 hover:text-red-700"

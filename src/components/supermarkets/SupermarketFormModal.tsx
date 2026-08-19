@@ -5,6 +5,7 @@ import { Field } from '@components/ui/Field';
 import { ModalActions } from '@components/ui/ModalActions';
 import { Button } from '@components/ui/Button';
 import { getLocalizedCulture } from '@lib/formatters';
+import { useTranslation } from 'react-i18next';
 
 export function SupermarketFormModal({
   initial,
@@ -15,6 +16,7 @@ export function SupermarketFormModal({
   onSave: (d: any) => Promise<string | null>;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('supermarkets');
   const [nameEn, setNameEn] = useState(
     initial
       ? getLocalizedCulture(initial.name, 'en') ||
@@ -65,11 +67,15 @@ export function SupermarketFormModal({
   };
 
   return (
-    <Modal title={initial ? 'Edit Supermarket' : 'Add Supermarket'} onClose={onClose} isOpen={true}>
+    <Modal
+      title={initial ? t('editSupermarket') : t('addSupermarket')}
+      onClose={onClose}
+      isOpen={true}
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-1">
         {/* Logo Upload / Preview Section */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-bold text-slate-700">Supermarket Logo</label>
+          <label className="text-xs font-bold text-slate-700">{t('logoLabel')}</label>
           <div className="flex items-center gap-1 p-3 bg-slate-50 border border-slate-200 rounded-xl">
             {logoPreview ? (
               <div className="relative group">
@@ -110,7 +116,7 @@ export function SupermarketFormModal({
                   <polyline points="17 8 12 3 7 8" />
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
-                {logoPreview ? 'Change Logo' : 'Upload Image'}
+                {logoPreview ? t('changeLogo') : t('uploadImage')}
                 <input
                   type="file"
                   accept="image/*"
@@ -126,17 +132,17 @@ export function SupermarketFormModal({
                   variant="ghost"
                   className="text-[11px] font-semibold text-red-600 hover:underline w-fit border-none bg-transparent cursor-pointer p-0 h-auto min-h-0 hover:bg-transparent"
                 >
-                  Remove Logo
+                  {t('removeLogo')}
                 </Button>
               )}
 
-              <span className="text-[11px] text-slate-400">PNG, JPG or WEBP (max. 5MB)</span>
+              <span className="text-[11px] text-slate-400">{t('logoLimits')}</span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-          <Field label="English Name" required>
+          <Field label={t('nameEn')} required>
             <input
               className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border"
               value={nameEn}
@@ -145,9 +151,9 @@ export function SupermarketFormModal({
               required={!nameAr}
             />
           </Field>
-          <Field label="Arabic Name">
+          <Field label={t('nameAr')}>
             <input
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border text-right"
+              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border text-end"
               dir="rtl"
               value={nameAr}
               onChange={(e) => setNameAr(e.target.value)}
@@ -157,7 +163,7 @@ export function SupermarketFormModal({
           </Field>
         </div>
 
-        <Field label="Facebook Page / Scraper URL">
+        <Field label={t('scraperUrl')}>
           <input
             className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border"
             value={websiteUrl}
@@ -167,7 +173,7 @@ export function SupermarketFormModal({
           />
         </Field>
 
-        <Field label="Address / Region">
+        <Field label={t('address')}>
           <input
             className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border"
             value={address}
@@ -181,7 +187,7 @@ export function SupermarketFormModal({
         <ModalActions
           onCancel={onClose}
           saving={saving}
-          label={initial ? 'Save Changes' : 'Add Supermarket'}
+          label={initial ? t('saveChanges') : t('addSupermarket')}
         />
       </form>
     </Modal>

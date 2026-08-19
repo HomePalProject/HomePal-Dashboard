@@ -2,6 +2,7 @@ import { getLocalizedName } from '@/utils/categoryHelpers';
 import { getImageUrl } from '@lib/formatters';
 import { Button } from '@components/ui/Button';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
+import { useTranslation } from 'react-i18next';
 
 interface TableProps {
   categories: ProductCategory[];
@@ -18,17 +19,18 @@ export default function TableView({
   onDelete,
   loadingEditId,
 }: TableProps) {
+  const { t } = useTranslation('categories');
   return (
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-start border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-              <th className="px-16 py-3 whitespace-nowrap">Cover</th>
-              <th className="px-16 py-3 whitespace-nowrap">English Name</th>
-              <th className="px-16 py-3 text-right whitespace-nowrap">Arabic Name</th>
-              <th className="px-16 py-3 whitespace-nowrap">Items Count</th>
-              <th className="px-16 py-3 text-right whitespace-nowrap">Actions</th>
+              <th className="px-16 py-3 whitespace-nowrap">{t('tableHeaderCover')}</th>
+              <th className="px-16 py-3 whitespace-nowrap">{t('tableHeaderEn')}</th>
+              <th className="px-16 py-3 text-end whitespace-nowrap">{t('tableHeaderAr')}</th>
+              <th className="px-16 py-3 whitespace-nowrap">{t('tableHeaderCount')}</th>
+              <th className="px-16 py-3 text-end whitespace-nowrap">{t('tableHeaderActions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-xs">
@@ -64,20 +66,20 @@ export default function TableView({
                   </td>
                   <td className="px-16 py-3 font-bold text-slate-900 whitespace-nowrap">{en}</td>
                   <td
-                    className="px-16 py-3 text-right font-semibold text-slate-600 whitespace-nowrap"
+                    className="px-16 py-3 text-end font-semibold text-slate-600 whitespace-nowrap"
                     dir="rtl"
                   >
                     {ar || '—'}
                   </td>
                   <td className="px-16 py-3 font-bold text-slate-800 whitespace-nowrap">
-                    {count} Items
+                    {t('items', { count })}
                   </td>
-                  <td className="px-16 py-3 text-right whitespace-nowrap">
+                  <td className="px-16 py-3 text-end whitespace-nowrap">
                     <div className="flex items-center justify-end gap-1">
                       <Button
                         onClick={() => onEdit(cat)}
                         disabled={loadingEditId === cat.id}
-                        title="Edit Category"
+                        title={t('editCategory')}
                         variant="ghost"
                         size="icon"
                       >
@@ -109,7 +111,7 @@ export default function TableView({
                       </Button>
                       <Button
                         onClick={() => onUpload(cat.id)}
-                        title="Upload Cover Image"
+                        title={t('uploadCover')}
                         variant="ghost"
                         size="icon"
                       >
@@ -128,7 +130,7 @@ export default function TableView({
                       </Button>
                       <Button
                         onClick={() => onDelete(cat)}
-                        title="Delete Category"
+                        title={t('deleteCategory')}
                         variant="ghost"
                         size="icon"
                         className="text-red-600 hover:bg-red-50 hover:text-red-700"

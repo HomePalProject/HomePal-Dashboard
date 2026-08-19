@@ -4,9 +4,11 @@ import { fetchBilingual } from '@lib/localization';
 import { productCategoryService } from '@services/productCategoryService';
 import type { CreateUpdateCategoryPayload, ProductCategory } from '@typeDefs/productCategoryTypes';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getLocalizedName } from '../utils/categoryHelpers';
 
 export default function useProductCategories() {
+  const { t } = useTranslation('categories');
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,7 +91,7 @@ export default function useProductCategories() {
           ],
         };
       } catch {
-        showToast('Could not load both languages — showing available data only.');
+        showToast(t('toastLoadBilingualError'));
       } finally {
         setLoadingEditId(null);
       }
@@ -126,7 +128,7 @@ export default function useProductCategories() {
   const handleSubmitForm = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!enName.trim()) {
-      setFormError('English Name is required.');
+      setFormError(t('errEnNameRequired'));
       return;
     }
     setSaving(true);
@@ -153,9 +155,7 @@ export default function useProductCategories() {
       if (categoryId && coverFile) {
         await productCategoryService.uploadCategoryImage(categoryId, coverFile);
       }
-      showToast(
-        modalState.editing ? 'Category updated successfully!' : 'Category created successfully!'
-      );
+      showToast(modalState.editing ? t('toastCategoryUpdated') : t('toastCategoryCreated'));
       handleCloseModal();
       void fetchCategories();
     } catch (err: any) {
@@ -170,17 +170,15 @@ export default function useProductCategories() {
     setDeleting(true);
     try {
       await productCategoryService.deleteCategory(deleteTarget.id);
-      showToast('Category deleted successfully.');
+      showToast(t('toastCategoryDeleted'));
       setDeleteTarget(null);
       void fetchCategories();
     } catch (err: any) {
       const status = err?.response?.status;
       if (status === 500) {
-        showToast(
-          'Cannot delete category: It is currently linked to active products or offers in the database.'
-        );
+        showToast(t('errDeleteLinked'));
       } else {
-        showToast(`Delete failed: ${getErrorMessage(err)}`);
+        showToast(t('errDeleteFailed', { error: getErrorMessage(err) }));
       }
     } finally {
       setDeleting(false);
@@ -197,10 +195,10 @@ export default function useProductCategories() {
       const file = e.target.files[0];
       try {
         await productCategoryService.uploadCategoryImage(uploadTargetId, file);
-        showToast('Category image uploaded successfully!');
+        showToast(t('toastImageUploaded'));
         void fetchCategories();
       } catch (err: any) {
-        showToast(`Image upload failed: ${getErrorMessage(err)}`);
+        showToast(t('errImageUploadFailed', { error: getErrorMessage(err) }));
       } finally {
         setUploadTargetId(null);
         e.target.value = '';

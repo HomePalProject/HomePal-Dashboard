@@ -10,10 +10,12 @@ import { getImageUrl, getLocalString, getLocalizedCulture } from '@lib/formatter
 import { fetchBilingual } from '@lib/localization';
 import { Modal } from '@components/ui/Modal';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
+import { useTranslation } from 'react-i18next';
 
 type FilterTab = 'all' | 'unverified' | 'expiring';
 
 export default function OffersHub() {
+  const { t, i18n } = useTranslation(['offers', 'common']);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -142,7 +144,7 @@ export default function OffersHub() {
             ],
           };
         } catch {
-          showToast('Could not load both languages — showing available data only.');
+          showToast(t('toastLoadBilingualError'));
         } finally {
           setLoadingEditId(null);
         }
@@ -255,7 +257,7 @@ export default function OffersHub() {
         setOffers((prev) =>
           prev.map((o) => (o.id === editingOffer.id ? ({ ...o, ...payload } as Offer) : o))
         );
-        showToast('Offer updated successfully!');
+        showToast(t('toastOfferUpdated'));
       } else {
         const newOffer: Offer = {
           id: `off-${Date.now()}`,
@@ -263,11 +265,11 @@ export default function OffersHub() {
         } as Offer;
         await catalogService.saveOffer(payload).catch(() => null);
         setOffers((prev) => [newOffer, ...prev]);
-        showToast('New offer created successfully!');
+        showToast(t('toastOfferCreated'));
       }
       handleCloseModal();
     } catch (err: any) {
-      showToast(`Error saving offer: ${getErrorMessage(err)}`);
+      showToast(t('errSaveOffer', { error: getErrorMessage(err) }));
     } finally {
       setSaving(false);
     }
@@ -309,7 +311,7 @@ export default function OffersHub() {
       }
     }
 
-    showToast(updatedStatus ? 'Offer marked as Verified!' : 'Offer unverified.');
+    showToast(updatedStatus ? t('toastOfferVerified') : t('toastOfferUnverified'));
 
     try {
       await catalogService.saveOffer({ isVerified: updatedStatus }, offer.id);
@@ -358,10 +360,10 @@ export default function OffersHub() {
         }
       }
 
-      showToast('Offer deleted successfully.');
+      showToast(t('toastOfferDeleted'));
       setDeleteTarget(null);
     } catch (err: any) {
-      showToast(`Delete failed: ${getErrorMessage(err)}`);
+      showToast(t('errDeleteFailed', { error: getErrorMessage(err) }));
     } finally {
       setDeleting(false);
     }
@@ -463,7 +465,7 @@ export default function OffersHub() {
     <div className="w-full flex flex-col gap-6 font-sans pb-16 px-2 sm:px-0">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-3 border border-slate-700 animate-fade-in">
+        <div className="fixed top-6 inset-e-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-3 border border-slate-700 animate-fade-in">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>{toastMessage}</span>
         </div>
@@ -473,17 +475,14 @@ export default function OffersHub() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-            <span>Control Hub</span>
+            <span>{t('controlHub')}</span>
             <span>/</span>
-            <span className="text-slate-900 font-bold">Offers Management</span>
+            <span className="text-slate-900 font-bold">{t('offersManagement')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">
-            Offers Hub
+            {t('title')}
           </h1>
-          <p className="text-sm text-slate-500 mt-1 m-0">
-            Manage, verify, and track supermarket promotions automatically synced from scraping
-            pipelines.
-          </p>
+          <p className="text-sm text-slate-500 mt-1 m-0">{t('subtitle')}</p>
         </div>
 
         {/* Top Header Actions */}
@@ -497,7 +496,7 @@ export default function OffersHub() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="absolute start-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
             >
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -506,8 +505,8 @@ export default function OffersHub() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search offers..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:border-slate-400"
+              placeholder={t('searchPlaceholder')}
+              className="w-full ps-10 pe-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:border-slate-400"
             />
           </div>
 
@@ -528,7 +527,7 @@ export default function OffersHub() {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            <span>Add New Offer</span>
+            <span>{t('addNewOffer')}</span>
           </Button>
         </div>
       </div>
@@ -549,7 +548,7 @@ export default function OffersHub() {
                 : 'bg-transparent text-slate-500 hover:text-slate-900'
             )}
           >
-            All Offers ({offers.length})
+            {t('allOffers', { count: offers.length })}
           </button>
           <button
             onClick={() => {
@@ -563,7 +562,7 @@ export default function OffersHub() {
                 : 'bg-transparent text-slate-500 hover:text-slate-900'
             )}
           >
-            <span>Needs Verification</span>
+            <span>{t('needsVerification')}</span>
             {needsReviewCount > 0 && (
               <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">
                 {needsReviewCount}
@@ -582,12 +581,12 @@ export default function OffersHub() {
                 : 'bg-transparent text-slate-500 hover:text-slate-900'
             )}
           >
-            Expiring Soon
+            {t('expiringSoon')}
           </button>
 
           <button
             onClick={() => navigate('/dashboard/scraping-pipeline')}
-            className="ml-auto flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:underline border-none bg-transparent cursor-pointer shrink-0 whitespace-nowrap"
+            className="ms-auto flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:underline border-none bg-transparent cursor-pointer shrink-0 whitespace-nowrap"
           >
             <svg
               width="14"
@@ -599,7 +598,7 @@ export default function OffersHub() {
             >
               <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
             </svg>
-            Go to Scraper Pipeline →
+            {t('goToScrapers')}
           </button>
         </div>
 
@@ -607,7 +606,9 @@ export default function OffersHub() {
         <div className="px-6 py-3.5 bg-white border-b border-slate-200 flex flex-row flex-wrap items-center gap-3">
           {/* Supermarket Dropdown Filter */}
           <div className="flex items-center gap-2 text-xs w-full sm:w-auto">
-            <span className="hidden sm:inline font-semibold text-slate-500">Supermarket:</span>
+            <span className="hidden sm:inline font-semibold text-slate-500">
+              {t('labelSupermarket')}
+            </span>
             <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={selectedSupermarketFilter}
@@ -615,12 +616,13 @@ export default function OffersHub() {
                   setSelectedSupermarketFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full sm:w-auto appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
+                className="w-full sm:w-auto appearance-none ps-3.5 pe-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
               >
-                <option value="all">All Supermarkets ({supermarkets.length})</option>
+                <option value="all">{t('allSupermarkets', { count: supermarkets.length })}</option>
                 {supermarkets.map((m) => (
                   <option key={m.id} value={m.id}>
-                    {getLocalString(m.name)}
+                    {getLocalizedCulture(m.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                      getLocalString(m.name)}
                   </option>
                 ))}
               </select>
@@ -631,7 +633,7 @@ export default function OffersHub() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
               >
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -640,7 +642,9 @@ export default function OffersHub() {
 
           {/* Category Dropdown Filter */}
           <div className="flex items-center gap-2 text-xs w-full sm:w-auto">
-            <span className="hidden sm:inline font-semibold text-slate-500">Category:</span>
+            <span className="hidden sm:inline font-semibold text-slate-500">
+              {t('labelCategory')}
+            </span>
             <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={selectedCategoryFilter}
@@ -648,12 +652,13 @@ export default function OffersHub() {
                   setSelectedCategoryFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full sm:w-auto appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
+                className="w-full sm:w-auto appearance-none ps-3.5 pe-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
               >
-                <option value="all">All Categories ({categories.length})</option>
+                <option value="all">{t('allCategories', { count: categories.length })}</option>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {getLocalString(c.name)}
+                    {getLocalizedCulture(c.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                      getLocalString(c.name)}
                   </option>
                 ))}
               </select>
@@ -664,7 +669,7 @@ export default function OffersHub() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
               >
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -672,19 +677,21 @@ export default function OffersHub() {
           </div>
 
           {/* Sort By Dropdown */}
-          <div className="flex items-center gap-2 text-xs w-full sm:w-auto sm:ml-auto">
-            <span className="hidden sm:inline font-semibold text-slate-500">Sort by:</span>
+          <div className="flex items-center gap-2 text-xs w-full sm:w-auto sm:ms-auto">
+            <span className="hidden sm:inline font-semibold text-slate-500">
+              {t('labelSortBy')}
+            </span>
             <div className="relative flex-1 sm:flex-none inline-flex items-center">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full sm:w-auto appearance-none pl-3.5 pr-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
+                className="w-full sm:w-auto appearance-none ps-3.5 pe-9 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white hover:border-slate-300 outline-none cursor-pointer focus:border-slate-400 transition-colors shadow-2xs"
               >
-                <option value="newest">Newest Ingested</option>
-                <option value="oldest">Oldest First</option>
-                <option value="discount">Highest Discount (%)</option>
-                <option value="price_low">Price: Low to High</option>
-                <option value="price_high">Price: High to Low</option>
+                <option value="newest">{t('sortNewest')}</option>
+                <option value="oldest">{t('sortOldest')}</option>
+                <option value="discount">{t('sortDiscount')}</option>
+                <option value="price_low">{t('sortPriceLow')}</option>
+                <option value="price_high">{t('sortPriceHigh')}</option>
               </select>
               <svg
                 width="13"
@@ -693,7 +700,7 @@ export default function OffersHub() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2.5"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
               >
                 <polyline points="6 9 12 15 18 9" />
               </svg>
@@ -725,7 +732,7 @@ export default function OffersHub() {
               >
                 <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
               </svg>
-              <span>Reset Filters</span>
+              <span>{t('resetFilters')}</span>
             </button>
           )}
         </div>
@@ -733,32 +740,34 @@ export default function OffersHub() {
         {/* Offers Table */}
         {loading ? (
           <div className="p-16 text-center text-slate-400 text-xs font-semibold">
-            Loading promotions & scraped offers...
+            {t('loadingOffers')}
           </div>
         ) : paginatedOffers.length === 0 ? (
           <div className="p-16 text-center flex flex-col items-center justify-center gap-2">
-            <p className="text-sm font-bold text-slate-700 m-0">No offers found</p>
-            <p className="text-xs text-slate-400 m-0">
-              Run the scraper or click "Add New Offer" to add supermarket promotions.
-            </p>
+            <p className="text-sm font-bold text-slate-700 m-0">{t('noOffers')}</p>
+            <p className="text-xs text-slate-400 m-0">{t('noOffersDesc')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-start border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                  <th className="pl-6 pr-4 py-3.5 whitespace-nowrap">OFFER</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">SUPERMARKET</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">ORIGINAL PRICE</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">OFFER PRICE</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">VALIDITY</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">STATUS</th>
-                  <th className="pr-6 pl-4 py-3.5 text-right whitespace-nowrap">ACTIONS</th>
+                  <th className="ps-6 pe-4 py-3.5 whitespace-nowrap">{t('thOffer')}</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thSupermarket')}</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thOriginalPrice')}</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thOfferPrice')}</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thValidity')}</th>
+                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thStatus')}</th>
+                  <th className="pe-6 ps-4 py-3.5 text-end whitespace-nowrap">{t('thActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
                 {paginatedOffers.map((off) => {
-                  const titleText = getLocalString(off.title || off.name);
+                  const titleText =
+                    getLocalizedCulture(
+                      off.title || off.name,
+                      i18n.resolvedLanguage as 'en' | 'ar'
+                    ) || getLocalString(off.title || off.name);
                   const marketName = off.supermarketName || 'Supermarket';
                   const categoryText = off.categoryName || 'General';
                   const imgUrl = getImageUrl(off.imagePath);
@@ -769,9 +778,9 @@ export default function OffersHub() {
                   return (
                     <tr key={off.id} className="hover:bg-slate-50/60 transition-colors">
                       {/* OFFER Column */}
-                      <td className="pl-6 pr-4 py-4 whitespace-nowrap">
+                      <td className="ps-6 pe-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
                             {imgUrl ? (
                               <img
                                 src={imgUrl}
@@ -796,13 +805,13 @@ export default function OffersHub() {
                           </div>
                           <div className="flex flex-col">
                             <span
-                              className="font-bold text-slate-900 line-clamp-1 max-w-[200px]"
+                              className="font-bold text-slate-900 line-clamp-1 max-w-30"
                               title={titleText}
                             >
                               {titleText}
                             </span>
                             <span
-                              className="text-[11px] text-slate-400 font-semibold truncate max-w-[200px]"
+                              className="text-[11px] text-slate-400 font-semibold truncate max-w-30"
                               title={categoryText}
                             >
                               {categoryText}
@@ -818,10 +827,10 @@ export default function OffersHub() {
                             <img
                               src={getImageUrl(off.supermarketLogoPath)!}
                               alt={marketName}
-                              className="w-5 h-5 rounded-full object-cover border border-slate-200 shrink-0"
+                              className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0"
                             />
                           )}
-                          <span className="truncate max-w-[120px]" title={marketName}>
+                          <span className="truncate max-w-30" title={marketName}>
                             {marketName}
                           </span>
                         </div>
@@ -831,11 +840,11 @@ export default function OffersHub() {
                       <td className="px-4 py-4 text-slate-500 font-semibold whitespace-nowrap">
                         {hasDiscount ? (
                           <span className="line-through text-slate-400 text-xs">
-                            {origPrice} EGP
+                            {origPrice} {t('currency')}
                           </span>
                         ) : (
                           <span className="text-xs text-slate-600">
-                            {origPrice ? `${origPrice} EGP` : '—'}
+                            {origPrice ? `${origPrice} ${t('currency')}` : '—'}
                           </span>
                         )}
                       </td>
@@ -843,7 +852,9 @@ export default function OffersHub() {
                       {/* OFFER PRICE Column */}
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-black text-slate-900">{discPrice} EGP</span>
+                          <span className="text-xs font-black text-slate-900">
+                            {discPrice} {t('currency')}
+                          </span>
                           {hasDiscount && (
                             <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
                               -{Math.round(((origPrice - (discPrice || 0)) / origPrice) * 100)}%
@@ -869,18 +880,19 @@ export default function OffersHub() {
                               <circle cx="12" cy="12" r="10" />
                               <polyline points="12 6 12 12 16 14" />
                             </svg>
-                            Expires Today
+                            {t('expiresToday')}
                           </span>
                         ) : off.validTo ? (
                           <span>
-                            Ends in{' '}
-                            {Math.max(
-                              1,
-                              Math.ceil(
-                                (new Date(off.validTo).getTime() - Date.now()) / (1000 * 3600 * 24)
-                              )
-                            )}{' '}
-                            days
+                            {t('endsInDays', {
+                              count: Math.max(
+                                1,
+                                Math.ceil(
+                                  (new Date(off.validTo).getTime() - Date.now()) /
+                                    (1000 * 3600 * 24)
+                                )
+                              ),
+                            })}
                           </span>
                         ) : (
                           <span className="text-slate-400">—</span>
@@ -888,34 +900,36 @@ export default function OffersHub() {
                       </td>
 
                       {/* STATUS Column */}
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         {off.isVerified || off.status === 'Verified' ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            Verified
+                            {t('statusVerified')}
                           </span>
                         ) : off.status === 'Expiring' ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                            Expiring
+                            {t('statusExpiring')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            Unverified
+                            {t('statusUnverified')}
                           </span>
                         )}
                       </td>
 
                       {/* ACTIONS Column */}
-                      <td className="pr-6 pl-4 py-4 text-right">
+                      <td className="pe-6 ps-4 py-4 text-end">
                         <div className="flex items-center justify-end gap-1">
                           {/* Verify Button */}
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleToggleVerify(off)}
-                            title={off.isVerified ? 'Mark as Unverified' : 'Approve & Verify Offer'}
+                            title={off.isVerified ? t('tooltipUnverify') : t('tooltipVerify')}
                             className={cn(
-                              'p-1.5 rounded-lg border-none bg-transparent cursor-pointer transition-colors',
+                              'h-8 w-8 rounded-lg',
                               off.isVerified
                                 ? 'text-emerald-600 hover:bg-emerald-50'
                                 : 'text-amber-600 hover:text-emerald-700 hover:bg-amber-50'
@@ -932,14 +946,16 @@ export default function OffersHub() {
                               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                               <polyline points="22 4 12 14.01 9 11.01" />
                             </svg>
-                          </button>
+                          </Button>
 
                           {/* Edit Button */}
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => void handleOpenModal(off)}
                             disabled={loadingEditId === off.id}
-                            title="Edit Offer"
-                            className="p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border-none bg-transparent cursor-pointer transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                            title={t('editOffer')}
+                            className="h-8 w-8 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
                           >
                             {loadingEditId === off.id ? (
                               <svg
@@ -966,13 +982,15 @@ export default function OffersHub() {
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                               </svg>
                             )}
-                          </button>
+                          </Button>
 
                           {/* Delete Button */}
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => setDeleteTarget(off)}
-                            title="Delete Offer"
-                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 border-none bg-transparent cursor-pointer transition-colors"
+                            title={t('deleteOffer')}
+                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
                           >
                             <svg
                               width="15"
@@ -985,7 +1003,7 @@ export default function OffersHub() {
                               <polyline points="3 6 5 6 21 6" />
                               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                             </svg>
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -999,9 +1017,11 @@ export default function OffersHub() {
         {/* Table Footer / Pagination */}
         <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 font-semibold">
           <span>
-            Showing {filteredOffers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}-
-            {Math.min(currentPage * pageSize, filteredOffers.length)} of {filteredOffers.length}{' '}
-            offers
+            {t('showingOffers', {
+              start: filteredOffers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0,
+              end: Math.min(currentPage * pageSize, filteredOffers.length),
+              total: filteredOffers.length,
+            })}
           </span>
 
           <div className="flex items-center gap-1">
@@ -1029,16 +1049,16 @@ export default function OffersHub() {
       {/* ── Add / Edit Offer Modal ── */}
       {isModalOpen && (
         <Modal
-          title={editingOffer ? 'Edit Offer' : 'Add New Offer'}
+          title={editingOffer ? t('editOffer') : t('addNewOffer')}
           onClose={handleCloseModal}
           isOpen={true}
         >
-          <form onSubmit={handleSaveOffer} className="flex flex-col gap-4 pt-2">
+          <form onSubmit={handleSaveOffer} className="flex flex-col gap-4">
             {/* Title Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  English Offer Title <span className="text-red-500">*</span>
+                  {t('englishTitle')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1051,7 +1071,7 @@ export default function OffersHub() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Arabic Offer Title
+                  {t('arabicTitle')}
                 </label>
                 <input
                   type="text"
@@ -1059,7 +1079,7 @@ export default function OffersHub() {
                   value={titleAr}
                   onChange={(e) => setTitleAr(e.target.value)}
                   placeholder="مثال: ستيك ريب آي"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400 text-right"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400 text-end"
                   required={!titleEn}
                 />
               </div>
@@ -1069,17 +1089,18 @@ export default function OffersHub() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Supermarket
+                  {t('supermarket')}
                 </label>
                 <select
                   value={supermarketId}
                   onChange={(e) => setSupermarketId(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400"
                 >
-                  <option value="">Select Supermarket...</option>
+                  <option value="">{t('selectSupermarket')}</option>
                   {supermarkets.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {getLocalString(m.name)}
+                      {getLocalizedCulture(m.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                        getLocalString(m.name)}
                     </option>
                   ))}
                 </select>
@@ -1087,17 +1108,18 @@ export default function OffersHub() {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Product Category
+                  {t('category')}
                 </label>
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400"
                 >
-                  <option value="">Select Category...</option>
+                  <option value="">{t('selectCategory')}</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {typeof c.name === 'string' ? c.name : getLocalizedCulture(c.name, 'en')}
+                      {getLocalizedCulture(c.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                        getLocalString(c.name)}
                     </option>
                   ))}
                 </select>
@@ -1108,7 +1130,7 @@ export default function OffersHub() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Original Price (EGP)
+                  {t('originalPriceLabel')}
                 </label>
                 <input
                   type="number"
@@ -1122,7 +1144,7 @@ export default function OffersHub() {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Discounted Price (EGP)
+                  {t('discountedPriceLabel')}
                 </label>
                 <input
                   type="number"
@@ -1136,7 +1158,7 @@ export default function OffersHub() {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Valid Until
+                  {t('validUntilLabel')}
                 </label>
                 <input
                   type="date"
@@ -1150,7 +1172,7 @@ export default function OffersHub() {
             {/* Image Path */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                Image Path / URL
+                {t('imagePathLabel')}
               </label>
               <input
                 type="text"
@@ -1165,7 +1187,7 @@ export default function OffersHub() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  English Description
+                  {t('englishDesc')}
                 </label>
                 <textarea
                   value={descriptionEn}
@@ -1176,14 +1198,14 @@ export default function OffersHub() {
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Arabic Description
+                  {t('arabicDesc')}
                 </label>
                 <textarea
                   dir="rtl"
                   value={descriptionAr}
                   onChange={(e) => setDescriptionAr(e.target.value)}
                   placeholder="تفاصيل العرض..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400 min-h-[60px] text-right"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none focus:border-slate-400 min-h-[60px] text-end"
                 />
               </div>
             </div>
@@ -1201,7 +1223,7 @@ export default function OffersHub() {
                 htmlFor="isVerifiedCheckbox"
                 className="text-xs font-bold text-slate-800 cursor-pointer"
               >
-                Verified Offer (Approved for Mobile App Feed)
+                {t('verifiedOfferCheckbox')}
               </label>
             </div>
 
@@ -1212,14 +1234,14 @@ export default function OffersHub() {
                 onClick={handleCloseModal}
                 className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 cursor-pointer"
               >
-                Cancel
+                {t('common:cancel')}
               </button>
               <button
                 type="submit"
                 disabled={saving}
                 className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#1F3D32] hover:bg-[#162D25] cursor-pointer transition-all shadow-xs border-none"
               >
-                {saving ? 'Saving...' : 'Save Offer'}
+                {saving ? t('saving') : t('saveOffer')}
               </button>
             </div>
           </form>
@@ -1229,9 +1251,15 @@ export default function OffersHub() {
       {/* Delete Confirmation */}
       {deleteTarget && (
         <ConfirmDialog
-          title="Delete Offer"
-          confirmLabel="Delete Offer"
-          message={`Are you sure you want to delete "${getLocalString(deleteTarget.title || deleteTarget.name)}"?`}
+          title={t('deleteOffer')}
+          confirmLabel={t('deleteOffer')}
+          message={t('deleteConfirmMessage', {
+            name:
+              getLocalizedCulture(
+                deleteTarget.title || deleteTarget.name,
+                i18n.resolvedLanguage as 'en' | 'ar'
+              ) || getLocalString(deleteTarget.title || deleteTarget.name),
+          })}
           onConfirm={handleDeleteOffer}
           onCancel={() => setDeleteTarget(null)}
           loading={deleting}

@@ -8,6 +8,7 @@ import { Modal } from '@components/ui/Modal';
 import { Field } from '@components/ui/Field';
 import { ModalActions } from '@components/ui/ModalActions';
 import { getLocalizedCulture, getLocalString } from '@lib/formatters';
+import { useTranslation } from 'react-i18next';
 
 export function PreferenceFormModal({
   initial,
@@ -20,6 +21,7 @@ export function PreferenceFormModal({
   onSave: (d: AddPreferenceRequest) => Promise<string | null>;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('preferences');
   const [nameEn, setNameEn] = useState(
     initial
       ? getLocalizedCulture(initial.name, 'en') ||
@@ -65,23 +67,27 @@ export function PreferenceFormModal({
   };
 
   return (
-    <Modal title={initial ? 'Edit Preference' : 'Add Preference'} onClose={onClose} isOpen={true}>
+    <Modal
+      title={initial ? t('editPreference') : t('addPreference')}
+      onClose={onClose}
+      isOpen={true}
+    >
       <form onSubmit={handleSubmit} className="flex flex-col gap-1">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-          <Field label="English Name" required hint="2–100 characters">
+          <Field label={t('englishName')} required hint={t('hintNameEn')}>
             <input
               className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border"
               value={nameEn}
               onChange={(e) => setNameEn(e.target.value)}
-              placeholder="e.g. Vegan, Gluten-Free"
+              placeholder={t('placeholderNameEnPref')}
               minLength={2}
               maxLength={100}
               required={!nameAr}
             />
           </Field>
-          <Field label="Arabic Name" hint="Optional if English is provided">
+          <Field label={t('arabicName')} hint={t('hintNameAr')}>
             <input
-              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border text-right"
+              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border text-end"
               dir="rtl"
               value={nameAr}
               onChange={(e) => setNameAr(e.target.value)}
@@ -93,14 +99,14 @@ export function PreferenceFormModal({
           </Field>
         </div>
 
-        <Field label="Category" required>
+        <Field label={t('headerCategory')} required>
           <select
             className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border appearance-none"
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
             required
           >
-            <option value="">Select a category…</option>
+            <option value="">{t('selectCategory')}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {getLocalString(c.name)}
@@ -110,22 +116,22 @@ export function PreferenceFormModal({
         </Field>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-          <Field label="English Description" hint="Optional — max 300 characters">
+          <Field label={t('englishDesc')} hint={t('hintDescEn')}>
             <textarea
               className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px]"
               value={descriptionEn}
               onChange={(e) => setDescriptionEn(e.target.value)}
-              placeholder="Briefly describe this preference..."
+              placeholder={t('placeholderDescEnPref')}
               maxLength={300}
             />
           </Field>
-          <Field label="Arabic Description" hint="Optional — max 300 characters">
+          <Field label={t('arabicDesc')} hint={t('hintDescAr')}>
             <textarea
-              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px] text-right"
+              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px] text-end"
               dir="rtl"
               value={descriptionAr}
               onChange={(e) => setDescriptionAr(e.target.value)}
-              placeholder="وصف هذا التفضيل..."
+              placeholder={t('placeholderDescArPref')}
               maxLength={300}
             />
           </Field>
@@ -136,7 +142,7 @@ export function PreferenceFormModal({
           <ModalActions
             onCancel={onClose}
             saving={saving}
-            label={initial ? 'Save Changes' : 'Add Preference'}
+            label={initial ? t('saveChanges') : t('addPreference')}
           />
         </div>
       </form>

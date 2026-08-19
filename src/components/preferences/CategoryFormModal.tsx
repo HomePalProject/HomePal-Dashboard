@@ -4,6 +4,7 @@ import { Modal } from '@components/ui/Modal';
 import { Field } from '@components/ui/Field';
 import { ModalActions } from '@components/ui/ModalActions';
 import { getLocalizedCulture } from '@lib/formatters';
+import { useTranslation } from 'react-i18next';
 
 export function CategoryFormModal({
   initial,
@@ -14,6 +15,7 @@ export function CategoryFormModal({
   onSave: (d: CreateCategoryRequest) => Promise<string | null>;
   onClose: () => void;
 }) {
+  const { t } = useTranslation('preferences');
   const [nameEn, setNameEn] = useState(
     initial
       ? getLocalizedCulture(initial.name, 'en') ||
@@ -57,23 +59,23 @@ export function CategoryFormModal({
   };
 
   return (
-    <Modal title={initial ? 'Edit Category' : 'Add Category'} onClose={onClose} isOpen={true}>
+    <Modal title={initial ? t('editCategory') : t('addCategory')} onClose={onClose} isOpen={true}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-1">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-          <Field label="English Name" required hint="2–100 characters">
+          <Field label={t('englishName')} required hint={t('hintNameEn')}>
             <input
               className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border"
               value={nameEn}
               onChange={(e) => setNameEn(e.target.value)}
-              placeholder="e.g. Dietary Restrictions"
+              placeholder={t('placeholderNameEnCat')}
               minLength={2}
               maxLength={100}
               required={!nameAr}
             />
           </Field>
-          <Field label="Arabic Name" hint="Optional if English is provided">
+          <Field label={t('arabicName')} hint={t('hintNameAr')}>
             <input
-              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border text-right"
+              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border text-end"
               dir="rtl"
               value={nameAr}
               onChange={(e) => setNameAr(e.target.value)}
@@ -86,22 +88,22 @@ export function CategoryFormModal({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-          <Field label="English Description" hint="Optional — max 300 characters">
+          <Field label={t('englishDesc')} hint={t('hintDescEn')}>
             <textarea
               className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px]"
               value={descriptionEn}
               onChange={(e) => setDescriptionEn(e.target.value)}
-              placeholder="Describe what this category covers..."
+              placeholder={t('placeholderDescEnCat')}
               maxLength={300}
             />
           </Field>
-          <Field label="Arabic Description" hint="Optional — max 300 characters">
+          <Field label={t('arabicDesc')} hint={t('hintDescAr')}>
             <textarea
-              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px] text-right"
+              className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px] text-end"
               dir="rtl"
               value={descriptionAr}
               onChange={(e) => setDescriptionAr(e.target.value)}
-              placeholder="وصف هذا التصنيف..."
+              placeholder={t('placeholderDescArCat')}
               maxLength={300}
             />
           </Field>
@@ -112,7 +114,7 @@ export function CategoryFormModal({
           <ModalActions
             onCancel={onClose}
             saving={saving}
-            label={initial ? 'Save Changes' : 'Add Category'}
+            label={initial ? t('saveChanges') : t('addCategory')}
           />
         </div>
       </form>

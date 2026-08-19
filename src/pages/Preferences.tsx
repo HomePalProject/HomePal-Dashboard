@@ -10,16 +10,18 @@ import type {
 
 type Tab = 'preferences' | 'categories';
 
-import { getCategoryColor, getLocalString } from '@lib/formatters';
+import { getCategoryColor, getLocalString, getLocalizedCulture } from '@lib/formatters';
 import { fetchBilingual } from '@lib/localization';
-import { ActionBtn } from '@components/ui/ActionBtn';
+import { Button } from '@components/ui/Button';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { PreferenceFormModal } from '@components/preferences/PreferenceFormModal';
 import { CategoryFormModal } from '@components/preferences/CategoryFormModal';
 
 // ── Main Page ──
+import { useTranslation } from 'react-i18next';
 
 export default function Preferences() {
+  const { t, i18n } = useTranslation(['preferences', 'common']);
   const [activeTab, setActiveTab] = useState<Tab>('preferences');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategoryId, setFilterCategoryId] = useState('');
@@ -134,7 +136,7 @@ export default function Preferences() {
         },
       });
     } catch {
-      setFetchError('Could not load both languages — showing available data only.');
+      setFetchError(t('toastLoadBilingualError'));
       setPrefModal({ open: true, editing: pref });
     } finally {
       setLoadingEditId(null);
@@ -162,7 +164,7 @@ export default function Preferences() {
         },
       });
     } catch {
-      setFetchError('Could not load both languages — showing available data only.');
+      setFetchError(t('toastLoadBilingualError'));
       setCatModal({ open: true, editing: cat });
     } finally {
       setLoadingEditId(null);
@@ -204,21 +206,19 @@ export default function Preferences() {
 
   const cols = isPrefsTab ? 'grid-cols-[2fr_1.2fr_3fr_96px]' : 'grid-cols-[2fr_3fr_96px]';
   const headers = isPrefsTab
-    ? ['Preference Name', 'Category', 'Description', 'Actions']
-    : ['Category Name', 'Description', 'Actions'];
+    ? [t('headerName'), t('headerCategory'), t('headerDesc'), t('headerActions')]
+    : [t('headerCatName'), t('headerDesc'), t('headerActions')];
 
   return (
     <div className="w-full py-8 font-sans">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-7 gap-6 sm:gap-16">
         <div>
-          <h1 className="text-24 sm:text-28 font-bold text-text-primary m-0">System Preferences</h1>
-          <p className="text-sm text-text-secondary mt-1.5 mb-0">
-            Configure the intelligent logic and global categorizations for the HomePal ecosystem.
-          </p>
+          <h1 className="text-24 sm:text-28 font-bold text-text-primary m-0">{t('title')}</h1>
+          <p className="text-sm text-text-secondary mt-1.5 mb-0">{t('subtitle')}</p>
         </div>
         <button
           onClick={() => (isPrefsTab ? setPrefModal({ open: true }) : setCatModal({ open: true }))}
-          className="flex items-center gap-[8px] px-6 sm:px-20 py-2.5 bg-primary text-white border-none rounded-[10px] cursor-pointer text-sm font-semibold whitespace-nowrap w-fit shrink-0"
+          className="flex items-center gap-2 px-6 sm:px-20 py-2.5 bg-primary text-white border-none rounded-[10px] cursor-pointer text-sm font-semibold whitespace-nowrap w-fit shrink-0"
         >
           <svg
             width="16"
@@ -231,29 +231,31 @@ export default function Preferences() {
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
-          {isPrefsTab ? 'Add Preference' : 'Add Category'}
+          {isPrefsTab ? t('addPreference') : t('addCategory')}
         </button>
       </div>
 
-      <div className="flex border-b-[1.5px] border-border mb-6 overflow-x-auto">
-        {(['preferences', 'categories'] as Tab[]).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => {
-              setActiveTab(tab);
-              setSearchQuery('');
-              setFilterCategoryId('');
-            }}
-            className={cn(
-              'px-6 sm:px-20 py-2.5 border-0 bg-transparent cursor-pointer text-sm font-semibold -mb-0.5 border-b-2 whitespace-nowrap',
-              activeTab === tab
-                ? 'text-primary border-primary font-bold'
-                : 'text-text-secondary border-transparent'
-            )}
-          >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
+      <div className="overflow-x-auto mb-6">
+        <div className="flex border-b-[1.5px] border-border min-w-max">
+          {(['preferences', 'categories'] as Tab[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveTab(tab);
+                setSearchQuery('');
+                setFilterCategoryId('');
+              }}
+              className={cn(
+                'px-6 sm:px-20 py-2.5 bg-transparent cursor-pointer text-sm font-semibold -mb-[1.5px] border-b-2 whitespace-nowrap transition-colors duration-150',
+                activeTab === tab
+                  ? 'text-primary border-primary font-bold'
+                  : 'text-text-secondary border-transparent'
+              )}
+            >
+              {t(tab)}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-12 sm:items-center mb-6">
@@ -265,7 +267,7 @@ export default function Preferences() {
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
+            className="absolute inset-s-4 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none"
           >
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -273,8 +275,8 @@ export default function Preferences() {
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={isPrefsTab ? 'Search preferences…' : 'Search categories…'}
-            className="w-full pl-11 pr-4 py-2.5 border-[1.5px] border-border rounded-lg text-sm text-text-primary bg-surface outline-none box-border"
+            placeholder={isPrefsTab ? t('searchPrefPlaceholder') : t('searchCatPlaceholder')}
+            className="w-full ps-11 pe-4 py-2.5 border-[1.5px] border-border rounded-lg text-sm text-text-primary bg-surface outline-none box-border"
           />
         </div>
         {isPrefsTab && (
@@ -283,7 +285,7 @@ export default function Preferences() {
             onChange={(e) => setFilterCategoryId(e.target.value)}
             className="w-full sm:w-auto sm:max-w-50 px-4 py-2.5 border-[1.5px] border-border rounded-lg text-sm text-text-primary bg-surface outline-none box-border appearance-none"
           >
-            <option value="">All Categories</option>
+            <option value="">{t('allCategories')}</option>
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {getLocalString(c.name)}
@@ -291,10 +293,8 @@ export default function Preferences() {
             ))}
           </select>
         )}
-        <span className="sm:ml-auto text-xs text-text-secondary font-semibold tracking-wider uppercase">
-          {loading
-            ? '…'
-            : `${displayedItems.length} item${displayedItems.length !== 1 ? 's' : ''} found`}
+        <span className="sm:ms-auto text-xs text-text-secondary font-semibold tracking-wider uppercase">
+          {loading ? '…' : t('itemsFound', { count: displayedItems.length })}
         </span>
       </div>
 
@@ -305,10 +305,10 @@ export default function Preferences() {
       )}
 
       <div className="bg-surface rounded-xl border border-border overflow-x-auto">
-        <div className="min-w-[800px]">
+        <div className="min-w-200">
           <div
             className={cn(
-              'grid px-6 sm:px-20 py-4 border-b border-border bg-surface-variant items-center',
+              'grid px-5 py-4 border-b border-border bg-surface-variant items-center',
               cols,
               'gap-4'
             )}
@@ -323,11 +323,17 @@ export default function Preferences() {
             ))}
           </div>
 
-          {loading && <div className="p-12 text-center text-text-secondary text-sm">Loading…</div>}
+          {loading && (
+            <div className="p-12 text-center text-text-secondary text-sm">{t('loading')}</div>
+          )}
 
           {!loading && displayedItems.length === 0 && (
             <div className="p-12 text-center text-text-secondary text-sm">
-              {searchQuery ? 'No results found.' : `No ${activeTab} yet. Add your first one!`}
+              {searchQuery
+                ? t('noResults')
+                : isPrefsTab
+                  ? t('noPreferencesYet')
+                  : t('noCategoriesYet')}
             </div>
           )}
 
@@ -339,13 +345,14 @@ export default function Preferences() {
                 <div
                   key={pref.id}
                   className={cn(
-                    'grid px-6 sm:px-20 py-4 items-center transition-colors duration-150 hover:bg-surface-variant gap-4',
+                    'grid px-5 py-4 items-center transition-colors duration-150 hover:bg-surface-variant gap-4',
                     i < preferences.length - 1 && 'border-b border-border',
                     cols
                   )}
                 >
                   <span className="text-sm font-semibold text-text-primary">
-                    {getLocalString(pref.name)}
+                    {getLocalizedCulture(pref.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                      getLocalString(pref.name)}
                   </span>
                   <span
                     className={cn(
@@ -354,24 +361,66 @@ export default function Preferences() {
                       badge.text
                     )}
                   >
-                    {pref.categoryName}
+                    {t((pref.categoryName || '').toLowerCase(), pref.categoryName)}
                   </span>
                   <span className="text-13 text-text-secondary leading-relaxed truncate">
-                    {getLocalString(pref.description)}
+                    {getLocalizedCulture(pref.description, i18n.resolvedLanguage as 'en' | 'ar') ||
+                      getLocalString(pref.description)}
                   </span>
-                  <div className="flex gap-[8px] justify-end sm:justify-start">
-                    <ActionBtn
-                      icon="edit"
-                      title="Edit"
-                      loading={loadingEditId === pref.id}
+                  <div className="flex gap-1 justify-end sm:justify-start">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={t('edit')}
+                      disabled={loadingEditId === pref.id}
                       onClick={() => void handleEditPreference(pref)}
-                    />
-                    <ActionBtn
-                      icon="delete"
-                      title="Delete"
-                      danger
+                      className="h-8 w-8 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
+                    >
+                      {loadingEditId === pref.id ? (
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className="animate-spin"
+                        >
+                          <path d="M21 12a9 9 0 1 1-9-9" />
+                        </svg>
+                      ) : (
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title={t('delete')}
                       onClick={() => setDeleteTarget({ type: 'preference', item: pref })}
-                    />
+                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                    >
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
+                    </Button>
                   </div>
                 </div>
               );
@@ -389,24 +438,67 @@ export default function Preferences() {
                 )}
               >
                 <span className="text-sm font-semibold text-text-primary">
-                  {getLocalString(cat.name)}
+                  {getLocalizedCulture(cat.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                    getLocalString(cat.name)}
                 </span>
                 <span className="text-13 text-text-secondary leading-relaxed truncate">
-                  {getLocalString(cat.description)}
+                  {getLocalizedCulture(cat.description, i18n.resolvedLanguage as 'en' | 'ar') ||
+                    getLocalString(cat.description)}
                 </span>
-                <div className="flex gap-[8px] justify-end sm:justify-start">
-                  <ActionBtn
-                    icon="edit"
-                    title="Edit"
-                    loading={loadingEditId === cat.id}
+                <div className="flex gap-1 justify-end sm:justify-start">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    title={t('edit')}
+                    disabled={loadingEditId === cat.id}
                     onClick={() => void handleEditCategory(cat)}
-                  />
-                  <ActionBtn
-                    icon="delete"
-                    title="Delete"
-                    danger
+                    className="h-8 w-8 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
+                  >
+                    {loadingEditId === cat.id ? (
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className="animate-spin"
+                      >
+                        <path d="M21 12a9 9 0 1 1-9-9" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="15"
+                        height="15"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      >
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    title={t('delete')}
                     onClick={() => setDeleteTarget({ type: 'category', item: cat })}
-                  />
+                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
+                  >
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                  </Button>
                 </div>
               </div>
             ))}
@@ -430,12 +522,24 @@ export default function Preferences() {
       )}
       {deleteTarget && (
         <ConfirmDialog
-          title="Confirm Delete"
-          confirmLabel="Delete"
+          title={t('confirmDelete')}
+          confirmLabel={t('delete')}
           message={
             deleteTarget.type === 'preference'
-              ? `Are you sure you want to delete "${getLocalString(deleteTarget.item.name)}"? This cannot be undone.`
-              : `Are you sure you want to delete the category "${getLocalString(deleteTarget.item.name)}"? All preferences in this category may be affected.`
+              ? t('deletePreferenceConfirm', {
+                  name:
+                    getLocalizedCulture(
+                      deleteTarget.item.name,
+                      i18n.resolvedLanguage as 'en' | 'ar'
+                    ) || getLocalString(deleteTarget.item.name),
+                })
+              : t('deleteCategoryConfirm', {
+                  name:
+                    getLocalizedCulture(
+                      deleteTarget.item.name,
+                      i18n.resolvedLanguage as 'en' | 'ar'
+                    ) || getLocalString(deleteTarget.item.name),
+                })
           }
           onConfirm={handleDelete}
           onCancel={() => setDeleteTarget(null)}

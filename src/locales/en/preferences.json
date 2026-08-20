@@ -28,6 +28,7 @@
   "headerCatName": "Category Name",
   "toastLoadBilingualError": "Could not load both languages — showing available data only.",
   "editPreference": "Edit Preference",
+  "editCategory": "Edit Category",
   "englishName": "English Name",
   "arabicName": "Arabic Name",
   "englishDesc": "English Description",

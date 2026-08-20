@@ -8,8 +8,10 @@ import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
 import type { ScraperJobStatus, ScraperHistoryItem } from '@typeDefs/scraperTypes';
 import { getLocalString, getImageUrl } from '@lib/formatters';
 import { Modal } from '@components/ui/Modal';
+import { useTranslation } from 'react-i18next';
 
 function ExtractedOfferCard({ offer }: { offer: Offer }) {
+  const { t } = useTranslation('scrapingPipeline');
   const [imgError, setImgError] = useState(false);
 
   const title = getLocalString(offer.name || offer.title);
@@ -61,7 +63,9 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
               </span>
             )}
             <span className="text-slate-300">•</span>
-            <span className="text-slate-500">Category: {offer.categoryName || 'Bakery'}</span>
+            <span className="text-slate-500">
+              {t('categoryLabel', { name: offer.categoryName || 'Bakery' })}
+            </span>
           </div>
 
           {/* Supermarket Name */}
@@ -104,6 +108,7 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
 }
 
 export default function ScrapingPipeline() {
+  const { t, i18n } = useTranslation(['scrapingPipeline', 'common']);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'facebook' | 'upload'>('facebook');
 
@@ -288,7 +293,7 @@ export default function ScrapingPipeline() {
     } catch (err) {
       console.error('Failed to load initial data:', err);
     }
-  }, []);
+  }, [i18n.language]);
 
   // Desk View Metrics & Ingestion Timeline
   const needsReviewCount = catalogOffers.filter(
@@ -348,7 +353,7 @@ export default function ScrapingPipeline() {
   const handleRunSingleUrlScrape = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedSupermarket || !pageUrl) {
-      setErrorMessage('Please select a supermarket and enter a Facebook page URL.');
+      setErrorMessage(t('toastUrlReq'));
       return;
     }
 
@@ -378,7 +383,7 @@ export default function ScrapingPipeline() {
         resultsLimit,
       });
 
-      showToast(`Scraper job initiated for ${brandName}. Polling server status...`);
+      showToast(t('toastInitiated', { brand: brandName }));
 
       if (res?.createdOffers && res.createdOffers.length > 0) {
         recordSupermarketScraped(selectedSupermarket);
@@ -397,7 +402,7 @@ export default function ScrapingPipeline() {
         syncExtractedOffersToOffersHub(res.createdOffers);
         setReviewOffers(res.createdOffers);
         showToast(
-          `Extraction finished immediately! Extracted ${res.createdOffers.length} offers for ${brandName}.`
+          t('toastImmediateSuccess', { count: res.createdOffers.length, brand: brandName })
         );
       } else {
         let isDone = false;
@@ -451,9 +456,9 @@ export default function ScrapingPipeline() {
           if (finalOffers.length > 0) {
             syncExtractedOffersToOffersHub(finalOffers);
             setReviewOffers(finalOffers);
-            showToast(`Scraper finished for ${brandName}! Fetched ${finalOffers.length} offers.`);
+            showToast(t('toastFinishedCount', { brand: brandName, count: finalOffers.length }));
           } else {
-            showToast(`Scraper finished for ${brandName}, but no new offers were extracted.`);
+            showToast(t('toastFinishedEmpty', { brand: brandName }));
           }
         } catch {
           updateHistory((prev) =>
@@ -503,7 +508,7 @@ export default function ScrapingPipeline() {
   const handleRunImageUploadScrape = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedSupermarket || !uploadFile) {
-      setErrorMessage('Please select a supermarket and choose a flyer image file.');
+      setErrorMessage(t('toastImgReq'));
       return;
     }
 
@@ -541,7 +546,7 @@ export default function ScrapingPipeline() {
         setReviewOffers(createdOffersList);
       }
 
-      showToast(`Flyer processed via Vision AI for ${brandName}! Extracted ${parsedCount} offers.`);
+      showToast(t('toastVisionSuccess', { brand: brandName, count: parsedCount }));
       setUploadFile(null);
       setUploadPreview(null);
       setUploadCaption('');
@@ -555,12 +560,12 @@ export default function ScrapingPipeline() {
 
   const handleRunBatchScrape = async () => {
     if (supermarkets.length === 0) {
-      showToast('No supermarkets available to scrape.');
+      showToast(t('toastNoSupermarkets'));
       return;
     }
 
     setIsBatchRunning(true);
-    showToast('Starting sequential batch scraper pipeline for active chains...');
+    showToast(t('toastBatchStart'));
 
     let totalExtractedBatch = 0;
     let skippedCount = 0;
@@ -585,7 +590,7 @@ export default function ScrapingPipeline() {
             startedAt: `Skipped (Scraped ${timeAgoText})`,
           };
           updateHistory((prev) => [skippedJob, ...prev]);
-          showToast(`Skipped ${name} — already scraped ${timeAgoText} (< 24h limit)`);
+          showToast(t('toastBatchSkipped', { brand: name, timeAgo: timeAgoText }));
           await new Promise((r) => setTimeout(r, 600));
           continue;
         }
@@ -705,9 +710,7 @@ export default function ScrapingPipeline() {
 
     setIsBatchRunning(false);
     setBatchProgress(null);
-    showToast(
-      `Batch scraping finished! Extracted ${totalExtractedBatch} offers (${skippedCount > 0 ? `${skippedCount} chains skipped < 24h` : 'all processed'}).`
-    );
+    showToast(t('toastBatchFinish', { count: totalExtractedBatch, skipped: skippedCount }));
   };
 
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -737,16 +740,14 @@ export default function ScrapingPipeline() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-            <span>Catalog Pipeline</span>
+            <span>{t('catalogPipeline')}</span>
             <span>/</span>
-            <span className="text-slate-900 font-bold">Scraping Ingestion</span>
+            <span className="text-slate-900 font-bold">{t('scrapingIngestion')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">
-            Offer Scraping &amp; Ingestion
+            {t('title')}
           </h1>
-          <p className="text-sm text-slate-500 mt-1 m-0">
-            Automate flyer extraction, run AI vision scraping jobs, and feed backend catalog offers.
-          </p>
+          <p className="text-sm text-slate-500 mt-1 m-0">{t('subtitle')}</p>
         </div>
 
         {/* Top Header Buttons */}
@@ -758,7 +759,7 @@ export default function ScrapingPipeline() {
               onChange={(e) => setSkipRecentlyScraped(e.target.checked)}
               className="w-4 h-4 accent-[#1F3D32] rounded cursor-pointer"
             />
-            <span>Skip scraped &lt; 24h ago</span>
+            <span>{t('skipScraped')}</span>
           </label>
 
           <Button
@@ -773,7 +774,11 @@ export default function ScrapingPipeline() {
           >
             {isBatchRunning ? (
               <span>
-                Scraping {batchProgress?.current}/{batchProgress?.total} ({batchProgress?.name})
+                {t('scrapingProgress', {
+                  current: batchProgress?.current,
+                  total: batchProgress?.total,
+                  name: batchProgress?.name,
+                })}
               </span>
             ) : (
               <>
@@ -787,7 +792,7 @@ export default function ScrapingPipeline() {
                 >
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-10.42" />
                 </svg>
-                <span>Scrape All Chains</span>
+                <span>{t('scrapeAll')}</span>
               </>
             )}
           </Button>
@@ -808,7 +813,7 @@ export default function ScrapingPipeline() {
             >
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             </svg>
-            <span>Manage Supermarkets</span>
+            <span>{t('manageSupermarkets')}</span>
           </Button>
 
           {history.length > 0 && (
@@ -825,7 +830,7 @@ export default function ScrapingPipeline() {
                 link.href = URL.createObjectURL(blob);
                 link.download = 'scraping_pipeline_logs.csv';
                 link.click();
-                showToast('Logs exported successfully');
+                showToast(t('logsExportSuccess'));
               }}
               className="flex items-center gap-2 shrink-0 w-full sm:w-auto"
             >
@@ -841,7 +846,7 @@ export default function ScrapingPipeline() {
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
-              Export Logs
+              {t('exportLogs')}
             </Button>
           )}
         </div>
@@ -868,7 +873,7 @@ export default function ScrapingPipeline() {
                   : 'text-slate-500 hover:text-slate-900'
               )}
             >
-              Facebook Auto-Scraper
+              {t('tabScraper')}
             </button>
             <button
               onClick={() => setActiveTab('upload')}
@@ -879,7 +884,7 @@ export default function ScrapingPipeline() {
                   : 'text-slate-500 hover:text-slate-900'
               )}
             >
-              Flyer Manual Upload (Vision AI)
+              {t('tabUpload')}
             </button>
           </div>
 
@@ -888,16 +893,16 @@ export default function ScrapingPipeline() {
             <form onSubmit={handleRunSingleUrlScrape} className="flex flex-col gap-5">
               {/* Supermarket Selection */}
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-slate-700">Select Supermarket Chain</label>
+                <label className="text-xs font-bold text-slate-700">{t('selectSupermarket')}</label>
                 {supermarkets.length === 0 ? (
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 flex justify-between items-center">
-                    <span>No supermarkets found in database.</span>
+                    <span>{t('noSupermarkets')}</span>
                     <button
                       type="button"
                       onClick={() => navigate('/dashboard/supermarkets')}
                       className="text-xs font-bold text-slate-900 hover:underline border-none bg-transparent cursor-pointer"
                     >
-                      Add Supermarket →
+                      {t('addSupermarketLink')}
                     </button>
                   </div>
                 ) : (
@@ -955,14 +960,14 @@ export default function ScrapingPipeline() {
                   </div>
 
                   <span className="px-2.5 py-1 bg-white border border-slate-200 rounded-md text-[11px] font-bold text-slate-700 shrink-0">
-                    {selectedMarket.branches || 10}+ Branches
+                    {t('branchesCount', { count: selectedMarket.branches || 10 })}
                   </span>
                 </div>
               )}
 
               {/* Page URL input */}
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-slate-700">Target Facebook Page URL</label>
+                <label className="text-xs font-bold text-slate-700">{t('facebookUrl')}</label>
                 <div className="relative">
                   <svg
                     width="15"
@@ -990,20 +995,18 @@ export default function ScrapingPipeline() {
               {/* Scrape Depth & Limit */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-slate-700">
-                    Scrape Depth (Days Back)
-                  </label>
+                  <label className="text-xs font-bold text-slate-700">{t('scrapeDepth')}</label>
                   <div className="relative w-full flex items-center">
                     <select
                       value={daysBack}
                       onChange={(e) => setDaysBack(Number(e.target.value))}
                       className="w-full appearance-none pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none cursor-pointer"
                     >
-                      <option value={1}>Last 24 Hours (1 Day)</option>
-                      <option value={3}>Last 3 Days</option>
-                      <option value={7}>Last 7 Days (1 Week)</option>
-                      <option value={14}>Last 14 Days</option>
-                      <option value={30}>Last 30 Days (1 Month)</option>
+                      <option value={1}>{t('depth1')}</option>
+                      <option value={3}>{t('depth3')}</option>
+                      <option value={7}>{t('depth7')}</option>
+                      <option value={14}>{t('depth14')}</option>
+                      <option value={30}>{t('depth30')}</option>
                     </select>
                     <svg
                       width="14"
@@ -1020,17 +1023,17 @@ export default function ScrapingPipeline() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-slate-700">Results Limit</label>
+                  <label className="text-xs font-bold text-slate-700">{t('resultsLimit')}</label>
                   <div className="relative w-full flex items-center">
                     <select
                       value={resultsLimit}
                       onChange={(e) => setResultsLimit(Number(e.target.value))}
                       className="w-full appearance-none pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none cursor-pointer"
                     >
-                      <option value={10}>Top 10 Offers</option>
-                      <option value={25}>Top 25 Offers</option>
-                      <option value={50}>Top 50 Offers</option>
-                      <option value={100}>Top 100 Offers</option>
+                      <option value={10}>{t('limit10')}</option>
+                      <option value={25}>{t('limit25')}</option>
+                      <option value={50}>{t('limit50')}</option>
+                      <option value={100}>{t('limit100')}</option>
                     </select>
                     <svg
                       width="14"
@@ -1060,10 +1063,11 @@ export default function ScrapingPipeline() {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Executing Scraper...
+                    {t('executingScraper')}
                   </>
                 ) : (
                   <>
+                    {t('runScraper')}
                     <svg
                       width="15"
                       height="15"
@@ -1071,10 +1075,10 @@ export default function ScrapingPipeline() {
                       fill="none"
                       stroke="currentColor"
                       strokeWidth="2"
+                      className={cn(i18n.language === 'ar' && 'rotate-180')}
                     >
                       <polygon points="5 3 19 12 5 21 5 3" />
                     </svg>
-                    Run Facebook Scraper
                   </>
                 )}
               </button>
@@ -1085,7 +1089,7 @@ export default function ScrapingPipeline() {
           {activeTab === 'upload' && (
             <form onSubmit={handleRunImageUploadScrape} className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-slate-700">Supermarket Chain</label>
+                <label className="text-xs font-bold text-slate-700">{t('labelSupermarket')}</label>
                 <select
                   value={selectedSupermarket}
                   onChange={(e) => handleSupermarketChange(e.target.value)}
@@ -1102,9 +1106,7 @@ export default function ScrapingPipeline() {
 
               {/* Image Drag & Drop File Selector */}
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-slate-700">
-                  Flyer Image File (JPG, PNG, WEBP)
-                </label>
+                <label className="text-xs font-bold text-slate-700">{t('labelFlyerImage')}</label>
                 <div className="p-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 flex flex-col items-center justify-center text-center gap-3 relative hover:border-slate-400 transition-colors">
                   {uploadPreview ? (
                     <div className="relative group w-full max-h-48 flex justify-center">
@@ -1121,7 +1123,7 @@ export default function ScrapingPipeline() {
                         }}
                         className="absolute top-2 right-2 p-1.5 bg-slate-900/80 text-white rounded-lg text-xs hover:bg-slate-900 border-none cursor-pointer"
                       >
-                        Remove
+                        {t('removeImage')}
                       </button>
                     </div>
                   ) : (
@@ -1142,11 +1144,9 @@ export default function ScrapingPipeline() {
                       </div>
                       <div>
                         <p className="text-xs font-bold text-slate-900 m-0 mb-1">
-                          Click to select flyer image
+                          {t('clickToSelect')}
                         </p>
-                        <p className="text-[11px] text-slate-400 m-0">
-                          Supports single flyer page or catalogue screenshot
-                        </p>
+                        <p className="text-[11px] text-slate-400 m-0">{t('selectDesc')}</p>
                       </div>
                     </>
                   )}
@@ -1161,14 +1161,12 @@ export default function ScrapingPipeline() {
 
               {/* Optional Caption & OCR text */}
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-slate-700">
-                  Flyer Caption / Notes (Optional)
-                </label>
+                <label className="text-xs font-bold text-slate-700">{t('optionalCaption')}</label>
                 <input
                   type="text"
                   value={uploadCaption}
                   onChange={(e) => setUploadCaption(e.target.value)}
-                  placeholder="e.g. Weekend Mega Deals Oct 2026"
+                  placeholder={t('placeholderCaption')}
                   className="w-full px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-900 bg-white outline-none"
                 />
               </div>
@@ -1186,7 +1184,7 @@ export default function ScrapingPipeline() {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Processing Vision AI...
+                    {t('processingVision')}
                   </>
                 ) : (
                   <>
@@ -1202,7 +1200,7 @@ export default function ScrapingPipeline() {
                       <line x1="12" y1="8" x2="12" y2="12" />
                       <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
-                    Extract Offers via Vision AI
+                    {t('extractOffers')}
                   </>
                 )}
               </button>
@@ -1214,7 +1212,7 @@ export default function ScrapingPipeline() {
         <div className="flex flex-col gap-6">
           <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col gap-4">
             <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider m-0">
-              Scraper Engine Status
+              {t('engineStatus')}
             </h3>
 
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
@@ -1227,28 +1225,26 @@ export default function ScrapingPipeline() {
                       : 'bg-emerald-500 animate-pulse'
                   )}
                 />
-                <span>
-                  {jobStatus?.isRunning ? 'Engine Scraping Active' : 'Engine Idle & Ready'}
-                </span>
+                <span>{jobStatus?.isRunning ? t('engineActive') : t('engineIdle')}</span>
               </div>
               <span className="text-[11px] font-mono text-slate-500">v2.4-production</span>
             </div>
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Backend Endpoint:</span>
+                <span className="text-slate-500">{t('backendEndpoint')}</span>
                 <span className="font-mono font-medium text-slate-900 truncate max-w-[150px]">
                   /scrape/facebook-page
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100">
-                <span className="text-slate-500">Image Ingestion:</span>
+                <span className="text-slate-500">{t('imageIngestion')}</span>
                 <span className="font-mono font-medium text-slate-900 truncate max-w-[150px]">
                   /scrape/image-file
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-slate-500">Total Scraped Offers:</span>
+                <span className="text-slate-500">{t('totalScraped')}</span>
                 <span className="font-bold text-slate-900">{totalParsedCount}</span>
               </div>
             </div>
@@ -1256,7 +1252,7 @@ export default function ScrapingPipeline() {
 
           {/* Widget 2: Desk View Metrics & Daily Ingestion Rate */}
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col gap-5">
-            <h3 className="text-sm font-extrabold text-slate-900 m-0">Desk View</h3>
+            <h3 className="text-sm font-extrabold text-slate-900 m-0">{t('deskView')}</h3>
 
             <div className="grid grid-cols-2 gap-3">
               <div
@@ -1265,11 +1261,11 @@ export default function ScrapingPipeline() {
                 title="Click to view and verify unverified offers in Offers Hub"
               >
                 <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                  NEEDS REVIEW
+                  {t('needsReview')}
                 </span>
                 <span className="text-2xl font-black text-slate-900 mt-1">{needsReviewCount}</span>
                 <span className="text-[10px] text-amber-700 font-semibold mt-0.5">
-                  Unverified Offers
+                  {t('unverifiedOffers')}
                 </span>
               </div>
 
@@ -1279,13 +1275,13 @@ export default function ScrapingPipeline() {
                 title="Click to manage supermarket chains"
               >
                 <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                  ACTIVE PIPELINES
+                  {t('activePipelines')}
                 </span>
                 <span className="text-2xl font-black text-[#1F3D32] mt-1">
                   {activePipelinesCount}
                 </span>
                 <span className="text-[10px] text-emerald-800 font-semibold mt-0.5">
-                  Supermarket Chains
+                  {t('supermarketChains')}
                 </span>
               </div>
             </div>
@@ -1295,14 +1291,14 @@ export default function ScrapingPipeline() {
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">
-                    DAILY INGESTION RATE
+                    {t('dailyIngestion')}
                   </span>
                   <span className="text-[11px] text-slate-400 font-medium">
-                    Scraped & Synced Offers
+                    {t('scrapedSynced')}
                   </span>
                 </div>
                 <span className="text-xs font-black text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-md">
-                  {catalogOffers.length} Total Offers
+                  {t('totalOffersCount', { count: catalogOffers.length })}
                 </span>
               </div>
               <div className="flex items-end justify-between h-14 gap-1.5 pt-3">
@@ -1330,7 +1326,11 @@ export default function ScrapingPipeline() {
                     key={d.label + d.dateStr}
                     className={cn(d.isToday && 'text-[#1F3D32] font-black')}
                   >
-                    {d.label}
+                    {d.label === 'Today'
+                      ? t('today')
+                      : d.label === 'Yesterday'
+                        ? t('yesterday')
+                        : d.label}
                   </span>
                 ))}
               </div>
@@ -1344,15 +1344,13 @@ export default function ScrapingPipeline() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-extrabold text-slate-900 m-0">
-              Recent Scraping Audit History
+              {t('recentScrapingHistory')}
             </h2>
-            <p className="text-xs text-slate-500 m-0 mt-0.5">
-              Audit live execution logs and extracted offer results from real backend runs.
-            </p>
+            <p className="text-xs text-slate-500 m-0 mt-0.5">{t('auditDesc')}</p>
           </div>
           <div className="flex flex-col items-center justify-center w-12 h-12 bg-slate-50 border border-slate-200 rounded-full text-slate-700 shadow-2xs">
             <span className="text-sm font-black leading-none">{history.length}</span>
-            <span className="text-[10px] font-bold leading-none mt-0.5">Jobs</span>
+            <span className="text-[10px] font-bold leading-none mt-0.5">{t('jobs')}</span>
           </div>
         </div>
 
@@ -1370,22 +1368,20 @@ export default function ScrapingPipeline() {
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
-            <p className="text-xs font-bold text-slate-700 m-0">No scraping history logged yet</p>
-            <p className="text-[11px] text-slate-400 m-0">
-              Run a scraper job above to see live history logs.
-            </p>
+            <p className="text-xs font-bold text-slate-700 m-0">{t('noHistory')}</p>
+            <p className="text-[11px] text-slate-400 m-0">{t('historyDesc')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="px-4 py-3 whitespace-nowrap">Job ID</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Supermarket Brand</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Source</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Status</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Offers Extracted</th>
-                  <th className="px-4 py-3 whitespace-nowrap">Time</th>
+                  <th className="px-4 py-3 whitespace-nowrap">{t('thJobId')}</th>
+                  <th className="px-4 py-3 whitespace-nowrap">{t('thBrand')}</th>
+                  <th className="px-4 py-3 whitespace-nowrap">{t('thSource')}</th>
+                  <th className="px-4 py-3 whitespace-nowrap">{t('thStatus')}</th>
+                  <th className="px-4 py-3 whitespace-nowrap">{t('thOffers')}</th>
+                  <th className="px-4 py-3 whitespace-nowrap">{t('thTime')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -1413,11 +1409,13 @@ export default function ScrapingPipeline() {
                           onClick={() => setReviewOffers(h.offers!)}
                           className="text-xs font-bold text-slate-900 hover:text-emerald-600 hover:underline border-none bg-transparent cursor-pointer p-0 flex items-center gap-1.5"
                         >
-                          <span>{h.parsedCount} offers</span>
-                          <span className="text-[10px] text-slate-400 font-normal">(View)</span>
+                          <span>{t('offersCount', { count: h.parsedCount })}</span>
+                          <span className="text-[10px] text-slate-400 font-normal">
+                            {t('view')}
+                          </span>
                         </button>
                       ) : (
-                        <span>{h.parsedCount} offers</span>
+                        <span>{t('offersCount', { count: h.parsedCount })}</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
@@ -1434,14 +1432,14 @@ export default function ScrapingPipeline() {
       {/* ── Extracted Offers Review Modal ── */}
       {reviewOffers && (
         <Modal
-          title={`Extracted Offers (${reviewOffers.length})`}
+          title={t('extractedOffersTitle', { count: reviewOffers.length })}
           onClose={() => setReviewOffers(null)}
           isOpen={true}
         >
           <div className="flex flex-col gap-3">
             <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
               <span className="text-xs font-bold text-emerald-900">
-                {reviewOffers.length} offers extracted & synchronized with Offers Hub.
+                {t('syncSuccessMsg', { count: reviewOffers.length })}
               </span>
               <button
                 type="button"
@@ -1452,7 +1450,7 @@ export default function ScrapingPipeline() {
                 }}
                 className="px-3.5 py-1.5 bg-[#1F3D32] hover:bg-[#162D25] text-white rounded-lg text-xs font-bold cursor-pointer border-none shadow-xs flex items-center gap-1.5 shrink-0"
               >
-                <span>Publish to Offers Hub</span>
+                <span>{t('publishButton')}</span>
                 <span>→</span>
               </button>
             </div>

@@ -29,7 +29,12 @@ export function toLocalized(str: string) {
 
 export function getImageUrl(path?: string | null): string | null {
   if (!path) return null;
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+  if (
+    path.startsWith('http://') ||
+    path.startsWith('https://') ||
+    path.startsWith('data:') ||
+    path.startsWith('blob:')
+  ) {
     return path;
   }
   const cleanPath = path.startsWith('/') ? path : `/${path}`;

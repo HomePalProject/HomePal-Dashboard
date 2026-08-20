@@ -317,7 +317,7 @@ export default function Preferences() {
             {headers.map((h) => (
               <span
                 key={h}
-                className="text-[11px] font-bold text-text-secondary tracking-widest uppercase whitespace-nowrap"
+                className="text-sm font-bold text-text-secondary tracking-widest uppercase whitespace-nowrap"
               >
                 {h}
               </span>
@@ -379,7 +379,7 @@ export default function Preferences() {
                   </span>
                   <span
                     className={cn(
-                      'inline-block px-2.5 py-0.75 rounded-full text-[11px] font-bold tracking-wider uppercase w-fit whitespace-nowrap',
+                      'inline-block px-2.5 py-0.75 rounded-full text-sm font-bold tracking-wider uppercase w-fit whitespace-nowrap',
                       badge.bg,
                       badge.text
                     )}

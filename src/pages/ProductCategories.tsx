@@ -203,7 +203,7 @@ export default function ProductCategories() {
               {/* English / Arabic names */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold uppercase text-slate-500">
+                  <label className="text-sm font-bold uppercase text-slate-500">
                     {t('englishName')} <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -216,7 +216,7 @@ export default function ProductCategories() {
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] font-bold uppercase text-slate-500">
+                  <label className="text-sm font-bold uppercase text-slate-500">
                     {t('arabicName')}
                   </label>
                   <input
@@ -232,7 +232,7 @@ export default function ProductCategories() {
 
               {/* Description */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase text-slate-500">
+                <label className="text-sm font-bold uppercase text-slate-500">
                   {t('description')}
                 </label>
                 <textarea
@@ -246,7 +246,7 @@ export default function ProductCategories() {
 
               {/* Cover Image */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase text-slate-500">
+                <label className="text-sm font-bold uppercase text-slate-500">
                   {t('coverImage')}
                 </label>
                 {coverPreview ? (
@@ -301,7 +301,7 @@ export default function ProductCategories() {
                       className="text-slate-400"
                     />
                     <span className="text-xs font-bold text-slate-700">{t('uploadDesc')}</span>
-                    <span className="text-[11px] text-slate-400">{t('uploadFormats')}</span>
+                    <span className="text-sm text-slate-400">{t('uploadFormats')}</span>
                     <input
                       type="file"
                       accept="image/*"

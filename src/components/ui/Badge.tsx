@@ -10,7 +10,7 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 export function Badge({ children, variant = 'primary', className, ...props }: BadgeProps) {
   const baseClasses =
-    'inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.06em]';
+    'inline-flex items-center rounded-full px-3 py-1 text-sm font-bold uppercase tracking-[0.06em]';
 
   const variants = {
     success: 'bg-status-success-container text-status-success',

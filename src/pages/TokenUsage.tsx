@@ -289,7 +289,7 @@ export default function TokenUsage() {
                   <div className="text-xs font-bold text-slate-900">
                     Gemini 1.5 Pro (Multimodal Vision)
                   </div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-sm text-slate-500">
                     Supermarket flyer parsing & visual offer extraction
                   </div>
                 </div>
@@ -298,7 +298,7 @@ export default function TokenUsage() {
                   <div className="text-xs font-bold text-slate-900">
                     Gemini 1.5 Flash (OCR Normalization)
                   </div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-sm text-slate-500">
                     High-speed category normalization & price verification
                   </div>
                 </div>

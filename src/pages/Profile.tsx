@@ -55,7 +55,7 @@ export default function Profile() {
               <div className="w-32 h-32 rounded-full bg-surface-variant flex items-center justify-center border border-border shadow-sm overflow-hidden text-4xl font-extrabold text-text-disabled">
                 {meData?.username?.charAt(0)?.toUpperCase() || '?'}
               </div>
-              <span className="px-4 py-1.5 bg-primary-container text-primary text-[11px] font-extrabold tracking-wide uppercase rounded-full border border-primary/20">
+              <span className="px-4 py-1.5 bg-primary-container text-primary text-sm font-extrabold tracking-wide uppercase rounded-full border border-primary/20">
                 {meData?.isActive ? 'Active Status' : 'Inactive Account'}
               </span>
             </div>
@@ -63,7 +63,7 @@ export default function Profile() {
             {/* Details Section */}
             <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-8">
               <div>
-                <label className="text-[11px] font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
+                <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
                   Full Name / Username
                 </label>
                 <div className="text-base font-extrabold text-text-primary">
@@ -71,7 +71,7 @@ export default function Profile() {
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
+                <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
                   Email Address
                 </label>
                 <div className="text-base font-extrabold text-text-primary">
@@ -79,7 +79,7 @@ export default function Profile() {
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
+                <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
                   System Roles
                 </label>
                 <div className="flex gap-2 flex-wrap">
@@ -100,7 +100,7 @@ export default function Profile() {
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
+                <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
                   Account ID
                 </label>
                 <div className="text-base font-extrabold text-text-primary text-xs">
@@ -108,7 +108,7 @@ export default function Profile() {
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
+                <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
                   Gender
                 </label>
                 <div className="text-base font-extrabold text-text-primary capitalize">
@@ -116,7 +116,7 @@ export default function Profile() {
                 </div>
               </div>
               <div>
-                <label className="text-[11px] font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
+                <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
                   Account Created
                 </label>
                 <div className="text-base font-extrabold text-text-primary">

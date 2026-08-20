@@ -80,7 +80,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             <span className="text-xs font-medium text-text-primary hidden sm:block">
               {t('common:adminProfile', 'Admin Profile')}
             </span>
-            <span className="w-7 h-7 sm:w-6.5 sm:h-6.5 rounded-full bg-primary-active text-white flex items-center justify-center text-[10px] font-bold">
+            <span className="w-7 h-7 sm:w-6.5 sm:h-6.5 rounded-full bg-primary-active text-white flex items-center justify-center text-xs font-bold">
               {initials}
             </span>
           </Button>

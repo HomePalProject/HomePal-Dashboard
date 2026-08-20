@@ -131,7 +131,7 @@ export default function UserManagement() {
     <div className="w-full flex flex-col gap-5 font-sans pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1 border-b border-border/40">
         <div>
-          {/* <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-md mb-1.5 border border-primary/20">
+          {/* <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-md mb-1.5 border border-primary/20">
             <svg
               className="w-3 h-3"
               viewBox="0 0 24 24"

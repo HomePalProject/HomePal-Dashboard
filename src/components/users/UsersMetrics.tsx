@@ -124,7 +124,7 @@ export function UsersMetrics({
           className="bg-surface rounded-xl border border-border/80 p-3.5 flex flex-col justify-between gap-2 shadow-2xs hover:border-primary/40 hover:shadow-xs transition-all"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold text-text-secondary uppercase tracking-wider truncate">
+            <span className="text-sm font-semibold text-text-secondary uppercase tracking-wider truncate">
               {m.label}
             </span>
             <div className={cn('p-1.5 rounded-lg shrink-0', m.bgIcon)}>{m.icon}</div>
@@ -136,7 +136,7 @@ export function UsersMetrics({
             </span>
             <span
               className={cn(
-                'text-[10px] font-semibold px-2 py-0.5 rounded-full border border-current/10 whitespace-nowrap',
+                'text-xs font-semibold px-2 py-0.5 rounded-full border border-current/10 whitespace-nowrap',
                 m.badgeBg
               )}
             >

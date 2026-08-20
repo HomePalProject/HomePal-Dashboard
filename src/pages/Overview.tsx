@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuthStore } from '@store/authStore';
+import { SystemHealthCard } from '@components/dashboard/SystemHealthCard';
 import { analyticsService } from '@services/analyticsService';
 import { catalogService } from '@services/catalogService';
 import { productCategoryService } from '@services/productCategoryService';
-import { SystemHealthCard } from '@components/dashboard/SystemHealthCard';
+import { useAuthStore } from '@store/authStore';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
-import type { Supermarket } from '@typeDefs/catalogTypes';
 import type { MealPlansSummaryData } from '@typeDefs/analyticsTypes';
+import type { Supermarket } from '@typeDefs/catalogTypes';
+import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 
 import { getHour, getLocalizedCulture } from '@lib/formatters';
@@ -53,11 +53,10 @@ export default function Overview() {
     return () => {
       isMounted = false;
     };
-  }, [token]);
+  }, [token, i18n.language]);
 
   return (
     <div className="w-full space-y-8 font-sans pb-10">
-      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 pt-2">
         <div className="max-w-2xl">
           <h1 className="text-3xl md:text-4xl font-black text-text-primary tracking-tight leading-tight m-0">
@@ -87,16 +86,13 @@ export default function Overview() {
         </Link>
       </div>
 
-      {/* ── Main Content Grid ── */}
       <div className="flex flex-col xl:grid xl:grid-cols-3 gap-6 md:gap-8">
-        {/* System Health (Order 1 on mobile, Col 3 Row 1 on desktop) */}
         <div className="xl:col-start-3 xl:row-start-1 order-1">
           <div className="min-h-[220px] h-full">
             <SystemHealthCard delay={100} />
           </div>
         </div>
 
-        {/* Mobile-Only Manage Households Button (Order 2 on mobile, Hidden on desktop) */}
         <div className="flex sm:hidden order-2 justify-end">
           <Link
             to="/dashboard/households"
@@ -117,11 +113,8 @@ export default function Overview() {
           </Link>
         </div>
 
-        {/* Left Column: Key Metrics & Demographics (Order 3 on mobile, Col 1-2 Row 1-2 on desktop) */}
         <div className="xl:col-span-2 xl:col-start-1 xl:row-start-1 xl:row-span-2 space-y-6 md:space-y-8 order-3">
-          {/* ── Key Metrics Grid ── */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-            {/* Total Households */}
             <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-30 h-fit">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -154,7 +147,6 @@ export default function Overview() {
               </div>
             </div>
 
-            {/* Active Households */}
             <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-30 h-fit">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -181,7 +173,7 @@ export default function Overview() {
                     {loading ? '...' : (summaryData?.activeHouseholds?.toLocaleString() ?? '0')}
                   </span>
                   {summaryData?.totalHouseholds && summaryData.totalHouseholds > 0 ? (
-                    <span className="text-[10px] font-bold text-status-success bg-status-success/10 px-1.5 py-0.5 rounded-full border border-status-success/20">
+                    <span className="text-xs font-bold text-status-success bg-status-success/10 px-1.5 py-0.5 rounded-full border border-status-success/20">
                       {Math.round(
                         (summaryData.activeHouseholds / summaryData.totalHouseholds) * 100
                       )}
@@ -195,7 +187,6 @@ export default function Overview() {
               </div>
             </div>
 
-            {/* AI Meal Plans */}
             <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-amber-500/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-30 h-fit">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -242,10 +233,9 @@ export default function Overview() {
             </div>
           ) : (
             <>
-              {/* Stats Ribbon */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 p-6 rounded-2xl bg-surface-variant/40 border border-border/40 hover:bg-surface-variant/60 transition-colors">
-                  <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">
+                  <div className="text-xs font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">
                     {t('avgHouseholdSize')}
                   </div>
                   <div className="text-2xl font-black text-text-primary tracking-tight">
@@ -258,7 +248,7 @@ export default function Overview() {
                 </div>
 
                 <div className="flex-1 p-6 rounded-2xl bg-surface-variant/40 border border-border/40 hover:bg-surface-variant/60 transition-colors">
-                  <div className="text-[10px] font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">
+                  <div className="text-xs font-bold text-text-secondary uppercase tracking-[0.15em] mb-1">
                     {t('avgPlansPerHousehold')}
                   </div>
                   <div className="text-2xl font-black text-text-primary tracking-tight">
@@ -271,13 +261,12 @@ export default function Overview() {
                 </div>
               </div>
 
-              {/* Supermarkets Network - Visual but Monochromatic */}
               <div className="bg-surface rounded-2xl border border-border/60 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-sm font-black text-text-primary tracking-tight m-0">
                     {t('partnerChains')}
                   </h3>
-                  <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20 uppercase tracking-wider">
                     {t('integrated', { count: realSupermarkets.length })}
                   </span>
                 </div>
@@ -341,7 +330,6 @@ export default function Overview() {
           )}
         </div>
 
-        {/* Right Column: Global Categories (Order 4 on mobile, Col 3 Row 2 on desktop) */}
         <div className="xl:col-span-1 xl:col-start-3 xl:row-start-2 order-4">
           <div className="bg-surface rounded-2xl border border-border/60 flex flex-col h-full overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-6 border-b border-border/40 flex items-center justify-between bg-surface-variant/20">
@@ -349,7 +337,7 @@ export default function Overview() {
                 <h3 className="text-sm font-black text-text-primary tracking-tight m-0">
                   {t('globalCategories')}
                 </h3>
-                <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider mt-1 block">
+                <span className="text-xs font-bold text-text-secondary uppercase tracking-wider mt-1 block">
                   {t('total', { count: categories.length })}
                 </span>
               </div>
@@ -382,7 +370,7 @@ export default function Overview() {
                         className="group p-3 rounded-xl hover:bg-surface-variant/50 transition-colors flex items-center justify-between cursor-default"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-[10px] font-bold text-text-disabled w-4 text-end">
+                          <span className="text-xs font-bold text-text-disabled w-4 text-end">
                             {String(i + 1).padStart(2, '0')}
                           </span>
                           <span className="text-xs font-bold text-text-primary group-hover:text-primary transition-colors">
@@ -412,7 +400,7 @@ export default function Overview() {
               )}
             </div>
 
-            <div className="p-5 bg-surface-variant/20 border-t border-border/40 text-[11px] font-medium text-text-secondary leading-relaxed">
+            <div className="p-5 bg-surface-variant/20 border-t border-border/40 text-sm font-medium text-text-secondary leading-relaxed">
               {t('exploreCategoriesDesc')}
             </div>
           </div>

@@ -584,7 +584,7 @@ export default function OffersHub() {
           >
             <span>{t('needsVerification')}</span>
             {needsReviewCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">
+              <span className="px-1.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">
                 {needsReviewCount}
               </span>
             )}
@@ -740,7 +740,7 @@ export default function OffersHub() {
                 setSearchQuery('');
                 setCurrentPage(1);
               }}
-              className="flex items-center gap-1.5 text-[11px] font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100/80 border border-red-200 px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-2xs"
+              className="flex items-center gap-1.5 text-sm font-bold text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100/80 border border-red-200 px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-2xs"
             >
               <svg
                 width="12"
@@ -769,7 +769,7 @@ export default function OffersHub() {
           <div className="overflow-x-auto">
             <table className="w-full text-start border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
                   <th className="ps-6 pe-4 py-3.5 whitespace-nowrap">{t('thOffer')}</th>
                   <th className="px-4 py-3.5 whitespace-nowrap">{t('thSupermarket')}</th>
                   <th className="px-4 py-3.5 whitespace-nowrap">{t('thOriginalPrice')}</th>
@@ -829,7 +829,7 @@ export default function OffersHub() {
                               {titleText}
                             </span>
                             <span
-                              className="text-[11px] text-slate-400 font-semibold truncate max-w-30"
+                              className="text-sm text-slate-400 font-semibold truncate max-w-30"
                               title={categoryText}
                             >
                               {categoryText}
@@ -874,7 +874,7 @@ export default function OffersHub() {
                             {discPrice} {t('currency')}
                           </span>
                           {hasDiscount && (
-                            <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                            <span className="text-xs font-black px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
                               -{Math.round(((origPrice - (discPrice || 0)) / origPrice) * 100)}%
                             </span>
                           )}
@@ -920,17 +920,17 @@ export default function OffersHub() {
                       {/* STATUS Column */}
                       <td className="px-4 py-4 whitespace-nowrap">
                         {off.isVerified || off.status === 'Verified' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             {t('statusVerified')}
                           </span>
                         ) : off.status === 'Expiring' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold bg-red-50 text-red-700 border border-red-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                             {t('statusExpiring')}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 text-amber-700 border border-amber-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                             {t('statusUnverified')}
                           </span>
@@ -1075,7 +1075,7 @@ export default function OffersHub() {
             {/* Title Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('englishTitle')} <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -1088,7 +1088,7 @@ export default function OffersHub() {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('arabicTitle')}
                 </label>
                 <input
@@ -1106,7 +1106,7 @@ export default function OffersHub() {
             {/* Supermarket & Category Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('supermarket')}
                 </label>
                 <select
@@ -1125,7 +1125,7 @@ export default function OffersHub() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('category')}
                 </label>
                 <select
@@ -1147,7 +1147,7 @@ export default function OffersHub() {
             {/* Prices & Validity Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('originalPriceLabel')}
                 </label>
                 <input
@@ -1161,7 +1161,7 @@ export default function OffersHub() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('discountedPriceLabel')}
                 </label>
                 <input
@@ -1175,7 +1175,7 @@ export default function OffersHub() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('validUntilLabel')}
                 </label>
                 <input
@@ -1189,7 +1189,7 @@ export default function OffersHub() {
 
             {/* Image Path */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                 {t('imagePathLabel')}
               </label>
               <input
@@ -1204,7 +1204,7 @@ export default function OffersHub() {
             {/* Description Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('englishDesc')}
                 </label>
                 <textarea
@@ -1215,7 +1215,7 @@ export default function OffersHub() {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <label className="text-sm font-bold uppercase tracking-wider text-slate-500">
                   {t('arabicDesc')}
                 </label>
                 <textarea

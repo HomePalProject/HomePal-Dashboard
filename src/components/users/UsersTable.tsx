@@ -149,7 +149,7 @@ export function UsersTable({
 
         <table className="w-full border-collapse text-left align-middle text-xs">
           <thead>
-            <tr className="bg-surface-variant/20 border-b border-border/70 text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+            <tr className="bg-surface-variant/20 border-b border-border/70 text-sm font-bold text-text-secondary uppercase tracking-wider">
               <th className="px-3.5 py-2.5 whitespace-nowrap">{t('thUser')}</th>
               <th className="px-3 py-2.5 text-center whitespace-nowrap">{t('thRole')}</th>
               <th className="px-3 py-2.5 text-center whitespace-nowrap">{t('thStatus')}</th>
@@ -178,7 +178,7 @@ export function UsersTable({
                       <div className="text-xs font-bold text-text-primary">
                         {t('noMatchingUsers')}
                       </div>
-                      <p className="text-[11px] text-text-secondary mt-0.5 mb-0">
+                      <p className="text-sm text-text-secondary mt-0.5 mb-0">
                         {search || roleFilter !== 'All'
                           ? t('noMatchingUsersDesc')
                           : t('noUsersRecorded')}
@@ -251,7 +251,7 @@ export function UsersTable({
                             )}
                           </div>
 
-                          <div className="flex items-center gap-1 text-[11px] text-text-secondary group/email">
+                          <div className="flex items-center gap-1 text-sm text-text-secondary group/email">
                             <span className="truncate max-w-[140px] sm:max-w-xs">{u.email}</span>
                             <button
                               onClick={() => handleCopyEmail(u.email)}
@@ -283,7 +283,7 @@ export function UsersTable({
                       <div className="inline-flex flex-col items-center gap-0.5">
                         <span
                           className={cn(
-                            'text-[11px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap',
+                            'text-sm font-semibold px-2 py-0.5 rounded-full whitespace-nowrap',
                             getRoleBadgeClass(roles)
                           )}
                         >
@@ -308,7 +308,7 @@ export function UsersTable({
                         />
                         <span
                           className={cn(
-                            'text-[11px] font-semibold',
+                            'text-sm font-semibold',
                             isActive ? 'text-status-success' : 'text-status-error'
                           )}
                         >
@@ -350,11 +350,11 @@ export function UsersTable({
                             </svg>
                           </Button>
                         ) : isMainAdmin ? (
-                          <span className="text-[10px] text-text-disabled italic px-1.5 py-0.5 bg-surface-variant/40 rounded">
+                          <span className="text-xs text-text-disabled italic px-1.5 py-0.5 bg-surface-variant/40 rounded">
                             {t('roleProtected')}
                           </span>
                         ) : (
-                          <span className="text-[10px] text-status-error/80 italic px-1.5 py-0.5 bg-status-error/10 rounded">
+                          <span className="text-xs text-status-error/80 italic px-1.5 py-0.5 bg-status-error/10 rounded">
                             {t('statusSuspended')}
                           </span>
                         )}
@@ -374,7 +374,7 @@ export function UsersTable({
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <span className="text-text-secondary text-[11px]">{t('rows')}</span>
+            <span className="text-text-secondary text-sm">{t('rows')}</span>
             <select
               value={pageSize}
               onChange={(e) => {

@@ -19,9 +19,9 @@ export function StatCard({
         highlight ? 'border-status-error shadow-[0_4px_12px_rgba(217,83,79,0.08)]' : 'border-border'
       )}
     >
-      {highlight && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-status-error" />}
+      {highlight && <div className="absolute left-0 top-0 bottom-0 w-1 bg-status-error" />}
 
-      <div className="flex items-center gap-[8px]">
+      <div className="flex items-center gap-2">
         <div
           className={cn(
             'w-8 h-8 rounded-3xl flex items-center justify-center',
@@ -70,7 +70,7 @@ export function StatCard({
           'text-xs font-medium w-fit rounded',
           highlight
             ? 'text-status-error bg-transparent p-0'
-            : 'text-text-secondary bg-surface px-[8px] py-[4px]'
+            : 'text-text-secondary bg-surface px-2 py-1'
         )}
       >
         {subValue}

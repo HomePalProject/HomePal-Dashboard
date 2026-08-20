@@ -89,7 +89,7 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
         </div>
         <div>
           <div className="text-xs font-bold text-text-primary">{t('modalCredentialsTitle')}</div>
-          <p className="text-[11px] text-text-secondary m-0">{t('modalCredentialsDesc')}</p>
+          <p className="text-sm text-text-secondary m-0">{t('modalCredentialsDesc')}</p>
         </div>
       </div>
 
@@ -181,12 +181,12 @@ export function AdminFormModal({ onSave, onClose }: AdminFormModalProps) {
             </div>
 
             {password && (
-              <div className="flex items-center justify-between text-[11px] px-2.5 py-1 bg-surface-variant/30 rounded-md border border-border/60">
+              <div className="flex items-center justify-between text-sm px-2.5 py-1 bg-surface-variant/30 rounded-md border border-border/60">
                 <span className="font-mono text-text-secondary truncate">{password}</span>
                 <button
                   type="button"
                   onClick={handleCopyPassword}
-                  className="text-[11px] font-bold text-primary hover:underline cursor-pointer shrink-0 ml-2"
+                  className="text-sm font-bold text-primary hover:underline cursor-pointer shrink-0 ml-2"
                 >
                   {copiedPass ? t('copied') : t('copy')}
                 </button>

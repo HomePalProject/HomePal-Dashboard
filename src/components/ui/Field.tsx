@@ -17,7 +17,7 @@ export function Field({
         {label} {required && <span className="text-status-error">*</span>}
       </label>
       {children}
-      {hint && <p className="text-xs text-text-secondary mt-[4px] mb-0">{hint}</p>}
+      {hint && <p className="text-xs text-text-secondary mt-1 mb-0">{hint}</p>}
     </div>
   );
 }

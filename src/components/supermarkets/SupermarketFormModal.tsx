@@ -130,13 +130,13 @@ export function SupermarketFormModal({
                   type="button"
                   onClick={handleRemoveLogo}
                   variant="ghost"
-                  className="text-[11px] font-semibold text-red-600 hover:underline w-fit border-none bg-transparent cursor-pointer p-0 h-auto min-h-0 hover:bg-transparent"
+                  className="text-sm font-semibold text-red-600 hover:underline w-fit border-none bg-transparent cursor-pointer p-0 h-auto min-h-0 hover:bg-transparent"
                 >
                   {t('removeLogo')}
                 </Button>
               )}
 
-              <span className="text-[11px] text-slate-400">{t('logoLimits')}</span>
+              <span className="text-sm text-slate-400">{t('logoLimits')}</span>
             </div>
           </div>
         </div>

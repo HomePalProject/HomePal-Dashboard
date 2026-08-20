@@ -389,12 +389,12 @@ export default function MeasuringUnits() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                  <th className="pl-6 pr-4 py-3.5 whitespace-nowrap">{t('thName')}</th>
+                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+                  <th className="ps-6 pe-4 py-3.5 whitespace-nowrap">{t('thName')}</th>
                   <th className="px-4 py-3.5 whitespace-nowrap">{t('thSymbol')}</th>
                   <th className="px-4 py-3.5 whitespace-nowrap">{t('thCreated')}</th>
                   <th className="px-4 py-3.5 whitespace-nowrap">{t('thStatus')}</th>
-                  <th className="pr-6 pl-4 py-3.5 text-right whitespace-nowrap">
+                  <th className="pe-6 ps-4 py-3.5 text-right whitespace-nowrap">
                     {t('thActions')}
                   </th>
                 </tr>
@@ -407,7 +407,7 @@ export default function MeasuringUnits() {
                   return (
                     <tr key={unit.id} className="hover:bg-slate-50/60 transition-colors">
                       {/* UNIT NAME (EN / AR) Column */}
-                      <td className="pl-6 pr-4 py-4 whitespace-nowrap">
+                      <td className="ps-6 pe-4 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <span className="font-extrabold text-slate-900 text-sm">
                             {namePair.en}
@@ -437,7 +437,7 @@ export default function MeasuringUnits() {
 
                       {/* STATUS Column */}
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           {t('statusActive')}
                         </span>
@@ -533,7 +533,7 @@ export default function MeasuringUnits() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* ENGLISH UNIT NAME */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                  <label className="text-sm font-extrabold text-slate-500 uppercase tracking-wider">
                     {t('labelNameEn')}
                   </label>
                   <input
@@ -547,7 +547,7 @@ export default function MeasuringUnits() {
 
                 {/* ARABIC UNIT NAME */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                  <label className="text-sm font-extrabold text-slate-500 uppercase tracking-wider">
                     {t('labelNameAr')}
                   </label>
                   <input
@@ -564,7 +564,7 @@ export default function MeasuringUnits() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* ENGLISH SYMBOL */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                  <label className="text-sm font-extrabold text-slate-500 uppercase tracking-wider">
                     {t('labelSymbolEn')}
                   </label>
                   <input
@@ -578,7 +578,7 @@ export default function MeasuringUnits() {
 
                 {/* ARABIC SYMBOL */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">
+                  <label className="text-sm font-extrabold text-slate-500 uppercase tracking-wider">
                     {t('labelSymbolAr')}
                   </label>
                   <input

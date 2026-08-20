@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@store/authStore';
 import { Card } from '@components/ui/Card';
-import { Button } from '@components/ui/Button';
 import { api } from '@services/api';
 import { useTranslation } from 'react-i18next';
 
@@ -43,7 +42,7 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
         vis ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}
     >
-      <div className="text-[10px] font-bold tracking-[0.12em] text-white/55 uppercase mb-6">
+      <div className="text-base font-bold tracking-[0.12em] text-white/55 uppercase mb-6">
         {t('systemHealth')}
       </div>
 
@@ -75,13 +74,13 @@ export function SystemHealthCard({ delay = 0 }: SystemHealthCardProps) {
         {isChecking ? t('pingingApi') : isOnline ? t('allOperational') : t('cannotReachApi')}
       </div>
 
-      <Button
+      {/* <Button
         variant="ghost"
         size="sm"
-        className="text-white hover:bg-white/10 uppercase tracking-widest text-[10px] px-6 py-2"
+        className="text-white hover:bg-white/10 uppercase tracking-widest text-xs px-6 py-2"
       >
         {t('details')}
-      </Button>
+      </Button> */}
     </Card>
   );
 }

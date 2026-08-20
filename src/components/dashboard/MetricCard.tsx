@@ -63,13 +63,13 @@ export function MetricCard({
           {value}
         </div>
         <div
-          className={`text-[11px] font-bold tracking-[0.08em] uppercase mt-2 ${dark ? 'text-white/65' : 'text-text-disabled'}`}
+          className={`text-sm font-bold tracking-[0.08em] uppercase mt-2 ${dark ? 'text-white/65' : 'text-text-disabled'}`}
         >
           {label}
         </div>
         {note && (
           <div
-            className={`text-[10px] italic mt-6 leading-[1.4] ${dark ? 'text-white/40' : 'text-text-disabled/70'}`}
+            className={`text-xs italic mt-6 leading-[1.4] ${dark ? 'text-white/40' : 'text-text-disabled/70'}`}
           >
             {note}
           </div>

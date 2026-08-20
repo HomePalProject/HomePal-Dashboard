@@ -23,7 +23,7 @@ export default function TableView({
       <div className="overflow-x-auto">
         <table className="w-full text-start border-collapse">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+            <tr className="bg-slate-50 border-b border-slate-200 text-sm font-bold text-slate-500 uppercase tracking-wider">
               <th className="px-16 py-3 whitespace-nowrap">{t('tableHeaderCover')}</th>
               <th className="px-16 py-3 whitespace-nowrap">{t('tableHeaderEn')}</th>
               <th className="px-16 py-3 text-end whitespace-nowrap">{t('tableHeaderAr')}</th>

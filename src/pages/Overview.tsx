@@ -122,10 +122,10 @@ export default function Overview() {
           {/* ── Key Metrics Grid ── */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             {/* Total Households */}
-            <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-[120px] h-fit">
+            <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-30 h-fit">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">
+                  <div className="text-xs rtl:text-base font-black uppercase tracking-[0.2em] text-text-secondary">
                     {t('totalHouseholds')}
                   </div>
                   <div className="p-1.5 rounded-lg bg-surface-variant/50 text-text-secondary group-hover:text-primary transition-colors">
@@ -155,10 +155,10 @@ export default function Overview() {
             </div>
 
             {/* Active Households */}
-            <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-[120px] h-fit">
+            <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-30 h-fit">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">
+                  <div className="text-xs rtl:text-base font-black uppercase tracking-[0.2em] text-text-secondary">
                     {t('activeHouseholds')}
                   </div>
                   <div className="p-1.5 rounded-lg bg-surface-variant/50 text-text-secondary group-hover:text-status-success transition-colors">
@@ -196,10 +196,10 @@ export default function Overview() {
             </div>
 
             {/* AI Meal Plans */}
-            <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-amber-500/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-[120px] h-fit">
+            <div className="group p-5 rounded-2xl bg-surface border border-border/60 hover:border-amber-500/30 transition-all hover:shadow-lg hover:-translate-y-0.5 flex flex-col min-h-30 h-fit">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em] text-text-secondary">
+                  <div className="text-xs rtl:text-base font-black uppercase tracking-[0.2em] text-text-secondary">
                     {t('mealPlans')}
                   </div>
                   <div className="p-1.5 rounded-lg bg-surface-variant/50 text-text-secondary group-hover:text-amber-600 transition-colors">

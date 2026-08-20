@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@store/authStore';
 import { NAV_ITEMS } from '@constants/navigation';
@@ -33,17 +33,21 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         }`}
       >
         <div className="p-5 pb-4 border-b border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <Link
+            to="/dashboard"
+            onClick={() => onClose()}
+            className="flex items-center gap-2.5 hover:opacity-80 transition-opacity no-underline select-none"
+          >
             <img src="/logo-light.svg" alt="HomePal" className="w-8 h-8 object-contain" />
             <div>
               <div className="text-white font-extrabold text-sm leading-none tracking-tight">
-                HomePal
+                {t('homepal')}
               </div>
               <div className="text-white/40 font-bold text-[9px] tracking-[0.12em] uppercase mt-1">
-                {t('common:executivePanel', 'Executive Panel')}
+                {t('executivePanel', 'Executive Panel')}
               </div>
             </div>
-          </div>
+          </Link>
           <button
             onClick={onClose}
             className="lg:hidden text-white/50 hover:text-white -me-2 p-2 rounded-xl hover:bg-white/10 flex items-center justify-center shrink-0"

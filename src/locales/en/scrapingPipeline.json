@@ -1,4 +1,5 @@
 {
+  "currency": "EGP",
   "catalogPipeline": "Catalog Pipeline",
   "scrapingIngestion": "Scraping Ingestion",
   "title": "Offer Scraping & Ingestion",

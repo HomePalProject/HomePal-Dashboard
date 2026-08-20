@@ -1,5 +1,6 @@
 import { MOCK_HOUSEHOLDS_DATA } from '@constants/householdsData';
 import { getErrorMessage } from '@lib/utils';
+import { formatCurrencyString } from '@lib/formatters';
 import { analyticsService } from '@services/analyticsService';
 import type { HouseholdsSummaryData } from '@typeDefs/householdsTypes';
 import { useCallback, useEffect, useState } from 'react';
@@ -98,7 +99,7 @@ export default function Households() {
             {t('avgMonthlyIncome')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
-            {data.avgHouseholdIncome}
+            {formatCurrencyString(data.avgHouseholdIncome, t('currency'))}
           </div>
           <div className="text-xs font-semibold text-text-secondary mt-[4px]">
             {t('selfReported')}

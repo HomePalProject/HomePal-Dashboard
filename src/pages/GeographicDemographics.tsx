@@ -10,6 +10,7 @@ import { analyticsService } from '@services/analyticsService';
 import type { GeographicDemographicsData } from '@typeDefs/demographicsTypes';
 import type { UserDemographicsData } from '@typeDefs/analyticsTypes';
 import { MOCK_DEMOGRAPHICS_DATA } from '@constants/demographicsData';
+import { formatCurrencyString } from '@lib/formatters';
 
 function RecenterButton({ center, zoom }: { center: [number, number]; zoom: number }) {
   const { t } = useTranslation('geographicDemographics');
@@ -410,7 +411,7 @@ export default function GeographicDemographics() {
             </div>
             <div className="flex items-baseline gap-2 mb-6">
               <span className="text-4xl font-extrabold text-primary">
-                {data.budget.value ? data.budget.value.replace('EGP', t('currency')) : ''}
+                {formatCurrencyString(data.budget.value, t('currency'))}
               </span>
               <span className="text-[13px] text-text-secondary">{t('perHousehold')}</span>
             </div>
@@ -499,13 +500,14 @@ export default function GeographicDemographics() {
           {data.householdSize.map((item, i) => {
             const maxValue = Math.max(...data.householdSize.map((d) => d.value), 1);
             const heightPercent = Math.max(Math.round((item.value / maxValue) * 100), 12);
+            const isMax = item.value === maxValue;
             return (
               <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group">
                 <div className="w-full flex flex-col items-center flex-1 justify-end">
                   <span
                     className={cn(
                       'text-xs font-bold mb-2 transition-all group-hover:scale-110',
-                      i === 2 ? 'text-primary' : 'text-text-secondary'
+                      isMax ? 'text-primary' : 'text-text-secondary'
                     )}
                   >
                     {item.value}%
@@ -513,7 +515,7 @@ export default function GeographicDemographics() {
                   <div
                     className={cn(
                       'w-full max-w-36 rounded-t-2xl relative transition-all duration-300 group-hover:opacity-90',
-                      i === 2
+                      isMax
                         ? 'bg-primary shadow-sm shadow-primary/20'
                         : 'bg-surface-variant hover:bg-surface-variant/80'
                     )}
@@ -523,7 +525,7 @@ export default function GeographicDemographics() {
                 <div
                   className={cn(
                     'text-xs text-center mt-3 whitespace-nowrap',
-                    i === 2 ? 'font-bold text-primary' : 'font-medium text-text-secondary'
+                    isMax ? 'font-bold text-primary' : 'font-medium text-text-secondary'
                   )}
                 >
                   {getLocalizedSize(item.size)}

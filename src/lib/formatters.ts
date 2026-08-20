@@ -40,12 +40,12 @@ export function getImageUrl(path?: string | null): string | null {
 export function getCategoryColor(name: string): { bg: string; text: string } {
   const hash = [...name].reduce((acc, c) => acc + c.charCodeAt(0), 0);
   const palettes = [
-    { bg: 'bg-[#356859]/10', text: 'text-[#356859]' },
-    { bg: 'bg-amber-500/10', text: 'text-amber-700' },
-    { bg: 'bg-blue-500/10', text: 'text-blue-700' },
-    { bg: 'bg-purple-500/10', text: 'text-purple-700' },
-    { bg: 'bg-red-500/10', text: 'text-red-700' },
-    { bg: 'bg-teal-500/10', text: 'text-teal-700' },
+    { bg: 'bg-primary-container', text: 'text-primary' },
+    { bg: 'bg-accent-container', text: 'text-accent' },
+    { bg: 'bg-status-info-container', text: 'text-status-info' },
+    { bg: 'bg-status-warning-container', text: 'text-status-warning' },
+    { bg: 'bg-status-error-container', text: 'text-status-error' },
+    { bg: 'bg-status-success-container', text: 'text-status-success' },
   ];
   return palettes[hash % palettes.length] ?? palettes[0];
 }
@@ -79,4 +79,12 @@ export function getInitials(name: string) {
     .map((w) => w[0])
     .join('')
     .toUpperCase();
+}
+
+export function formatCurrencyString(
+  val: string | undefined | null,
+  currencySymbol: string
+): string {
+  if (!val) return '—';
+  return val.replace(/EGP|\$/gi, currencySymbol).trim();
 }

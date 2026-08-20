@@ -14,7 +14,7 @@ import { getLocalizedCulture } from '@lib/formatters';
 function SupermarketLogo({
   logoPath,
   name,
-  className = 'w-[36px] h-[36px]',
+  className = 'w-9 h-9',
 }: {
   logoPath?: string | null;
   name: string;
@@ -52,7 +52,7 @@ function SupermarketLogo({
   return (
     <div
       className={cn(
-        'rounded-lg bg-primary/10 text-primary font-extrabold text-[12px] border border-primary/20 flex items-center justify-center shrink-0',
+        'rounded-lg bg-primary/10 text-primary font-extrabold text-xs border border-primary/20 flex items-center justify-center shrink-0',
         className
       )}
     >
@@ -156,9 +156,9 @@ export default function SupermarketPerformance() {
 
   if (loading) {
     return (
-      <div className="p-[40px] text-center flex flex-col items-center justify-center min-h-[300px]">
-        <div className="w-[32px] h-[32px] border-4 border-primary border-t-transparent rounded-full animate-spin mb-[16px]" />
-        <span className="text-[14px] font-medium text-text-secondary">
+      <div className="p-10 text-center flex flex-col items-center justify-center min-h-[300px]">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+        <span className="text-sm font-medium text-text-secondary">
           {t('loadingSupermarketAnalytics')}
         </span>
       </div>
@@ -166,14 +166,14 @@ export default function SupermarketPerformance() {
   }
 
   return (
-    <div className="w-full flex flex-col gap-[20px] pb-[16px] font-sans relative">
+    <div className="w-full flex flex-col gap-5 pb-4 font-sans relative">
       {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-[12px]">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <div className="flex items-center gap-[6px] text-[13px] text-text-secondary mb-[4px] font-medium">
+          <div className="flex items-center gap-1.5 text-sm text-text-secondary mb-1 font-medium">
             <span>{t('homepalAdmin')}</span>
             <svg
-              className="w-[12px] h-[12px] rtl:rotate-180"
+              className="w-3 h-3 rtl:rotate-180"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -185,25 +185,25 @@ export default function SupermarketPerformance() {
             </svg>
             <span className="text-text-primary">{t('analytics')}</span>
           </div>
-          <h1 className="text-[24px] font-extrabold text-text-primary tracking-tight m-0">
+          <h1 className="text-2xl font-extrabold text-text-primary tracking-tight m-0">
             {t('titlePerformance')}
           </h1>
-          <p className="text-[13px] text-text-secondary m-0 mt-[2px]">{t('subtitlePerformance')}</p>
+          <p className="text-sm text-text-secondary m-0 mt-0.5">{t('subtitlePerformance')}</p>
         </div>
-        <div className="flex gap-[10px] items-center flex-wrap">
+        <div className="flex gap-2.5 items-center flex-wrap">
           <button
             onClick={handleExportCSV}
             disabled={isExporting}
             className={cn(
-              'flex items-center gap-[6px] px-[14px] py-[8px] bg-surface border border-border rounded-lg text-[13px] font-semibold text-text-primary transition-all shadow-xs hover:bg-surface-variant cursor-pointer',
+              'flex items-center gap-1.5 px-3.5 py-2 bg-surface border border-border rounded-lg text-sm font-semibold text-text-primary transition-all shadow-xs hover:bg-surface-variant cursor-pointer',
               isExporting && 'opacity-70 cursor-not-allowed'
             )}
           >
             {isExporting ? (
-              <div className="w-[14px] h-[14px] border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             ) : (
               <svg
-                className="w-[15px] h-[15px]"
+                className="w-4 h-4"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -220,10 +220,10 @@ export default function SupermarketPerformance() {
           </button>
           <button
             onClick={() => navigate('/dashboard/supermarkets?openAdd=true')}
-            className="flex items-center gap-[6px] px-[14px] py-[8px] bg-primary text-white border-none rounded-lg text-[13px] font-semibold cursor-pointer transition-opacity hover:opacity-90 shadow-xs"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-primary text-text-inverse border-none rounded-lg text-sm font-semibold cursor-pointer transition-opacity hover:opacity-90 shadow-xs"
           >
             <svg
-              className="w-[15px] h-[15px]"
+              className="w-4 h-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -240,11 +240,11 @@ export default function SupermarketPerformance() {
       </div>
 
       {/* ── KPI Cards Section ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Top Supermarket Partner */}
-        <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
-          <div className="flex justify-between items-center mb-[8px]">
-            <span className="text-[13px] font-semibold text-text-secondary">
+        <div className="bg-surface rounded-xl border border-border p-4 sm:p-5 flex flex-col justify-between shadow-xs">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-text-secondary">
               {t('topSupermarketPartner')}
             </span>
             {(() => {
@@ -258,18 +258,12 @@ export default function SupermarketPerformance() {
                 );
               });
               if (sm) {
-                return (
-                  <SupermarketLogo
-                    name={smName}
-                    logoPath={sm.logoPath}
-                    className="w-[36px] h-[36px]"
-                  />
-                );
+                return <SupermarketLogo name={smName} logoPath={sm.logoPath} className="w-9 h-9" />;
               }
               return (
-                <div className="w-[36px] h-[36px] rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center text-primary shrink-0">
                   <svg
-                    className="w-[18px] h-[18px]"
+                    className="w-4.5 h-4.5"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -284,18 +278,18 @@ export default function SupermarketPerformance() {
               );
             })()}
           </div>
-          <div className="text-[20px] font-bold text-text-primary tracking-tight">
+          <div className="text-xl font-bold text-text-primary tracking-tight">
             {shoppingTrends?.mostSuccessfulSupermarket || 'Carrefour'}
           </div>
-          <div className="text-[12px] text-primary font-medium mt-[4px]">
+          <div className="text-xs text-primary font-medium mt-1">
             {t('highestConsumerEngagement')}
           </div>
         </div>
 
         {/* Card 2: Most Purchased Category */}
-        <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
-          <div className="flex justify-between items-center mb-[8px]">
-            <span className="text-[13px] font-semibold text-text-secondary">
+        <div className="bg-surface rounded-xl border border-border p-4 sm:p-5 flex flex-col justify-between shadow-xs">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-text-secondary">
               {t('topPurchasedCategory')}
             </span>
             {(() => {
@@ -308,15 +302,15 @@ export default function SupermarketPerformance() {
               const imgUrl = getImageUrl(cat?.imagePath);
               if (imgUrl) {
                 return (
-                  <div className="w-[36px] h-[36px] rounded-lg overflow-hidden shrink-0 bg-white border border-border">
+                  <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-surface border border-border">
                     <img src={imgUrl} alt={catName} className="w-full h-full object-cover" />
                   </div>
                 );
               }
               return (
-                <div className="w-[36px] h-[36px] rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-status-success-container flex items-center justify-center text-status-success shrink-0">
                   <svg
-                    className="w-[18px] h-[18px]"
+                    className="w-4.5 h-4.5"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -332,7 +326,7 @@ export default function SupermarketPerformance() {
               );
             })()}
           </div>
-          <div className="text-[20px] font-bold text-text-primary tracking-tight truncate">
+          <div className="text-xl font-bold text-text-primary tracking-tight truncate">
             {getLocalizedCulture(
               shoppingTrends?.mostBoughtCategory?.name,
               i18n.resolvedLanguage as 'en' | 'ar'
@@ -340,7 +334,7 @@ export default function SupermarketPerformance() {
               shoppingTrends?.mostBoughtCategory?.name ||
               'Dairy & Eggs'}
           </div>
-          <div className="text-[12px] text-emerald-600 font-semibold mt-[4px]">
+          <div className="text-xs text-status-success font-semibold mt-1">
             {shoppingTrends?.mostBoughtCategory?.percentage
               ? t('pctOfPurchases', { percentage: shoppingTrends.mostBoughtCategory.percentage })
               : t('highVolumeDemand')}
@@ -348,9 +342,9 @@ export default function SupermarketPerformance() {
         </div>
 
         {/* Card 3: Top Inventory Category */}
-        <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
-          <div className="flex justify-between items-center mb-[8px]">
-            <span className="text-[13px] font-semibold text-text-secondary">
+        <div className="bg-surface rounded-xl border border-border p-4 sm:p-5 flex flex-col justify-between shadow-xs">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-text-secondary">
               {t('topInventoryCategory')}
             </span>
             {(() => {
@@ -363,15 +357,15 @@ export default function SupermarketPerformance() {
               const imgUrl = getImageUrl(cat?.imagePath);
               if (imgUrl) {
                 return (
-                  <div className="w-[36px] h-[36px] rounded-lg overflow-hidden shrink-0 bg-white border border-border">
+                  <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-surface border border-border">
                     <img src={imgUrl} alt={catName} className="w-full h-full object-cover" />
                   </div>
                 );
               }
               return (
-                <div className="w-[36px] h-[36px] rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-600 shrink-0">
+                <div className="w-9 h-9 rounded-lg bg-accent-container flex items-center justify-center text-accent shrink-0">
                   <svg
-                    className="w-[18px] h-[18px]"
+                    className="w-4.5 h-4.5"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -387,7 +381,7 @@ export default function SupermarketPerformance() {
               );
             })()}
           </div>
-          <div className="text-[20px] font-bold text-text-primary tracking-tight truncate">
+          <div className="text-xl font-bold text-text-primary tracking-tight truncate">
             {getLocalizedCulture(
               shoppingTrends?.mostCommonInventoryCategory?.name,
               i18n.resolvedLanguage as 'en' | 'ar'
@@ -395,7 +389,7 @@ export default function SupermarketPerformance() {
               shoppingTrends?.mostCommonInventoryCategory?.name ||
               'Beverages'}
           </div>
-          <div className="text-[12px] text-amber-600 font-semibold mt-[4px]">
+          <div className="text-xs text-accent font-semibold mt-1">
             {shoppingTrends?.mostCommonInventoryCategory?.percentage
               ? t('pctOfTotalStock', {
                   percentage: shoppingTrends.mostCommonInventoryCategory.percentage,
@@ -405,14 +399,14 @@ export default function SupermarketPerformance() {
         </div>
 
         {/* Card 4: Total Active Offers */}
-        <div className="bg-surface rounded-xl border border-border p-[16px] sm:p-[20px] flex flex-col justify-between shadow-xs">
-          <div className="flex justify-between items-center mb-[8px]">
-            <span className="text-[13px] font-semibold text-text-secondary">
+        <div className="bg-surface rounded-xl border border-border p-4 sm:p-5 flex flex-col justify-between shadow-xs">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-semibold text-text-secondary">
               {t('activeOffersCatalog')}
             </span>
-            <div className="w-[36px] h-[36px] rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-status-info-container flex items-center justify-center text-status-info shrink-0">
               <svg
-                className="w-[18px] h-[18px]"
+                className="w-4.5 h-4.5"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -425,25 +419,25 @@ export default function SupermarketPerformance() {
               </svg>
             </div>
           </div>
-          <div className="text-[20px] font-bold text-text-primary tracking-tight">
+          <div className="text-xl font-bold text-text-primary tracking-tight">
             {t('activeCount', { count: offers.length })}
           </div>
-          <div className="text-[12px] text-indigo-600 font-semibold mt-[4px]">
+          <div className="text-xs text-status-info font-semibold mt-1">
             {t('verifiedPartnerDeals')}
           </div>
         </div>
       </div>
 
       {/* ── Main Section Grid ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-[20px] items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 items-start">
         {/* Partner Supermarkets Table */}
         <div className="bg-surface rounded-xl border border-border flex flex-col overflow-hidden shadow-xs">
-          <div className="px-[20px] py-[14px] border-b border-border flex flex-col sm:flex-row justify-between sm:items-center gap-[10px]">
-            <div className="flex items-center gap-[8px] whitespace-nowrap">
-              <h2 className="text-[15px] font-bold text-text-primary m-0">
+          <div className="px-5 py-3.5 border-b border-border flex flex-col sm:flex-row justify-between sm:items-center gap-2.5">
+            <div className="flex items-center gap-2 whitespace-nowrap">
+              <h2 className="text-base font-bold text-text-primary m-0">
                 {t('partnerSupermarkets')}
               </h2>
-              <span className="px-[8px] py-[2px] rounded-full bg-primary/10 text-primary text-[11px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-primary-container text-primary text-xs font-bold">
                 {t('enrolledCount', { count: supermarkets.length })}
               </span>
             </div>
@@ -453,10 +447,10 @@ export default function SupermarketPerformance() {
                 placeholder={t('searchPartner')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-[10px] py-[6px] ps-[30px] text-[13px] bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:border-primary h-[34px]"
+                className="w-full px-2.5 py-1.5 ps-7.5 text-sm bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:border-primary h-8.5"
               />
               <svg
-                className="w-[14px] h-[14px] absolute start-[10px] top-1/2 -translate-y-1/2 text-text-disabled"
+                className="w-3.5 h-3.5 absolute start-2.5 top-1/2 -translate-y-1/2 text-text-disabled"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -472,16 +466,16 @@ export default function SupermarketPerformance() {
             <table className="w-full border-collapse text-start">
               <thead>
                 <tr className="border-b border-border bg-surface-variant/30">
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
+                  <th className="px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase whitespace-nowrap">
                     {t('thSupermarketPartner')}
                   </th>
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
+                  <th className="px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase whitespace-nowrap">
                     {t('thFacebookPage')}
                   </th>
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase whitespace-nowrap">
+                  <th className="px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase whitespace-nowrap">
                     {t('thActiveOffers')}
                   </th>
-                  <th className="px-[16px] py-[10px] text-[11px] font-semibold text-text-secondary uppercase text-end whitespace-nowrap">
+                  <th className="px-4 py-2.5 text-xs font-semibold text-text-secondary uppercase text-end whitespace-nowrap">
                     {t('thStatus')}
                   </th>
                 </tr>
@@ -489,10 +483,7 @@ export default function SupermarketPerformance() {
               <tbody>
                 {filteredSupermarkets.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={4}
-                      className="px-[20px] py-[32px] text-center text-text-disabled text-[13px]"
-                    >
+                    <td colSpan={4} className="px-5 py-8 text-center text-text-disabled text-sm">
                       {t('noMatchingSupermarkets')}
                     </td>
                   </tr>
@@ -508,27 +499,27 @@ export default function SupermarketPerformance() {
                         key={supermarket.id}
                         className="border-b border-border transition-colors hover:bg-surface-variant/40"
                       >
-                        <td className="px-[16px] py-[12px]">
-                          <div className="flex items-center gap-[10px]">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2.5">
                             <SupermarketLogo
                               logoPath={supermarket.logoPath}
                               name={name}
-                              className="w-[36px] h-[36px]"
+                              className="w-9 h-9"
                             />
                             <div>
-                              <div className="text-[13px] font-semibold text-text-primary">
+                              <div className="text-sm font-semibold text-text-primary">
                                 {getLocalizedCulture(
                                   supermarket.name,
                                   i18n.resolvedLanguage as 'en' | 'ar'
                                 ) || getLocalString(supermarket.name)}
                               </div>
-                              <div className="text-[11px] text-text-disabled">
+                              <div className="text-xs text-text-disabled">
                                 {supermarket.address || t('partnerChain')}
                               </div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-[16px] py-[12px] text-[13px] text-text-secondary whitespace-nowrap">
+                        <td className="px-4 py-3 text-sm text-text-secondary whitespace-nowrap">
                           {supermarket.websiteUrl ? (
                             <a
                               href={
@@ -538,7 +529,7 @@ export default function SupermarketPerformance() {
                               }
                               target="_blank"
                               rel="noreferrer"
-                              className="text-primary hover:underline font-medium text-[12px]"
+                              className="text-primary hover:underline font-medium text-xs"
                             >
                               {t('facebookLink')}
                             </a>
@@ -546,25 +537,25 @@ export default function SupermarketPerformance() {
                             <span className="text-text-disabled">—</span>
                           )}
                         </td>
-                        <td className="px-[16px] py-[12px] text-[13px] font-semibold text-text-primary whitespace-nowrap">
-                          <span className="px-[8px] py-[3px] rounded bg-surface-variant text-text-secondary text-[12px]">
+                        <td className="px-4 py-3 text-sm font-semibold text-text-primary whitespace-nowrap">
+                          <span className="px-2 py-0.5 rounded bg-surface-variant text-text-secondary text-xs">
                             {t('dealsCount', { count: sOffersCount })}
                           </span>
                         </td>
-                        <td className="px-[16px] py-[12px] text-end">
+                        <td className="px-4 py-3 text-end">
                           <span
                             className={cn(
-                              'inline-flex items-center gap-[5px] px-[8px] py-[2px] rounded-full text-[11px] font-bold',
+                              'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold',
                               supermarket.isActive !== false
-                                ? 'bg-emerald-500/10 text-emerald-600'
+                                ? 'bg-status-success-container text-status-success'
                                 : 'bg-surface-variant text-text-disabled'
                             )}
                           >
                             <span
                               className={cn(
-                                'w-[6px] h-[6px] rounded-full',
+                                'w-1.5 h-1.5 rounded-full',
                                 supermarket.isActive !== false
-                                  ? 'bg-emerald-500'
+                                  ? 'bg-status-success'
                                   : 'bg-text-disabled'
                               )}
                             />
@@ -583,24 +574,22 @@ export default function SupermarketPerformance() {
         </div>
 
         {/* Side Section: Consumer Preference Rankings & Chain Share */}
-        <div className="flex flex-col gap-[20px]">
-          {/* Preference Ranking Breakdown (From GET /api/analytics/shopping-trends) */}
-          <div className="bg-surface rounded-xl border border-border p-[18px] shadow-xs">
-            <h3 className="text-[14px] font-bold text-text-primary m-0 mb-[2px]">
+        <div className="flex flex-col gap-5">
+          {/* Preference Ranking Breakdown */}
+          <div className="bg-surface rounded-xl border border-border p-4.5 shadow-xs">
+            <h3 className="text-sm font-bold text-text-primary m-0 mb-0.5">
               {t('consumerPreferenceRanking')}
             </h3>
-            <p className="text-[11px] text-text-disabled m-0 mb-[14px]">
-              {t('rankedDietaryPreferences')}
-            </p>
+            <p className="text-xs text-text-disabled m-0 mb-3.5">{t('rankedDietaryPreferences')}</p>
 
             {shoppingTrends?.preferenceRanking && shoppingTrends.preferenceRanking.length > 0 ? (
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-2.5">
                 {shoppingTrends.preferenceRanking.map((pref, idx) => (
                   <div
                     key={idx}
-                    className="flex flex-col gap-[4px] p-[8px] rounded-lg bg-surface-variant/40 border border-border/50"
+                    className="flex flex-col gap-1 p-2 rounded-lg bg-surface-variant/40 border border-border/50"
                   >
-                    <div className="flex justify-between items-center text-[12px]">
+                    <div className="flex justify-between items-center text-xs">
                       <span className="font-semibold text-text-primary">
                         {getLocalizedCulture(
                           pref.preference,
@@ -613,7 +602,7 @@ export default function SupermarketPerformance() {
                       </span>
                       <span className="font-bold text-primary">{pref.percentage}%</span>
                     </div>
-                    <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
+                    <div className="w-full h-1.5 rounded-full bg-surface-variant overflow-hidden">
                       <div
                         className="h-full bg-primary rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(pref.percentage, 100)}%` }}
@@ -623,7 +612,7 @@ export default function SupermarketPerformance() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-2.5">
                 {[
                   { pref: 'Organic / Non-GMO', cat: 'Produce', pct: 42 },
                   { pref: 'Low Sodium / Sugar-Free', cat: 'Pantry', pct: 31 },
@@ -649,15 +638,15 @@ export default function SupermarketPerformance() {
                   return (
                     <div
                       key={i}
-                      className="flex flex-col gap-[4px] p-[8px] rounded-lg bg-surface-variant/40 border border-border/50"
+                      className="flex flex-col gap-1 p-2 rounded-lg bg-surface-variant/40 border border-border/50"
                     >
-                      <div className="flex justify-between items-center text-[12px]">
+                      <div className="flex justify-between items-center text-xs">
                         <span className="font-semibold text-text-primary">
                           {displayPref} ({displayCat})
                         </span>
                         <span className="font-bold text-primary">{item.pct}%</span>
                       </div>
-                      <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
+                      <div className="w-full h-1.5 rounded-full bg-surface-variant overflow-hidden">
                         <div
                           className="h-full bg-primary rounded-full"
                           style={{ width: `${item.pct}%` }}
@@ -670,29 +659,29 @@ export default function SupermarketPerformance() {
             )}
           </div>
 
-          {/* Top Supermarket Chains Distribution (From GET /api/analytics/overview) */}
-          <div className="bg-surface rounded-xl border border-border p-[18px] shadow-xs">
-            <h3 className="text-[14px] font-bold text-text-primary m-0 mb-[2px]">
+          {/* Top Supermarket Chains Distribution */}
+          <div className="bg-surface rounded-xl border border-border p-4.5 shadow-xs">
+            <h3 className="text-sm font-bold text-text-primary m-0 mb-0.5">
               {t('supermarketChainShare')}
             </h3>
-            <p className="text-[11px] text-text-disabled m-0 mb-[14px]">
+            <p className="text-xs text-text-disabled m-0 mb-3.5">
               {t('aggregatedCatalogVolumeShare')}
             </p>
 
             {overviewData?.topSupermarketChains && overviewData.topSupermarketChains.length > 0 ? (
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-2.5">
                 {overviewData.topSupermarketChains.map((chain, i) => (
-                  <div key={i} className="flex flex-col gap-[4px]">
-                    <div className="flex justify-between text-[12px]">
+                  <div key={i} className="flex flex-col gap-1">
+                    <div className="flex justify-between text-xs">
                       <span className="text-text-primary font-semibold">
                         {getLocalizedCulture(chain.name, i18n.resolvedLanguage as 'en' | 'ar') ||
                           getLocalString(chain.name)}
                       </span>
                       <span className="text-text-secondary font-bold">{chain.value}%</span>
                     </div>
-                    <div className="w-full h-[5px] rounded-full bg-surface-variant overflow-hidden">
+                    <div className="w-full h-1.5 rounded-full bg-surface-variant overflow-hidden">
                       <div
-                        className="h-full bg-emerald-500 rounded-full"
+                        className="h-full bg-status-success rounded-full"
                         style={{ width: `${Math.min(chain.value, 100)}%` }}
                       />
                     </div>
@@ -700,7 +689,7 @@ export default function SupermarketPerformance() {
                 ))}
               </div>
             ) : (
-              <div className="text-[12px] text-text-disabled text-center py-[10px]">
+              <div className="text-xs text-text-disabled text-center py-2.5">
                 {t('noChainShareData')}
               </div>
             )}
@@ -710,7 +699,7 @@ export default function SupermarketPerformance() {
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-[16px] inset-e-[16px] bg-gray-900 text-white px-[16px] py-[8px] rounded-lg text-[13px] font-medium shadow-lg z-50 animate-bounce">
+        <div className="fixed bottom-4 inset-e-4 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg z-50 animate-bounce">
           {toastMessage}
         </div>
       )}

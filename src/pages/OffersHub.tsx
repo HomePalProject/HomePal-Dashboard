@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 
 function OffersTableSkeleton() {
   return (
-    <div className="divide-y divide-slate-100">
+    <div className="divide-y divide-border">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex items-center gap-3 ps-6 pe-6 py-4">
           <Skeleton className="w-10 h-10 rounded-full shrink-0" />

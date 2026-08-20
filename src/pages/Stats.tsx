@@ -255,13 +255,13 @@ export default function Stats() {
     <div className="w-full flex flex-col gap-6 font-sans pb-10">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-[#2d2a26] tracking-tight m-0">
+          <h1 className="text-2xl font-extrabold text-text-primary tracking-tight m-0">
             {t('title')}
           </h1>
-          <p className="text-xs text-[#6d6862] mt-1 m-0">{t('subtitle')}</p>
+          <p className="text-xs text-text-secondary mt-1 m-0">{t('subtitle')}</p>
         </div>
         <div className="flex gap-3 flex-wrap sm:flex-nowrap w-full sm:w-auto">
-          <button className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-[#356859] hover:bg-[#2a5347] text-white border-none rounded-xl text-xs font-bold cursor-pointer transition-colors shadow-xs">
+          <button className="flex-1 sm:flex-none flex justify-center items-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-active text-white border-none rounded-xl text-xs font-bold cursor-pointer transition-colors shadow-xs">
             <svg
               width="14"
               height="14"
@@ -277,7 +277,7 @@ export default function Stats() {
             </svg>
             {t('exportReport')}
           </button>
-          <div className="flex-1 sm:flex-none flex justify-center items-center px-5 py-2.5 bg-white border border-[#e4e0da] rounded-xl text-xs font-bold text-[#2d2a26] shadow-xs">
+          <div className="flex-1 sm:flex-none flex justify-center items-center px-5 py-2.5 bg-surface border border-border rounded-xl text-xs font-bold text-text-primary shadow-xs">
             {t('liveSynced')}
           </div>
         </div>
@@ -315,8 +315,9 @@ export default function Stats() {
               height="20"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#d9534f"
+              stroke="currentColor"
               strokeWidth="2"
+              className="text-status-error"
             >
               <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
               <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
@@ -336,8 +337,9 @@ export default function Stats() {
               height="20"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#d99a3d"
+              stroke="currentColor"
               strokeWidth="2"
+              className="text-accent"
             >
               <circle cx="12" cy="12" r="10" />
               <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
@@ -348,19 +350,19 @@ export default function Stats() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs min-h-75">
+        <div className="bg-surface rounded-2xl border border-border p-6 flex flex-col justify-between shadow-xs min-h-75">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
+              <h2 className="text-base font-extrabold text-text-primary m-0">
                 {t('topSupermarketChainsTitle')}
               </h2>
-              <p className="text-xs text-[#6d6862] m-0 mt-0.5">
+              <p className="text-xs text-text-secondary m-0 mt-0.5">
                 {t('topSupermarketChainsSubtitle')}
               </p>
             </div>
             <button
               onClick={() => navigate('/dashboard/supermarket-performance')}
-              className="bg-transparent border-none text-[#356859] text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
+              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
             >
               {t('viewAll')}
               <svg
@@ -379,17 +381,17 @@ export default function Stats() {
 
           {chains.length > 0 ? (
             <div className="flex-1 flex flex-col justify-end overflow-hidden w-full">
-              <div className="flex-1 relative min-h-47.5 flex items-end justify-around gap-1 sm:gap-4 px-2 sm:px-4 pt-8 pb-3 border-b border-[#e4e0da] bg-[#faf8f3] rounded-xl">
-                <div className="absolute inset-x-4 top-1/4 border-b border-dashed border-[#e4e0da] pointer-events-none" />
-                <div className="absolute inset-x-4 top-2/4 border-b border-dashed border-[#e4e0da] pointer-events-none" />
-                <div className="absolute inset-x-4 top-3/4 border-b border-dashed border-[#e4e0da] pointer-events-none" />
+              <div className="flex-1 relative min-h-47.5 flex items-end justify-around gap-1 sm:gap-4 px-2 sm:px-4 pt-8 pb-3 border-b border-border bg-background rounded-xl">
+                <div className="absolute inset-x-4 top-1/4 border-b border-dashed border-border pointer-events-none" />
+                <div className="absolute inset-x-4 top-2/4 border-b border-dashed border-border pointer-events-none" />
+                <div className="absolute inset-x-4 top-3/4 border-b border-dashed border-border pointer-events-none" />
 
                 {chains.map((chain, i) => {
                   const barColors = [
-                    'bg-[#356859]',
-                    'bg-[#2a5347]',
-                    'bg-[#d99a3d]',
-                    'bg-[#6d6862]',
+                    'bg-primary',
+                    'bg-primary-active',
+                    'bg-accent',
+                    'bg-text-secondary',
                   ];
 
                   return (
@@ -397,7 +399,7 @@ export default function Stats() {
                       key={i}
                       className="flex-1 flex flex-col items-center justify-end gap-2 z-10 group h-full max-w-11"
                     >
-                      <span className="text-[10px] sm:text-[11px] font-black text-[#2d2a26] bg-white px-1.5 sm:px-2 py-0.5 rounded-md border border-[#e4e0da] shadow-xs mb-1 group-hover:scale-110 transition-transform">
+                      <span className="text-[10px] sm:text-[11px] font-black text-text-primary bg-surface px-1.5 sm:px-2 py-0.5 rounded-md border border-border shadow-xs mb-1 group-hover:scale-110 transition-transform">
                         {chain.value}%
                       </span>
 
@@ -417,7 +419,7 @@ export default function Stats() {
                 {chains.map((chain, i) => (
                   <div
                     key={i}
-                    className="flex-1 text-center text-[10px] sm:text-xs font-bold text-[#2d2a26] truncate max-w-11"
+                    className="flex-1 text-center text-[10px] sm:text-xs font-bold text-text-primary truncate max-w-11"
                     title={chain.name}
                   >
                     {chain.name}
@@ -426,11 +428,11 @@ export default function Stats() {
               </div>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#faf8f3] rounded-xl border border-dashed border-[#e4e0da] text-center space-y-2">
-              <span className="text-xs font-bold text-[#6d6862]">{t('noChains')}</span>
+            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-background rounded-xl border border-dashed border-border text-center space-y-2">
+              <span className="text-xs font-bold text-text-secondary">{t('noChains')}</span>
               <button
                 onClick={() => navigate('/dashboard/supermarket-performance')}
-                className="px-3 py-1.5 bg-[#356859] text-white text-xs font-bold rounded-lg border-none cursor-pointer"
+                className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-lg border-none cursor-pointer"
               >
                 {t('addSupermarket')}
               </button>
@@ -438,14 +440,14 @@ export default function Stats() {
           )}
         </div>
 
-        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs">
+        <div className="bg-surface rounded-2xl border border-border p-6 flex flex-col justify-between shadow-xs">
           <div className="flex justify-between items-start mb-1">
-            <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
+            <h2 className="text-base font-extrabold text-text-primary m-0">
               {t('receiptParsingAccuracyTitle')}
             </h2>
             <button
               onClick={() => navigate('/dashboard/ai-token-usage')}
-              className="bg-transparent border-none text-[#356859] text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
+              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
             >
               {t('logs')}
               <svg
@@ -461,20 +463,22 @@ export default function Stats() {
               </svg>
             </button>
           </div>
-          <p className="text-xs text-[#6d6862] mb-6 mt-0">{t('receiptParsingAccuracySubtitle')}</p>
+          <p className="text-xs text-text-secondary mb-6 mt-0">
+            {t('receiptParsingAccuracySubtitle')}
+          </p>
 
           <div className="flex gap-6 items-center">
             <div
               className="w-28 h-28 rounded-full relative flex items-center justify-center p-3 shrink-0"
               style={{
-                background: `conic-gradient(#356859 0deg ${autoDeg}deg, #d99a3d ${autoDeg}deg ${autoDeg + manualDeg}deg, #d9534f ${autoDeg + manualDeg}deg 360deg)`,
+                background: `conic-gradient(var(--color-primary) 0deg ${autoDeg}deg, var(--color-accent) ${autoDeg}deg ${autoDeg + manualDeg}deg, var(--color-status-error) ${autoDeg + manualDeg}deg 360deg)`,
               }}
             >
-              <div className="w-full h-full bg-white rounded-full flex flex-col items-center justify-center shadow-xs">
-                <span className="text-xl font-black text-[#2d2a26]">
+              <div className="w-full h-full bg-surface rounded-full flex flex-col items-center justify-center shadow-xs">
+                <span className="text-xl font-black text-text-primary">
                   {(visionHealth.autoParsedPercentage || 100).toFixed(0)}%
                 </span>
-                <span className="text-[9px] font-bold text-[#6d6862] uppercase tracking-wider">
+                <span className="text-[9px] font-bold text-text-secondary uppercase tracking-wider">
                   {t('success')}
                 </span>
               </div>
@@ -485,28 +489,28 @@ export default function Stats() {
                 {
                   label: t('autoParsed'),
                   val: visionHealth.autoParsedPercentage || 100,
-                  color: '#356859',
+                  color: 'var(--color-primary)',
                 },
                 {
                   label: t('manualFallback'),
                   val: visionHealth.manualFallbackPercentage || 0,
-                  color: '#d99a3d',
+                  color: 'var(--color-accent)',
                 },
                 {
                   label: t('failed'),
                   val: visionHealth.failedPercentage || 0,
-                  color: '#d9534f',
+                  color: 'var(--color-status-error)',
                 },
               ].map((item) => (
                 <div key={item.label}>
                   <div className="flex justify-between text-xs font-bold mb-1">
-                    <span className="flex items-center gap-1.5 text-[#2d2a26]">
+                    <span className="flex items-center gap-1.5 text-text-primary">
                       <span className="w-2 h-2 rounded-full" style={{ background: item.color }} />
                       {item.label}
                     </span>
-                    <span className="text-[#2d2a26] font-extrabold">{item.val.toFixed(1)}%</span>
+                    <span className="text-text-primary font-extrabold">{item.val.toFixed(1)}%</span>
                   </div>
-                  <div className="h-1.5 bg-[#f4f2ee] rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-surface-variant rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full"
                       style={{ width: `${item.val}%`, background: item.color }}
@@ -522,66 +526,68 @@ export default function Stats() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
         <div
           onClick={() => navigate('/dashboard/geographic-demographics')}
-          className="bg-[#faf8f3] rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-md group min-h-65"
+          className="bg-background rounded-2xl border border-border p-6 flex flex-col justify-between relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-md group min-h-65"
         >
           <div className="flex justify-between items-start z-10 mb-2 gap-4">
             <div>
-              <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
+              <h2 className="text-base font-extrabold text-text-primary m-0">
                 {t('regionalDistributionTitle')}
               </h2>
-              <p className="text-xs text-[#6d6862] z-10 mt-1 m-0">
+              <p className="text-xs text-text-secondary z-10 mt-1 m-0">
                 {t('regionalDistributionSubtitle')}
               </p>
             </div>
-            <button className="bg-white hover:bg-[#e4e0da]/30 text-[#356859] text-[11px] font-bold px-3 py-1.5 rounded-full border border-[#e4e0da] cursor-pointer flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 mt-0.5 shadow-xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#356859] animate-pulse" />
+            <button className="bg-surface hover:bg-surface-variant text-primary text-[11px] font-bold px-3 py-1.5 rounded-full border border-border cursor-pointer flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 mt-0.5 shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               <span>{t('liveData')}</span>
             </button>
           </div>
 
           <div className="absolute inset-0 pointer-events-none mt-18 overflow-hidden rounded-b-2xl flex items-center justify-center">
-            <div className="absolute inset-x-0 top-0 h-12 bg-linear-to-b from-[#faf8f3] to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-12 bg-linear-to-b from-background to-transparent z-10 pointer-events-none" />
             <img
               src="/regional-map.jpg"
               alt="Regional Distribution"
               className="w-full h-[150%] object-cover object-center opacity-85 mix-blinset-e-multiply transition-transform duration-1000 group-hover:scale-105"
             />
-            <div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-[#faf8f3] to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-background to-transparent z-10 pointer-events-none" />
           </div>
 
           <div className="relative z-10 flex-1 flex items-center justify-center pointer-events-none mt-16">
-            <div className="bg-[#fdfcf9] border border-[#e4e0da] rounded-xl px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center transition-transform duration-300 group-hover:-translate-y-1">
-              <span className="text-[#2d2a26] font-extrabold text-[13px] mb-1">
+            <div className="bg-surface border border-border rounded-xl px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center transition-transform duration-300 group-hover:-translate-y-1">
+              <span className="text-text-primary font-extrabold text-[13px] mb-1">
                 {t('centralDistrict')}
               </span>
-              <span className="text-[#356859] font-bold text-xs">{t('newHouseholds')}</span>
+              <span className="text-primary font-bold text-xs">{t('newHouseholds')}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs">
+        <div className="bg-surface rounded-2xl border border-border p-6 flex flex-col justify-between shadow-xs">
           <div>
-            <h2 className="text-base font-extrabold text-[#2d2a26] m-0 mb-1">
+            <h2 className="text-base font-extrabold text-text-primary m-0 mb-1">
               {t('topGroceryCategoriesTitle')}
             </h2>
-            <p className="text-xs text-[#6d6862] m-0 mb-6">{t('topGroceryCategoriesSubtitle')}</p>
+            <p className="text-xs text-text-secondary m-0 mb-6">
+              {t('topGroceryCategoriesSubtitle')}
+            </p>
           </div>
 
           {categories.length > 0 ? (
             <div className="flex flex-col gap-3.5 flex-1 justify-center">
               {categories.map((cat, i) => (
                 <div key={i} className="space-y-1">
-                  <div className="flex justify-between text-xs font-bold text-[#2d2a26]">
+                  <div className="flex justify-between text-xs font-bold text-text-primary">
                     <span className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#356859]" />
+                      <span className="w-2 h-2 rounded-full bg-primary" />
                       {getLocalizedCulture(cat.name, i18n.resolvedLanguage as 'en' | 'ar') ||
                         getLocalString(cat.name)}
                     </span>
-                    <span className="text-[#356859] font-extrabold">{cat.percentage}%</span>
+                    <span className="text-primary font-extrabold">{cat.percentage}%</span>
                   </div>
-                  <div className="h-2 bg-[#f4f2ee] rounded-full overflow-hidden">
+                  <div className="h-2 bg-surface-variant rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#356859] rounded-full transition-all duration-500"
+                      className="h-full bg-primary rounded-full transition-all duration-500"
                       style={{ width: `${cat.percentage}%` }}
                     />
                   </div>
@@ -589,7 +595,7 @@ export default function Stats() {
               ))}
             </div>
           ) : (
-            <div className="flex-1 flex items-center justify-center p-6 bg-[#faf8f3] rounded-xl text-xs text-[#6d6862]">
+            <div className="flex-1 flex items-center justify-center p-6 bg-background rounded-xl text-xs text-text-secondary">
               {t('noCategories')}
             </div>
           )}

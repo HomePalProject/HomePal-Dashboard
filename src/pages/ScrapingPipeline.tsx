@@ -30,7 +30,7 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
   const supermarketLogoUrl = getImageUrl(offer.supermarketLogoPath);
 
   return (
-    <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-4 hover:bg-slate-100/70 transition-colors">
+    <div className="p-3.5 bg-background border border-border rounded-xl flex items-center justify-between gap-4 hover:bg-surface-variant transition-colors">
       <div className="flex items-center gap-3.5 min-w-0">
         {/* Product Image Thumbnail */}
         {imageUrl && !imgError ? (
@@ -38,32 +38,32 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
             src={imageUrl}
             alt={title}
             onError={() => setImgError(true)}
-            className="w-12 h-12 rounded-lg object-cover bg-white border border-slate-200 shrink-0 shadow-xs"
+            className="w-12 h-12 rounded-lg object-cover bg-surface border border-border shrink-0 shadow-xs"
           />
         ) : (
-          <div className="w-12 h-12 rounded-lg bg-slate-200 text-slate-500 flex items-center justify-center shrink-0 border border-slate-200 font-bold text-xs">
+          <div className="w-12 h-12 rounded-lg bg-surface-variant text-text-disabled flex items-center justify-center shrink-0 border border-border font-bold text-xs">
             {title && title !== '—' ? title.charAt(0).toUpperCase() : 'P'}
           </div>
         )}
 
         <div className="min-w-0 flex flex-col gap-0.5">
           {/* Title */}
-          <div className="text-xs font-bold text-slate-900 truncate" title={title}>
+          <div className="text-xs font-bold text-text-primary truncate" title={title}>
             {title}
           </div>
 
           {/* Description, Unit, Category */}
-          <div className="flex items-center gap-2 text-[11px] text-slate-500 flex-wrap">
+          <div className="flex items-center gap-2 text-[11px] text-text-secondary flex-wrap">
             {description && description !== '—' && (
-              <span className="font-medium text-slate-700">{description}</span>
+              <span className="font-medium text-text-primary">{description}</span>
             )}
             {unit && (
-              <span className="px-1.5 py-0.5 bg-slate-200/80 rounded text-[10px] font-semibold text-slate-600">
+              <span className="px-1.5 py-0.5 bg-surface-variant rounded text-[10px] font-semibold text-text-secondary">
                 {unit}
               </span>
             )}
-            <span className="text-slate-300">•</span>
-            <span className="text-slate-500">
+            <span className="text-text-disabled">•</span>
+            <span className="text-text-secondary">
               {t('categoryLabel', { name: offer.categoryName || 'Bakery' })}
             </span>
           </div>
@@ -78,7 +78,7 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
                   className="w-3.5 h-3.5 rounded-full object-cover"
                 />
               )}
-              <span className="text-[10px] font-semibold text-slate-500">
+              <span className="text-[10px] font-semibold text-text-secondary">
                 {offer.supermarketName}
               </span>
             </div>
@@ -90,17 +90,17 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
       <div className="flex flex-col items-end shrink-0">
         {currentPrice !== undefined && currentPrice !== null ? (
           <div className="flex flex-col items-end gap-0.5">
-            <span className="text-xs font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
-              {currentPrice} EGP
+            <span className="text-xs font-extrabold text-status-success bg-status-success-container border border-status-success/20 px-2.5 py-1 rounded-lg">
+              {currentPrice} {t('currency')}
             </span>
             {hasDiscount && (
-              <span className="text-[10px] text-slate-400 line-through">{origPrice} EGP</span>
+              <span className="text-[10px] text-text-disabled line-through">
+                {origPrice} {t('currency')}
+              </span>
             )}
           </div>
         ) : (
-          <span className="text-xs font-bold text-slate-400 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-            N/A
-          </span>
+          <span className="text-[10px] text-text-disabled font-medium">{t('noPrice')}</span>
         )}
       </div>
     </div>

@@ -119,7 +119,46 @@
 }
 
 @theme {
-  /* Colors */
+  /* Brand Primitive Colors */
+  --color-green-50: var(--color-green-50);
+  --color-green-300: var(--color-green-300);
+  --color-green-400: var(--color-green-400);
+  --color-green-500: var(--color-green-500);
+  --color-green-600: var(--color-green-600);
+  --color-green-800: var(--color-green-800);
+
+  --color-amber-50: var(--color-amber-50);
+  --color-amber-300: var(--color-amber-300);
+  --color-amber-400: var(--color-amber-400);
+  --color-amber-500: var(--color-amber-500);
+  --color-amber-600: var(--color-amber-600);
+
+  --color-gray-25: var(--color-gray-25);
+  --color-gray-50: var(--color-gray-50);
+  --color-gray-100: var(--color-gray-100);
+  --color-gray-200: var(--color-gray-200);
+  --color-gray-300: var(--color-gray-300);
+  --color-gray-400: var(--color-gray-400);
+  --color-gray-500: var(--color-gray-500);
+  --color-gray-600: var(--color-gray-600);
+  --color-gray-700: var(--color-gray-700);
+  --color-gray-800: var(--color-gray-800);
+  --color-gray-850: var(--color-gray-850);
+  --color-gray-900: var(--color-gray-900);
+  --color-gray-920: var(--color-gray-920);
+  --color-gray-950: var(--color-gray-950);
+
+  --color-red-50: var(--color-red-50);
+  --color-red-400: var(--color-red-400);
+  --color-red-500: var(--color-red-500);
+  --color-red-800: var(--color-red-800);
+
+  --color-blue-50: var(--color-blue-50);
+  --color-blue-400: var(--color-blue-400);
+  --color-blue-500: var(--color-blue-500);
+  --color-blue-800: var(--color-blue-800);
+
+  /* Semantic Theme Colors */
   --color-background: var(--sys-background);
   --color-surface: var(--sys-surface);
   --color-surface-variant: var(--sys-surface-variant);
@@ -203,6 +242,24 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 20px;
+}
+
+@utility text-typography-micro {
+  font-family: var(--font-family-cairo);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+}
+
+@utility text-typography-display {
+  font-family: var(--font-family-cairo);
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 40px;
+}
+
+@utility tracking-eyebrow {
+  letter-spacing: 0.08em;
 }
 
 @keyframes hp-pulse {

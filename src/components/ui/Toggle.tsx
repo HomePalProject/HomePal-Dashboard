@@ -20,7 +20,7 @@ export function Toggle({ checked, onChange, disabled = false, title, className }
       disabled={disabled}
       title={title}
       className={cn(
-        'w-11 h-6 rounded-full border-none cursor-pointer relative p-[2px] transition-colors duration-200',
+        'w-11 h-6 rounded-full border-none cursor-pointer relative p-0.5 transition-colors duration-200',
         checked ? 'bg-primary' : 'bg-surface-variant',
         disabled && 'opacity-50 cursor-not-allowed',
         className
@@ -28,7 +28,7 @@ export function Toggle({ checked, onChange, disabled = false, title, className }
     >
       <span
         className={cn(
-          'block w-5 h-5 rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.2)] transition-transform duration-200',
+          'block w-5 h-5 rounded-full bg-white shadow-xs transition-transform duration-200',
           checked ? 'translate-x-20' : 'translate-x-0'
         )}
       />

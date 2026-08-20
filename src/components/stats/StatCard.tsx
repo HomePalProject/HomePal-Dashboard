@@ -33,8 +33,7 @@ export function StatCard({
       onClick={onClick}
       className={cn(
         'bg-surface rounded-xl border border-border p-6 flex flex-col gap-1',
-        onClick &&
-          'cursor-pointer transition-all duration-200 hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]'
+        onClick && 'cursor-pointer transition-all duration-200 hover:shadow-lg'
       )}
     >
       <div className="flex justify-between items-center">
@@ -44,7 +43,7 @@ export function StatCard({
         <div className="text-primary">{icon}</div>
       </div>
 
-      <div className="text-[32px] font-extrabold text-text-primary">{displayValue}</div>
+      <div className="text-typography-display text-text-primary">{displayValue}</div>
 
       <div className="flex items-center gap-1.5 text-xs">
         <span

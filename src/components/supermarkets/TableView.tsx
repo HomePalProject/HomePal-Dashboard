@@ -1,5 +1,4 @@
 import { getLocalString, getLocalizedCulture } from '@lib/formatters';
-import { BRANCH_COUNTS } from '@constants/supermarketData';
 import type { Supermarket } from '@typeDefs/catalogTypes';
 import { SupermarketLogo } from './SupermarketLogo';
 import { Button } from '@components/ui/Button';
@@ -19,9 +18,8 @@ export function TableView({ supermarkets, loadingEditId, onEdit, onDelete }: Tab
       <div className="overflow-x-auto">
         <table className="w-full text-start border-collapse">
           <thead>
-            <tr className="border-b border-border bg-surface text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+            <tr className="border-b border-border bg-surface text-sm font-bold text-slate-500 uppercase tracking-wider">
               <th className="px-5 py-3">{t('tableHeaderChain')}</th>
-              <th className="px-5 py-3">{t('tableHeaderBranches')}</th>
               <th className="px-5 py-3">{t('tableHeaderLocation')}</th>
               <th className="px-5 py-3">{t('tableHeaderEndpoint')}</th>
               <th className="px-5 py-3 text-end">{t('tableHeaderActions')}</th>
@@ -32,7 +30,6 @@ export function TableView({ supermarkets, loadingEditId, onEdit, onDelete }: Tab
               const name =
                 getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') ||
                 getLocalString(s.name);
-              const branches = s.branches ?? BRANCH_COUNTS[name] ?? 0;
               const fbUrl = s.websiteUrl || 'facebook.com/supermarket/offers';
 
               return (
@@ -46,17 +43,12 @@ export function TableView({ supermarkets, loadingEditId, onEdit, onDelete }: Tab
                       />
                       <div>
                         <div className="text-xs font-bold text-text-primary">{name}</div>
-                        <div className="text-[11px] text-slate-400 font-mono">
+                        <div className="text-sm text-slate-400 font-mono">
                           {t('idPrefix')}
                           {s.id.substring(0, 8)}
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className="px-2.5 py-1 bg-surface-variant border border-border rounded-2xl text-[11px] font-bold text-text-primary whitespace-nowrap">
-                      {t('branches', { count: branches })}
-                    </span>
                   </td>
                   <td className="px-5 py-3.5 text-xs text-slate-500">
                     {s.address || 'Cairo, Egypt'}

@@ -1,5 +1,4 @@
 import { getLocalString, getLocalizedCulture } from '@lib/formatters';
-import { BRANCH_COUNTS } from '@constants/supermarketData';
 import type { Supermarket } from '@typeDefs/catalogTypes';
 import { SupermarketLogo } from './SupermarketLogo';
 import { Button } from '@components/ui/Button';
@@ -21,7 +20,6 @@ export function GridView({ supermarkets, loadingEditId, onEdit, onDelete, onAdd 
         const name =
           getLocalizedCulture(s.name, i18n.resolvedLanguage as 'en' | 'ar') ||
           getLocalString(s.name);
-        const branches = s.branches ?? BRANCH_COUNTS[name] ?? 0;
         const fbUrl = s.websiteUrl || 'facebook.com/supermarket/offers';
 
         return (
@@ -57,16 +55,12 @@ export function GridView({ supermarkets, loadingEditId, onEdit, onDelete, onAdd 
                   </div>
                 </div>
               </div>
-
-              <span className="px-2.5 py-1 bg-surface-variant border border-border rounded-2xl text-[11px] font-bold text-text-primary shrink-0">
-                {t('branches', { count: branches })}
-              </span>
             </div>
 
             <div className="w-full h-px bg-[#EAE5D9]" />
 
             <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
                 {t('endpointLabel')}
               </span>
               <div className="bg-surface border border-border rounded-xl px-3 py-2 flex items-center justify-between gap-2">

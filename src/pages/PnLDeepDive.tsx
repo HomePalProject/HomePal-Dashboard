@@ -22,7 +22,8 @@ export default function PnLDeepDive() {
     'last12Months'
   );
 
-  const [selectedInvoice, setSelectedInvoice] = useState<BillingLedgerRow | null>(null);
+  // TODO: Re-enable when backend provides /analytics/billing-ledger endpoint
+  // const [selectedInvoice, setSelectedInvoice] = useState<BillingLedgerRow | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -82,17 +83,19 @@ export default function PnLDeepDive() {
           revenue: finalRevPoints,
           costs: finalCostPoints,
         },
-        billingLedger: [
-          {
-            id: '1',
-            provider: 'OpenAI API',
-            providerIcon: 'openai',
-            category: t('categoryLlmInference'),
-            usage: `${totalTokens > 0 ? (totalTokens / 1000000).toFixed(2) + 'M' : '0'} ${t('tokensLabel')}`,
-            cost: t('currencyValue', { value: cost.toLocaleString() }),
-            status: 'PAID',
-          },
-        ],
+        // TODO: Awaiting backend endpoint GET /analytics/billing-ledger for multi-provider support
+        // billingLedger: [
+        //   {
+        //     id: '1',
+        //     provider: 'OpenAI API',
+        //     providerIcon: 'openai',
+        //     category: t('categoryLlmInference'),
+        //     usage: `${totalTokens > 0 ? (totalTokens / 1000000).toFixed(2) + 'M' : '0'} ${t('tokensLabel')}`,
+        //     cost: t('currencyValue', { value: cost.toLocaleString() }),
+        //     status: 'PAID',
+        //   },
+        // ],
+        billingLedger: [],
       };
 
       setData(computedData);
@@ -138,9 +141,10 @@ export default function PnLDeepDive() {
     showToast(t('toastReportExported'));
   };
 
-  const handleRowClick = (row: BillingLedgerRow) => {
-    setSelectedInvoice(row);
-  };
+  // TODO: Re-enable when backend provides /analytics/billing-ledger endpoint
+  // const handleRowClick = (row: BillingLedgerRow) => {
+  //   setSelectedInvoice(row);
+  // };
 
   if (loading || !data) {
     return <div className="p-40 text-text-secondary">{t('loadingLedger')}</div>;
@@ -227,7 +231,6 @@ export default function PnLDeepDive() {
 
   return (
     <div className="w-full flex flex-col gap-6 pb-12 font-sans">
-      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-2">
         <div>
           <div className="flex items-center gap-1.5 text-xs text-text-secondary mb-1 font-semibold tracking-widest uppercase">
@@ -269,11 +272,8 @@ export default function PnLDeepDive() {
         </div>
       )}
 
-      {/* ── Unified Hero Panel ── */}
       <div className="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col lg:flex-row">
-        {/* Left Side: Stats (Vertical Stack) */}
         <div className="w-full lg:w-[320px] shrink-0 border-b lg:border-b-0 lg:border-r border-border bg-surface-variant/10 flex flex-col">
-          {/* Net Margin (Hero Metric) */}
           <div className="p-6 border-b border-border bg-primary text-white">
             <div className="text-xs font-semibold uppercase tracking-wider mb-2 opacity-90">
               {t('netMarginTitle')}
@@ -283,7 +283,6 @@ export default function PnLDeepDive() {
             </div>
           </div>
 
-          {/* MRR */}
           <div className="p-6 border-b border-border">
             <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
               {t('totalRevenue')}
@@ -291,7 +290,6 @@ export default function PnLDeepDive() {
             <div className="text-2xl font-mono font-bold text-text-primary">{data.mrr.value}</div>
           </div>
 
-          {/* AI Costs */}
           <div className="p-6 border-b border-border bg-status-error-container/20">
             <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
               {t('aiInfrastructure')}
@@ -301,7 +299,6 @@ export default function PnLDeepDive() {
             </div>
           </div>
 
-          {/* Cost Per Subscriber */}
           <div className="p-6">
             <div className="text-xs font-semibold text-text-secondary uppercase tracking-wider mb-1">
               {t('costPerActiveSub')}
@@ -313,7 +310,6 @@ export default function PnLDeepDive() {
           </div>
         </div>
 
-        {/* Right Side: Chart */}
         <div className="flex-1 p-6 flex flex-col">
           <div className="flex justify-between items-start mb-6">
             <div>
@@ -333,23 +329,19 @@ export default function PnLDeepDive() {
           </div>
 
           <div className="relative flex-1 min-h-[220px] w-full flex flex-col">
-            {/* Y-Axis */}
-            <div className="absolute start-0 top-0 bottom-8 flex flex-col justify-between text-text-secondary text-[10px] font-mono font-medium pe-3 border-e border-border w-12">
+            <div className="absolute start-0 top-0 bottom-8 flex flex-col justify-between text-text-secondary text-xs font-mono font-medium pe-3 border-e border-border w-12">
               <span>$1.5M</span>
               <span>$1.0M</span>
               <span>$0.5M</span>
               <span>$0</span>
             </div>
 
-            {/* Chart Area */}
             <div className="flex-1 ms-12 relative">
-              {/* Grid */}
               <div className="absolute inset-0 border-b border-surface-variant top-0" />
               <div className="absolute inset-0 border-b border-surface-variant top-[33.33%]" />
               <div className="absolute inset-0 border-b border-surface-variant top-[66.66%]" />
               <div className="absolute inset-0 border-b border-border top-full" />
 
-              {/* Chart Lines */}
               <svg
                 className="absolute inset-0 w-full h-full overflow-visible"
                 preserveAspectRatio="none"
@@ -391,8 +383,7 @@ export default function PnLDeepDive() {
               </svg>
             </div>
 
-            {/* X-Axis */}
-            <div className="ml-12 flex justify-between pt-2 pb-1 text-text-secondary text-[10px] font-mono font-medium">
+            <div className="ml-12 flex justify-between pt-2 pb-1 text-text-secondary text-xs font-mono font-medium">
               {months.map((m) => (
                 <span key={m}>{m}</span>
               ))}
@@ -401,29 +392,29 @@ export default function PnLDeepDive() {
         </div>
       </div>
 
-      {/* ── Invoice Ledger Table ── */}
+      {/* TODO: Uncomment when backend provides /analytics/billing-ledger endpoint
       <div className="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col">
         <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-surface-variant/30">
           <h2 className="text-sm font-bold text-text-primary">{t('monthlyComputeInvoices')}</h2>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-start min-w-[700px]">
+          <table className="w-full border-collapse text-start min-w-175">
             <thead>
               <tr className="border-b border-border bg-surface">
-                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
+                <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">
                   {t('thService')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
+                <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">
                   {t('thCategory')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider">
+                <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider">
                   {t('thUsageVolume')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider text-end">
+                <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider text-end">
                   {t('thAmount')}
                 </th>
-                <th className="px-6 py-3 text-[10px] font-bold text-text-secondary uppercase tracking-wider text-center">
+                <th className="px-6 py-3 text-xs font-bold text-text-secondary uppercase tracking-wider text-center">
                   {t('thStatus')}
                 </th>
               </tr>
@@ -438,7 +429,7 @@ export default function PnLDeepDive() {
                     className="border-b border-border cursor-pointer transition-colors hover:bg-surface-variant/50 even:bg-surface-variant/20"
                   >
                     <td className="px-6 py-3 flex items-center gap-3">
-                      <div className="w-6 h-6 shrink-0 rounded-[4px] overflow-hidden">
+                      <div className="w-6 h-6 shrink-0 rounded-1 overflow-hidden">
                         {getProviderIcon(row.providerIcon)}
                       </div>
                       <span className="text-xs font-semibold text-text-primary">
@@ -468,8 +459,9 @@ export default function PnLDeepDive() {
           </table>
         </div>
       </div>
+      */}
 
-      {/* ── Invoice Modal ── */}
+      {/* TODO: Uncomment when backend provides /analytics/billing-ledger endpoint
       {selectedInvoice && (
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
           <div
@@ -477,7 +469,6 @@ export default function PnLDeepDive() {
             onClick={() => setSelectedInvoice(null)}
           />
           <div className="relative bg-surface rounded-2xl w-full max-w-md shadow-2xl animate-[slideUp_0.2s_ease-out] overflow-hidden border border-border">
-            {/* Modal Header */}
             <div className="p-6 border-b border-dashed border-border bg-surface-variant/30 flex justify-between items-start">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-md overflow-hidden shrink-0">
@@ -494,7 +485,7 @@ export default function PnLDeepDive() {
               </div>
               <span
                 className={cn(
-                  'inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest',
+                  'inline-flex px-2.5 py-1 rounded-full text-xs font-bold tracking-widest',
                   statusStyles[selectedInvoice.status].bg,
                   statusStyles[selectedInvoice.status].text
                 )}
@@ -502,11 +493,10 @@ export default function PnLDeepDive() {
                 {selectedInvoice.status}
               </span>
             </div>
-            {/* Modal Body */}
             <div className="p-6">
               <div className="flex justify-between mb-6">
                 <div>
-                  <div className="text-[10px] text-text-secondary font-bold uppercase tracking-wider mb-1">
+                  <div className="text-xs text-text-secondary font-bold uppercase tracking-wider mb-1">
                     {t('issueDate')}
                   </div>
                   <div className="text-xs font-mono font-semibold text-text-primary">
@@ -514,7 +504,7 @@ export default function PnLDeepDive() {
                   </div>
                 </div>
                 <div className="text-end">
-                  <div className="text-[10px] text-text-secondary font-bold uppercase tracking-wider mb-1">
+                  <div className="text-xs text-text-secondary font-bold uppercase tracking-wider mb-1">
                     {t('period')}
                   </div>
                   <div className="text-xs font-mono font-semibold text-text-primary">
@@ -543,7 +533,6 @@ export default function PnLDeepDive() {
                 <span className="text-xl font-mono font-bold">{selectedInvoice.cost}</span>
               </div>
             </div>
-            {/* Modal Footer */}
             <div className="px-6 py-4 border-t border-border flex justify-end bg-surface-variant/20">
               <Button onClick={() => setSelectedInvoice(null)} variant="secondary">
                 {t('closeInvoice')}
@@ -552,6 +541,7 @@ export default function PnLDeepDive() {
           </div>
         </div>
       )}
+      */}
 
       {toastMessage && (
         <div className="fixed bottom-6 inset-e-6 bg-text-primary text-white px-4 py-3 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 z-[9999] animate-[slideUp_0.2s_ease-out]">

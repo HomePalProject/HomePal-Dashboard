@@ -9,7 +9,6 @@ import { Skeleton } from '@components/ui/Skeleton';
 import { analyticsService } from '@services/analyticsService';
 import type { GeographicDemographicsData } from '@typeDefs/demographicsTypes';
 import type { UserDemographicsData } from '@typeDefs/analyticsTypes';
-import { MOCK_DEMOGRAPHICS_DATA } from '@constants/demographicsData';
 import { formatCurrencyString } from '@lib/formatters';
 
 function RecenterButton({ center, zoom }: { center: [number, number]; zoom: number }) {
@@ -184,13 +183,12 @@ export default function GeographicDemographics() {
         analyticsService.getDemographics(),
         analyticsService.getUserDemographics().catch(() => null),
       ]);
-      setData(result || MOCK_DEMOGRAPHICS_DATA);
+      if (!result) throw new Error('No demographic data found');
+      setData(result);
       if (userDemoRes) setUserDemographics(userDemoRes);
     } catch (err) {
       const msg = getErrorMessage(err);
       setError(msg);
-      // Fallback to mock data on error for demo purposes
-      setData(MOCK_DEMOGRAPHICS_DATA);
     }
   }, [i18n.language]);
 
@@ -237,8 +235,16 @@ export default function GeographicDemographics() {
     return '#86efac'; // Low
   };
 
-  if (loading || !data) {
+  if (loading) {
     return <GeographicDemographicsSkeleton />;
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-100 text-slate-500 bg-white rounded-2xl border border-border">
+        <p>{error || 'Failed to load demographic data'}</p>
+      </div>
+    );
   }
 
   const cairoCenter: [number, number] = [30.02, 31.2];
@@ -323,13 +329,13 @@ export default function GeographicDemographics() {
 
           <div className="relative w-full h-100 sm:h-125 rounded-3xl overflow-hidden border border-border z-0">
             <div className="absolute left-4 bottom-4 bg-surface/90 px-4 py-3 rounded-3xl shadow-md z-1000 backdrop-blur-sm">
-              <div className="text-[11px] font-bold text-text-secondary mb-2 uppercase">
+              <div className="text-sm font-bold text-text-secondary mb-2 uppercase">
                 {t('densityIntensity')}
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-[11px] text-text-secondary">{t('low')}</span>
+                <span className="text-sm text-text-secondary">{t('low')}</span>
                 <div className="w-15 h-2 bg-linear-to-r from-green-300 to-green-800 rounded-3xl" />
-                <span className="text-[11px] text-text-secondary">{t('high')}</span>
+                <span className="text-sm text-text-secondary">{t('high')}</span>
               </div>
             </div>
 

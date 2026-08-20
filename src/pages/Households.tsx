@@ -1,4 +1,3 @@
-import { MOCK_HOUSEHOLDS_DATA } from '@constants/householdsData';
 import { getErrorMessage } from '@lib/utils';
 import { formatCurrencyString } from '@lib/formatters';
 import { analyticsService } from '@services/analyticsService';
@@ -16,12 +15,11 @@ export default function Households() {
     try {
       setError(null);
       const result = await analyticsService.getHouseholdsSummary();
-      setData(result || MOCK_HOUSEHOLDS_DATA);
+      if (!result) throw new Error('No household data found');
+      setData(result);
     } catch (err) {
       const msg = getErrorMessage(err);
       setError(msg);
-      // Fallback to mock data
-      setData(MOCK_HOUSEHOLDS_DATA);
     }
   }, []);
 
@@ -29,19 +27,27 @@ export default function Households() {
     fetchData().then(() => setLoading(false));
   }, [fetchData]);
 
-  if (loading || !data) {
+  if (loading) {
     return <div className="p-10 text-text-disabled font-sans">{t('loading')}</div>;
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex items-center justify-center min-h-100 text-slate-500 bg-white rounded-2xl border border-border">
+        <p>{error || 'Failed to load household data'}</p>
+      </div>
+    );
   }
 
   return (
     <div className="w-full flex flex-col gap-6 pb-15 font-sans">
       {/* ── Header ── */}
       <div>
-        <div className="flex items-center gap-[8px] mb-[8px] flex-wrap">
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
           <h1 className="text-[22px] sm:text-[28px] font-extrabold text-text-primary tracking-tight m-0">
             {t('title')}
           </h1>
-          <span className="bg-primary-container text-primary text-[11px] font-bold px-[8px] py-[4px] rounded-full uppercase tracking-wider">
+          <span className="bg-primary-container text-primary text-sm font-bold px-2 py-1 rounded-full uppercase tracking-wider">
             {t('privacyBadge')}
           </span>
         </div>
@@ -59,51 +65,47 @@ export default function Households() {
       {/* ── Top Metrics ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
-          <div className="text-[13px] font-semibold text-text-disabled mb-[8px]">
+          <div className="text-[13px] font-semibold text-text-disabled mb-2">
             {t('totalRegistered')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
             {data.totalHouseholds.toLocaleString()}
           </div>
-          <div className="text-xs font-semibold text-primary mt-[4px]">
+          <div className="text-xs font-semibold text-primary mt-1">
             {data.growthRate} {t('yoy')}
           </div>
         </div>
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
-          <div className="text-[13px] font-semibold text-text-disabled mb-[8px]">
+          <div className="text-[13px] font-semibold text-text-disabled mb-2">
             {t('activeThisMonth')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
             {data.activeHouseholds.toLocaleString()}
           </div>
-          <div className="text-xs font-semibold text-text-secondary mt-[4px]">
-            {t('activityRate')}
-          </div>
+          <div className="text-xs font-semibold text-text-secondary mt-1">{t('activityRate')}</div>
         </div>
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
-          <div className="text-[13px] font-semibold text-text-disabled mb-[8px]">
+          <div className="text-[13px] font-semibold text-text-disabled mb-2">
             {t('avgHouseholdSize')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
             {data.avgHouseholdSize}
           </div>
-          <div className="text-xs font-semibold text-text-secondary mt-[4px]">
+          <div className="text-xs font-semibold text-text-secondary mt-1">
             {t('membersPerHousehold')}
           </div>
         </div>
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
-          <div className="text-[13px] font-semibold text-text-disabled mb-[8px]">
+          <div className="text-[13px] font-semibold text-text-disabled mb-2">
             {t('avgMonthlyIncome')}
           </div>
           <div className="text-[32px] font-extrabold text-text-primary">
             {formatCurrencyString(data.avgHouseholdIncome, t('currency'))}
           </div>
-          <div className="text-xs font-semibold text-text-secondary mt-[4px]">
-            {t('selfReported')}
-          </div>
+          <div className="text-xs font-semibold text-text-secondary mt-1">{t('selfReported')}</div>
         </div>
       </div>
 
@@ -115,7 +117,7 @@ export default function Households() {
           <div className="flex flex-col gap-5">
             {data.topRegions.map((region, i) => (
               <div key={i}>
-                <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-[8px]">
+                <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-2">
                   <span>{region.name}</span>
                   <span className="text-text-secondary">
                     {region.count.toLocaleString()} ({region.percentage}%)
@@ -142,7 +144,7 @@ export default function Households() {
               const pct = Math.round((item.count / max) * 100);
               return (
                 <div key={i}>
-                  <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-[8px]">
+                  <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-2">
                     <span>{item.size}</span>
                     <span className="text-text-secondary">{item.count.toLocaleString()}</span>
                   </div>

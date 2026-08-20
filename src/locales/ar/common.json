@@ -1,5 +1,5 @@
 {
-  "homepal": "هوم بال",
+  "homepal": "HomePal",
   "logout": "تسجيل الخروج",
   "cancel": "إلغاء",
   "save": "حفظ",
@@ -9,6 +9,6 @@
   "executivePanel": "لوحة الإدارة",
   "grid": "شبكة",
   "table": "جدول",
-  "totalUnits": "إجمالي الوحدات: {{count}}",
-  "managementSystem": "نظام إدارة هوم بال إصدار 2.4"
+  "totalUnits": "الإجمالي: {{count}}",
+  "managementSystem": "نظام إدارة HomePal إصدار 2.4"
 }

@@ -10,6 +10,116 @@ import type { TokenUsageMetrics } from '@typeDefs/tokenUsageTypes';
 import { StatCard } from '@components/stats/StatCard';
 import { getLocalString, getLocalizedCulture } from '@lib/formatters';
 import { useTranslation } from 'react-i18next';
+import { Skeleton } from '@components/ui/Skeleton';
+
+function StatsSkeleton() {
+  return (
+    <div className="w-full flex flex-col gap-6 pb-10 animate-pulse">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48 rounded-xl" />
+          <Skeleton className="h-4 w-96 rounded-xl" />
+        </div>
+        <div className="flex gap-3 items-center">
+          <Skeleton className="h-9 w-28 rounded-xl" />
+          <Skeleton className="h-9 w-28 rounded-xl" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white rounded-2xl border border-[#e4e0da] p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <Skeleton className="h-4 w-32 rounded-lg" />
+              <Skeleton className="h-5 w-5 rounded-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-40 rounded-lg" />
+              <Skeleton className="h-4 w-full rounded-lg" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 h-80 flex flex-col justify-between space-y-4">
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-48 rounded-lg" />
+              <Skeleton className="h-4 w-64 rounded-lg" />
+            </div>
+            <Skeleton className="h-4 w-16 rounded-full" />
+          </div>
+          <div className="flex-1 relative flex items-end justify-around gap-4 px-4 pt-8 pb-3 bg-[#faf8f3] rounded-xl h-47.5">
+            {['h-[40%]', 'h-[80%]', 'h-[60%]', 'h-[30%]'].map((hClass, idx) => (
+              <div
+                key={idx}
+                className="flex-1 flex flex-col items-center justify-end gap-2 h-full max-w-11"
+              >
+                <Skeleton className="h-4 w-8 rounded-md" />
+                <Skeleton className={cn('w-full rounded-t-lg', hClass)} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between space-y-4 h-80">
+          <div className="flex justify-between items-start">
+            <Skeleton className="h-5 w-48 rounded-lg" />
+            <Skeleton className="h-4 w-12 rounded-lg" />
+          </div>
+          <div className="flex gap-6 items-center flex-1">
+            <Skeleton className="w-28 h-28 rounded-full shrink-0" />
+            <div className="flex-1 flex flex-col gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-2">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-3 w-20 rounded-md" />
+                    <Skeleton className="h-3 w-8 rounded-md" />
+                  </div>
+                  <Skeleton className="h-1.5 w-full rounded-full" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-65">
+        <div className="bg-[#faf8f3] rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between relative overflow-hidden h-65 space-y-4">
+          <div className="flex justify-between items-start">
+            <div className="space-y-2">
+              <Skeleton className="h-5 w-48 rounded-lg" />
+              <Skeleton className="h-4 w-64 rounded-lg" />
+            </div>
+            <Skeleton className="h-6 w-20 rounded-full" />
+          </div>
+          <div className="flex-1 flex items-center justify-center pt-8">
+            <Skeleton className="h-12 w-48 rounded-xl" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between space-y-4 h-65">
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-48 rounded-lg" />
+            <Skeleton className="h-4 w-64 rounded-lg" />
+          </div>
+          <div className="flex flex-col gap-3.5 flex-1 justify-center pt-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="space-y-2">
+                <div className="flex justify-between">
+                  <Skeleton className="h-3 w-28 rounded-md" />
+                  <Skeleton className="h-3 w-8 rounded-md" />
+                </div>
+                <Skeleton className="h-2 w-full rounded-full" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Stats() {
   const { t, i18n } = useTranslation('stats');
@@ -48,11 +158,7 @@ export default function Stats() {
   }, [fetchData]);
 
   if (loading) {
-    return (
-      <div className="p-12 text-center text-xs font-bold text-[#6d6862] bg-white rounded-2xl border border-[#e4e0da]">
-        {t('loadingOverview')}
-      </div>
-    );
+    return <StatsSkeleton />;
   }
 
   const visionHealth = data?.visionHealth || {
@@ -147,7 +253,6 @@ export default function Stats() {
 
   return (
     <div className="w-full flex flex-col gap-6 font-sans pb-10">
-      {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
           <h1 className="text-2xl font-extrabold text-[#2d2a26] tracking-tight m-0">
@@ -178,7 +283,6 @@ export default function Stats() {
         </div>
       </div>
 
-      {/* ── Stat Cards ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <StatCard
           title={t('revenueTitle')}
@@ -243,10 +347,8 @@ export default function Stats() {
         />
       </div>
 
-      {/* ── Middle Row ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
-        {/* Top Supermarket Chains (Real Live Catalog Calculation) */}
-        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs min-h-[300px]">
+        <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs min-h-75">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
@@ -277,9 +379,7 @@ export default function Stats() {
 
           {chains.length > 0 ? (
             <div className="flex-1 flex flex-col justify-end overflow-hidden w-full">
-              {/* Vertical Bar Chart Container */}
-              <div className="flex-1 relative min-h-[190px] flex items-end justify-around gap-1 sm:gap-4 px-2 sm:px-4 pt-8 pb-3 border-b border-[#e4e0da] bg-[#faf8f3] rounded-xl">
-                {/* Background grid lines */}
+              <div className="flex-1 relative min-h-47.5 flex items-end justify-around gap-1 sm:gap-4 px-2 sm:px-4 pt-8 pb-3 border-b border-[#e4e0da] bg-[#faf8f3] rounded-xl">
                 <div className="absolute inset-x-4 top-1/4 border-b border-dashed border-[#e4e0da] pointer-events-none" />
                 <div className="absolute inset-x-4 top-2/4 border-b border-dashed border-[#e4e0da] pointer-events-none" />
                 <div className="absolute inset-x-4 top-3/4 border-b border-dashed border-[#e4e0da] pointer-events-none" />
@@ -295,14 +395,12 @@ export default function Stats() {
                   return (
                     <div
                       key={i}
-                      className="flex-1 flex flex-col items-center justify-end gap-2 z-10 group h-full max-w-[44px]"
+                      className="flex-1 flex flex-col items-center justify-end gap-2 z-10 group h-full max-w-11"
                     >
-                      {/* Percentage Tooltip Badge */}
                       <span className="text-[10px] sm:text-[11px] font-black text-[#2d2a26] bg-white px-1.5 sm:px-2 py-0.5 rounded-md border border-[#e4e0da] shadow-xs mb-1 group-hover:scale-110 transition-transform">
                         {chain.value}%
                       </span>
 
-                      {/* Dynamic Height Bar */}
                       <div
                         className={cn(
                           'w-full rounded-t-lg transition-all duration-700 shadow-xs hover:opacity-90',
@@ -315,12 +413,11 @@ export default function Stats() {
                 })}
               </div>
 
-              {/* Bar Label Names */}
               <div className="flex justify-around gap-1 sm:gap-4 px-2 sm:px-4 pt-3 w-full">
                 {chains.map((chain, i) => (
                   <div
                     key={i}
-                    className="flex-1 text-center text-[10px] sm:text-xs font-bold text-[#2d2a26] truncate max-w-[44px]"
+                    className="flex-1 text-center text-[10px] sm:text-xs font-bold text-[#2d2a26] truncate max-w-11"
                     title={chain.name}
                   >
                     {chain.name}
@@ -341,7 +438,6 @@ export default function Stats() {
           )}
         </div>
 
-        {/* Vision AI Health */}
         <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs">
           <div className="flex justify-between items-start mb-1">
             <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
@@ -368,7 +464,6 @@ export default function Stats() {
           <p className="text-xs text-[#6d6862] mb-6 mt-0">{t('receiptParsingAccuracySubtitle')}</p>
 
           <div className="flex gap-6 items-center">
-            {/* Donut Chart via CSS in HomePal Brand Colors */}
             <div
               className="w-28 h-28 rounded-full relative flex items-center justify-center p-3 shrink-0"
               style={{
@@ -424,14 +519,11 @@ export default function Stats() {
         </div>
       </div>
 
-      {/* ── Bottom Row ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
-        {/* User Distribution Map */}
         <div
           onClick={() => navigate('/dashboard/geographic-demographics')}
-          className="bg-[#faf8f3] rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-md group min-h-[260px]"
+          className="bg-[#faf8f3] rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-md group min-h-65"
         >
-          {/* Header & Title */}
           <div className="flex justify-between items-start z-10 mb-2 gap-4">
             <div>
               <h2 className="text-base font-extrabold text-[#2d2a26] m-0">
@@ -447,18 +539,16 @@ export default function Stats() {
             </button>
           </div>
 
-          {/* Map Image (Realistic Heatmap) */}
-          <div className="absolute inset-0 pointer-events-none mt-[72px] overflow-hidden rounded-b-2xl flex items-center justify-center">
-            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-[#faf8f3] to-transparent z-10 pointer-events-none" />
+          <div className="absolute inset-0 pointer-events-none mt-18 overflow-hidden rounded-b-2xl flex items-center justify-center">
+            <div className="absolute inset-x-0 top-0 h-12 bg-linear-to-b from-[#faf8f3] to-transparent z-10 pointer-events-none" />
             <img
               src="/regional-map.jpg"
               alt="Regional Distribution"
               className="w-full h-[150%] object-cover object-center opacity-85 mix-blinset-e-multiply transition-transform duration-1000 group-hover:scale-105"
             />
-            <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#faf8f3] to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-[#faf8f3] to-transparent z-10 pointer-events-none" />
           </div>
 
-          {/* Active Hover / Floating Badge */}
           <div className="relative z-10 flex-1 flex items-center justify-center pointer-events-none mt-16">
             <div className="bg-[#fdfcf9] border border-[#e4e0da] rounded-xl px-5 py-3 shadow-[0_8px_30px_rgb(0,0,0,0.08)] flex flex-col items-center justify-center transition-transform duration-300 group-hover:-translate-y-1">
               <span className="text-[#2d2a26] font-extrabold text-[13px] mb-1">
@@ -469,7 +559,6 @@ export default function Stats() {
           </div>
         </div>
 
-        {/* Top Grocery Categories */}
         <div className="bg-white rounded-2xl border border-[#e4e0da] p-6 flex flex-col justify-between shadow-xs">
           <div>
             <h2 className="text-base font-extrabold text-[#2d2a26] m-0 mb-1">

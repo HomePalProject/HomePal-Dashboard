@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
-import { cn, getErrorMessage } from '@lib/utils';
-import { analyticsService } from '@services/analyticsService';
-import type { PnLDeepDiveData, BillingLedgerRow } from '@typeDefs/pnlTypes';
 import { Button } from '@components/ui/Button';
+import { getErrorMessage } from '@lib/utils';
+import { analyticsService } from '@services/analyticsService';
+import type { PnLDeepDiveData } from '@typeDefs/pnlTypes';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const statusStyles = {
-  PAID: { bg: 'bg-status-success-container', text: 'text-status-success' },
-  PENDING: { bg: 'bg-status-error-container', text: 'text-status-error' },
-};
+// const statusStyles = {
+//   PAID: { bg: 'bg-status-success-container', text: 'text-status-success' },
+//   PENDING: { bg: 'bg-status-error-container', text: 'text-status-error' },
+// };
 
 export default function PnLDeepDive() {
   const { t, i18n } = useTranslation('stats');
@@ -66,7 +66,7 @@ export default function PnLDeepDive() {
         costPoints.length > 0 ? costPoints : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
       // Dynamic Ledger
-      const totalTokens = (tokenRes?.inputTokens || 0) + (tokenRes?.outputTokens || 0);
+      // const totalTokens = (tokenRes?.inputTokens || 0) + (tokenRes?.outputTokens || 0);
 
       const computedData: PnLDeepDiveData = {
         mrr: { value: t('currencyValue', { value: rev.toLocaleString() }), change: '+0.0%' },
@@ -180,54 +180,54 @@ export default function PnLDeepDive() {
   const revenuePath = generatePath(data.chartData.revenue);
   const costsPath = generatePath(data.chartData.costs);
 
-  const getProviderIcon = (icon: string) => {
-    if (icon === 'openai')
-      return (
-        <div className="w-24 h-24 bg-[#10a37f] rounded-sm flex items-center justify-center text-white">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-          </svg>
-        </div>
-      );
-    if (icon === 'aws')
-      return (
-        <div className="w-24 h-24 bg-[#ff9900] rounded-sm flex items-center justify-center text-white">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7" />
-          </svg>
-        </div>
-      );
-    if (icon === 'pinecone')
-      return (
-        <div className="w-24 h-24 bg-[#f43f5e] rounded-sm flex items-center justify-center text-white">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-          </svg>
-        </div>
-      );
-    return <div className="w-24 h-24 bg-[#cbd5e1] rounded-sm" />;
-  };
+  // const getProviderIcon = (icon: string) => {
+  //   if (icon === 'openai')
+  //     return (
+  //       <div className="w-24 h-24 bg-[#10a37f] rounded-sm flex items-center justify-center text-white">
+  //         <svg
+  //           width="14"
+  //           height="14"
+  //           viewBox="0 0 24 24"
+  //           fill="none"
+  //           stroke="currentColor"
+  //           strokeWidth="2"
+  //         >
+  //           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+  //         </svg>
+  //       </div>
+  //     );
+  //   if (icon === 'aws')
+  //     return (
+  //       <div className="w-24 h-24 bg-[#ff9900] rounded-sm flex items-center justify-center text-white">
+  //         <svg
+  //           width="14"
+  //           height="14"
+  //           viewBox="0 0 24 24"
+  //           fill="none"
+  //           stroke="currentColor"
+  //           strokeWidth="2"
+  //         >
+  //           <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7" />
+  //         </svg>
+  //       </div>
+  //     );
+  //   if (icon === 'pinecone')
+  //     return (
+  //       <div className="w-24 h-24 bg-[#f43f5e] rounded-sm flex items-center justify-center text-white">
+  //         <svg
+  //           width="14"
+  //           height="14"
+  //           viewBox="0 0 24 24"
+  //           fill="none"
+  //           stroke="currentColor"
+  //           strokeWidth="2"
+  //         >
+  //           <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+  //         </svg>
+  //       </div>
+  //     );
+  //   return <div className="w-24 h-24 bg-[#cbd5e1] rounded-sm" />;
+  // };
 
   return (
     <div className="w-full flex flex-col gap-6 pb-12 font-sans">
@@ -328,8 +328,8 @@ export default function PnLDeepDive() {
             </div>
           </div>
 
-          <div className="relative flex-1 min-h-[220px] w-full flex flex-col">
-            <div className="absolute start-0 top-0 bottom-8 flex flex-col justify-between text-text-secondary text-xs font-mono font-medium pe-3 border-e border-border w-12">
+          <div className="relative flex-1 min-h-55 w-full flex flex-col">
+            <div className="absolute inset-s-0 top-0 bottom-8 flex flex-col justify-between text-text-secondary text-xs font-mono font-medium pe-3 border-e border-border w-12">
               <span>$1.5M</span>
               <span>$1.0M</span>
               <span>$0.5M</span>
@@ -544,7 +544,7 @@ export default function PnLDeepDive() {
       */}
 
       {toastMessage && (
-        <div className="fixed bottom-6 inset-e-6 bg-text-primary text-white px-4 py-3 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 z-[9999] animate-[slideUp_0.2s_ease-out]">
+        <div className="fixed bottom-6 inset-e-6 bg-text-primary text-white px-4 py-3 rounded-xl text-xs font-bold shadow-xl flex items-center gap-2 z-9999 animate-[slideUp_0.2s_ease-out]">
           <svg
             className="w-4 h-4 text-status-success"
             viewBox="0 0 24 24"

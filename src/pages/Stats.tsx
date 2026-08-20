@@ -1,16 +1,16 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { StatCard } from '@components/stats/StatCard';
+import { Skeleton } from '@components/ui/Skeleton';
+import { getLocalString, getLocalizedCulture } from '@lib/formatters';
 import { cn } from '@lib/utils';
 import { analyticsService } from '@services/analyticsService';
 import { catalogService } from '@services/catalogService';
-import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
-import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
 import type { RevenueData } from '@typeDefs/analyticsTypes';
+import type { Offer, Supermarket } from '@typeDefs/catalogTypes';
+import type { AnalyticsOverviewData } from '@typeDefs/statsTypes';
 import type { TokenUsageMetrics } from '@typeDefs/tokenUsageTypes';
-import { StatCard } from '@components/stats/StatCard';
-import { getLocalString, getLocalizedCulture } from '@lib/formatters';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Skeleton } from '@components/ui/Skeleton';
+import { useNavigate } from 'react-router-dom';
 
 function StatsSkeleton() {
   return (
@@ -200,7 +200,6 @@ export default function Stats() {
   // For previous month, we need to reconstruct it from trend data if available
   if (revenueData?.monthlyTrend && revenueData.monthlyTrend.length >= 2) {
     const trend = revenueData.monthlyTrend;
-    const lastMonth = trend[trend.length - 1];
     const prevMonth = trend[trend.length - 2];
 
     // Calculate previous month's net margin (assuming cost trend similar to revenue trend)

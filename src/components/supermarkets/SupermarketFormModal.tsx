@@ -4,7 +4,7 @@ import { Modal } from '@components/ui/Modal';
 import { Field } from '@components/ui/Field';
 import { ModalActions } from '@components/ui/ModalActions';
 import { Button } from '@components/ui/Button';
-import { getLocalizedCulture } from '@lib/formatters';
+import { getImageUrl, getLocalizedCulture } from '@lib/formatters';
 import { useTranslation } from 'react-i18next';
 
 export function SupermarketFormModal({
@@ -51,13 +51,17 @@ export function SupermarketFormModal({
     e.preventDefault();
     setSaving(true);
     setError(null);
+    const namePayload: any[] = [];
+    if (nameEn.trim())
+      namePayload.push({ culture: 'en-US', languageCode: 'en-US', value: nameEn.trim() });
+    if (nameAr.trim())
+      namePayload.push({ culture: 'ar', languageCode: 'ar', value: nameAr.trim() });
+
     const err = await onSave({
-      name: [
-        { culture: 'en-US', languageCode: 'en-US', value: nameEn.trim() || nameAr.trim() },
-        { culture: 'ar', languageCode: 'ar', value: nameAr.trim() || nameEn.trim() },
-      ],
+      name: namePayload,
       address: address.trim() || null,
       websiteUrl: websiteUrl.trim() || null,
+      logoPath: deleteLogo ? null : initial?.logoPath || null,
       logoFile,
       deleteLogo,
     });
@@ -80,7 +84,7 @@ export function SupermarketFormModal({
             {logoPreview ? (
               <div className="relative group">
                 <img
-                  src={logoPreview}
+                  src={getImageUrl(logoPreview) || undefined}
                   alt="Logo preview"
                   className="w-14 h-14 rounded-xl object-contain bg-white border border-slate-200 p-1"
                 />

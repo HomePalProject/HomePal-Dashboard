@@ -222,29 +222,22 @@ export default function OffersHub() {
     if (!titleEn.trim() && !titleAr.trim()) return;
 
     setSaving(true);
-    const selectedMarket = supermarkets.find((s) => s.id === supermarketId);
-    const selectedCategory = categories.find((c) => c.id === categoryId);
 
-    const titlePayload = [
-      { culture: 'en-US', languageCode: 'en-US', value: titleEn.trim() || titleAr.trim() },
-      { culture: 'ar', languageCode: 'ar', value: titleAr.trim() || titleEn.trim() },
-    ];
+    const titlePayload: any[] = [];
+    if (titleEn.trim())
+      titlePayload.push({ culture: 'en-US', languageCode: 'en-US', value: titleEn.trim() });
+    if (titleAr.trim())
+      titlePayload.push({ culture: 'ar', languageCode: 'ar', value: titleAr.trim() });
 
-    const descriptionPayload =
-      descriptionEn.trim() || descriptionAr.trim()
-        ? [
-            {
-              culture: 'en-US',
-              languageCode: 'en-US',
-              value: descriptionEn.trim() || descriptionAr.trim(),
-            },
-            {
-              culture: 'ar',
-              languageCode: 'ar',
-              value: descriptionAr.trim() || descriptionEn.trim(),
-            },
-          ]
-        : undefined;
+    const descriptionPayload: any[] = [];
+    if (descriptionEn.trim())
+      descriptionPayload.push({
+        culture: 'en-US',
+        languageCode: 'en-US',
+        value: descriptionEn.trim(),
+      });
+    if (descriptionAr.trim())
+      descriptionPayload.push({ culture: 'ar', languageCode: 'ar', value: descriptionAr.trim() });
 
     const payload: Partial<Offer> = {
       title: titlePayload,
@@ -259,16 +252,11 @@ export default function OffersHub() {
           : 0,
       validTo: validToDate || null,
       supermarketId: supermarketId || null,
-      supermarketName: selectedMarket ? getLocalString(selectedMarket.name) : 'Supermarket',
       categoryId: categoryId || null,
-      categoryName: selectedCategory
-        ? typeof selectedCategory.name === 'string'
-          ? selectedCategory.name
-          : getLocalizedCulture(selectedCategory.name, 'en')
-        : 'General',
       imagePath: imageUrl.trim() || null,
       isVerified,
       status: isVerified ? 'Verified' : 'Flagged',
+      quantity: 1,
     };
 
     try {
@@ -334,9 +322,42 @@ export default function OffersHub() {
     showToast(updatedStatus ? t('toastOfferVerified') : t('toastOfferUnverified'));
 
     try {
-      await catalogService.saveOffer({ isVerified: updatedStatus }, offer.id);
+      const { en, ar } = await fetchBilingual((lang) =>
+        catalogService.getOfferById(offer.id, lang)
+      );
+
+      const titlePayload = [
+        { culture: 'en-US', languageCode: 'en-US', value: getLocalString(en.name) },
+        { culture: 'ar', languageCode: 'ar', value: getLocalString(ar.name) },
+      ];
+
+      const descriptionPayload = [
+        { culture: 'en-US', languageCode: 'en-US', value: (en.description as string) || '' },
+        { culture: 'ar', languageCode: 'ar', value: (ar.description as string) || '' },
+      ];
+
+      const fullPayload = {
+        title: titlePayload,
+        name: titlePayload,
+        description: descriptionPayload,
+        originalPrice: en.originalPrice,
+        discountedPrice: en.discountedPrice,
+        price: en.price,
+        validTo: en.validTo,
+        supermarketId: en.supermarketId,
+        categoryId: en.categoryId,
+        imagePath: en.imagePath,
+        isVerified: updatedStatus,
+        status: updatedStatus ? 'Verified' : 'Flagged',
+        quantity: (en as any).quantity || 1,
+      };
+
+      await catalogService.saveOffer(fullPayload, offer.id);
     } catch (e) {
       console.error(e);
+      showToast(t('errSaveOffer', { error: 'Failed to verify offer' }));
+      // Rollback on failure
+      setOffers((prev) => prev.map((o) => (o.id === offer.id ? offer : o)));
     }
   };
 

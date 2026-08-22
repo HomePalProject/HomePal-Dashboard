@@ -25,14 +25,18 @@ function MeasuringUnitsTableSkeleton() {
   );
 }
 
-function formatDate(dateStr?: string): string {
-  if (!dateStr) return 'Aug 13, 2026';
+function formatDate(dateStr?: string, lang: string = 'en'): string {
+  if (!dateStr) return lang === 'ar' ? '١٣ أغسطس ٢٠٢٦' : 'Aug 13, 2026';
   try {
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return 'Aug 13, 2026';
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (isNaN(d.getTime())) return lang === 'ar' ? '١٣ أغسطس ٢٠٢٦' : 'Aug 13, 2026';
+    return d.toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
   } catch {
-    return 'Aug 13, 2026';
+    return lang === 'ar' ? '١٣ أغسطس ٢٠٢٦' : 'Aug 13, 2026';
   }
 }
 
@@ -387,16 +391,14 @@ export default function MeasuringUnits() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-start border-collapse">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
                   <th className="ps-6 pe-4 py-3.5 whitespace-nowrap">{t('thName')}</th>
                   <th className="px-4 py-3.5 whitespace-nowrap">{t('thSymbol')}</th>
                   <th className="px-4 py-3.5 whitespace-nowrap">{t('thCreated')}</th>
                   <th className="px-4 py-3.5 whitespace-nowrap">{t('thStatus')}</th>
-                  <th className="pe-6 ps-4 py-3.5 text-right whitespace-nowrap">
-                    {t('thActions')}
-                  </th>
+                  <th className="pe-6 ps-4 py-3.5 text-end whitespace-nowrap">{t('thActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs">
@@ -432,7 +434,11 @@ export default function MeasuringUnits() {
 
                       {/* CREATED AT Column */}
                       <td className="px-4 py-4 text-slate-600 font-semibold text-xs whitespace-nowrap">
-                        {unit.createdAt ? formatDate(unit.createdAt) : 'Aug 13, 2026'}
+                        {unit.createdAt
+                          ? formatDate(unit.createdAt, i18n.resolvedLanguage)
+                          : i18n.resolvedLanguage === 'ar'
+                            ? '١٣ أغسطس ٢٠٢٦'
+                            : 'Aug 13, 2026'}
                       </td>
 
                       {/* STATUS Column */}
@@ -444,7 +450,7 @@ export default function MeasuringUnits() {
                       </td>
 
                       {/* ACTIONS Column */}
-                      <td className="pr-6 pl-4 py-4 text-right whitespace-nowrap">
+                      <td className="pe-6 ps-4 py-4 text-end whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1">
                           {/* Edit Button */}
                           <button
@@ -496,8 +502,8 @@ export default function MeasuringUnits() {
 
         {/* Table Footer */}
         <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 font-semibold">
-          <span>{t('totalUnits', { count: units.length })}</span>
-          <span>{t('managementSystem')}</span>
+          <span>{t('common:totalUnits', { count: units.length })}</span>
+          <span>{t('common:managementSystem')}</span>
         </div>
       </div>
 

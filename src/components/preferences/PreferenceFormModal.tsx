@@ -73,7 +73,7 @@ export function PreferenceFormModal({
       isOpen={true}
     >
       <form onSubmit={handleSubmit} className="flex flex-col gap-1">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <Field label={t('englishName')} required hint={t('hintNameEn')}>
             <input
               className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border"
@@ -115,7 +115,7 @@ export function PreferenceFormModal({
           </select>
         </Field>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <Field label={t('englishDesc')} hint={t('hintDescEn')}>
             <textarea
               className="w-full px-3.5 py-2.5 border-[1.5px] border-slate-200 rounded-3xl text-sm text-slate-900 bg-white outline-none box-border resize-y min-h-[80px]"

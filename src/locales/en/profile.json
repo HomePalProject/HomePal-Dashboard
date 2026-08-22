@@ -1,0 +1,19 @@
+{
+  "profileTitle": "Admin Profile",
+  "profileSubtitle": "View your personal administrative account details and activity.",
+  "loadingProfile": "Loading profile data...",
+  "failedLoadProfile": "Failed to load profile data.",
+  "errorServer": "Error communicating with server.",
+  "activeStatus": "Active Status",
+  "inactiveAccount": "Inactive Account",
+  "fullName": "Full Name / Username",
+  "emailAddress": "Email Address",
+  "systemRoles": "System Roles",
+  "accountId": "Account ID",
+  "gender": "Gender",
+  "accountCreated": "Account Created",
+  "administrator": "Administrator",
+  "male": "Male",
+  "female": "Female",
+  "admin": "Admin"
+}

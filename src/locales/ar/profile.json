@@ -1,0 +1,19 @@
+{
+  "profileTitle": "ملف المدير الشخصي",
+  "profileSubtitle": "عرض تفاصيل ونشاط حسابك الإداري الشخصي.",
+  "loadingProfile": "جاري تحميل بيانات الملف الشخصي...",
+  "failedLoadProfile": "فشل تحميل بيانات الملف الشخصي.",
+  "errorServer": "حدث خطأ في الاتصال بالخادم.",
+  "activeStatus": "حالة نشطة",
+  "inactiveAccount": "حساب غير نشط",
+  "fullName": "الاسم الكامل / اسم المستخدم",
+  "emailAddress": "البريد الإلكتروني",
+  "systemRoles": "أدوار النظام",
+  "accountId": "معرف الحساب",
+  "gender": "الجنس",
+  "accountCreated": "تاريخ إنشاء الحساب",
+  "administrator": "مسؤول النظام",
+  "male": "ذكر",
+  "female": "أنثى",
+  "admin": "مدير"
+}

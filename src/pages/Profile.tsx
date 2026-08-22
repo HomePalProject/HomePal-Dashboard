@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { authService } from '@services/authService';
 
 export default function Profile() {
+  const { t, i18n } = useTranslation('profile');
   const [meData, setMeData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,10 +15,10 @@ export default function Profile() {
         if (res.success) {
           setMeData(res.data);
         } else {
-          setError(res.message || 'Failed to load profile data.');
+          setError(res.message || t('failedLoadProfile'));
         }
       } catch (err: any) {
-        setError(err.message || 'Error communicating with server.');
+        setError(err.message || t('errorServer'));
       } finally {
         setLoading(false);
       }
@@ -30,11 +32,9 @@ export default function Profile() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-text-primary tracking-tight m-0">
-            Admin Profile
+            {t('profileTitle')}
           </h1>
-          <p className="text-sm text-text-secondary mt-1.5 mb-0">
-            View your personal administrative account details and activity.
-          </p>
+          <p className="text-sm text-text-secondary mt-1.5 mb-0">{t('profileSubtitle')}</p>
         </div>
       </div>
 
@@ -42,7 +42,7 @@ export default function Profile() {
       <div className="bg-surface rounded-2xl border border-border shadow-xs p-6 md:p-10 flex flex-col md:flex-row gap-10 items-start min-h-[300px]">
         {loading ? (
           <div className="flex-1 flex justify-center items-center h-48 w-full text-xs font-bold text-text-secondary">
-            Loading profile data...
+            {t('loadingProfile')}
           </div>
         ) : error ? (
           <div className="flex-1 flex justify-center items-center h-48 w-full text-xs font-bold text-status-error bg-status-error-container rounded-xl border border-status-error/20">
@@ -56,7 +56,7 @@ export default function Profile() {
                 {meData?.username?.charAt(0)?.toUpperCase() || '?'}
               </div>
               <span className="px-4 py-1.5 bg-primary-container text-primary text-sm font-extrabold tracking-wide uppercase rounded-full border border-primary/20">
-                {meData?.isActive ? 'Active Status' : 'Inactive Account'}
+                {meData?.isActive ? t('activeStatus') : t('inactiveAccount')}
               </span>
             </div>
 
@@ -64,7 +64,7 @@ export default function Profile() {
             <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-y-8 gap-x-8">
               <div>
                 <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
-                  Full Name / Username
+                  {t('fullName')}
                 </label>
                 <div className="text-base font-extrabold text-text-primary">
                   {meData?.username || 'Pal Admin'}
@@ -72,7 +72,7 @@ export default function Profile() {
               </div>
               <div>
                 <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
-                  Email Address
+                  {t('emailAddress')}
                 </label>
                 <div className="text-base font-extrabold text-text-primary">
                   {meData?.email || 'admin@homepal.com'}
@@ -80,7 +80,7 @@ export default function Profile() {
               </div>
               <div>
                 <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
-                  System Roles
+                  {t('systemRoles')}
                 </label>
                 <div className="flex gap-2 flex-wrap">
                   {meData?.roles && meData.roles.length > 0 ? (
@@ -89,19 +89,19 @@ export default function Profile() {
                         key={role}
                         className="px-2 py-1 bg-surface-variant text-text-primary text-xs font-bold rounded-md border border-border"
                       >
-                        {role}
+                        {t(role.toLowerCase(), { defaultValue: role })}
                       </span>
                     ))
                   ) : (
                     <span className="text-base font-extrabold text-text-primary">
-                      Administrator
+                      {t('administrator')}
                     </span>
                   )}
                 </div>
               </div>
               <div>
                 <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
-                  Account ID
+                  {t('accountId')}
                 </label>
                 <div className="text-base font-extrabold text-text-primary text-xs">
                   {meData?.id || '—'}
@@ -109,18 +109,25 @@ export default function Profile() {
               </div>
               <div>
                 <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
-                  Gender
+                  {t('gender')}
                 </label>
                 <div className="text-base font-extrabold text-text-primary capitalize">
-                  {meData?.gender || '—'}
+                  {meData?.gender
+                    ? t(meData.gender.toLowerCase(), { defaultValue: meData.gender })
+                    : '—'}
                 </div>
               </div>
               <div>
                 <label className="text-sm font-bold text-text-disabled uppercase tracking-wider block mb-1.5">
-                  Account Created
+                  {t('accountCreated')}
                 </label>
                 <div className="text-base font-extrabold text-text-primary">
-                  {meData?.createdAt ? new Date(meData.createdAt).toLocaleDateString() : '—'}
+                  {meData?.createdAt
+                    ? new Date(meData.createdAt).toLocaleDateString(
+                        i18n.resolvedLanguage === 'ar' ? 'ar-EG' : 'en-US',
+                        { year: 'numeric', month: 'short', day: 'numeric' }
+                      )
+                    : '—'}
                 </div>
               </div>
             </div>

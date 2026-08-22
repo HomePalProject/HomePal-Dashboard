@@ -161,15 +161,10 @@ export default function Stats() {
     return <StatsSkeleton />;
   }
 
-  const visionHealth = data?.visionHealth || {
-    autoParsedPercentage: 100,
-    manualFallbackPercentage: 0,
-    failedPercentage: 0,
-  };
-
   // ── Compute Live Financials ──
   const liveRevenue = revenueData?.monthlyRevenue ?? 0;
-  const liveCost = tokenUsage?.totalCost ?? 0;
+  // Convert API cost (USD) to EGP using approximate rate
+  const liveCost = (tokenUsage?.totalCost ?? 0) * 50;
 
   // Calculate Net Margin Percentage
   // Formula: ((Revenue - Cost) / Revenue) * 100
@@ -218,16 +213,6 @@ export default function Stats() {
   if (revenueChange !== 0) {
     serverCostChange = revenueChange * 0.5; // Costs typically change ~50% as fast as revenue
   }
-
-  const visionTotal =
-    (visionHealth.autoParsedPercentage || 0) +
-    (visionHealth.manualFallbackPercentage || 0) +
-    (visionHealth.failedPercentage || 0);
-
-  const autoDeg =
-    visionTotal > 0 ? ((visionHealth.autoParsedPercentage || 0) / visionTotal) * 360 : 360;
-  const manualDeg =
-    visionTotal > 0 ? ((visionHealth.manualFallbackPercentage || 0) / visionTotal) * 360 : 0;
 
   // ── Calculate REAL Top Supermarket Chains dynamically from live GET /supermarkets & GET /offers ──
   const calculateRealChains = (): { name: string; value: number }[] => {
@@ -359,6 +344,7 @@ export default function Stats() {
               <line x1="6" y1="18" x2="6.01" y2="18" />
             </svg>
           }
+          onClick={() => navigate('/dashboard/ai-token-usage')}
         />
         <StatCard
           title={t('netMarginTitle')}
@@ -383,7 +369,7 @@ export default function Stats() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+      <div className="w-full">
         <div className="bg-surface rounded-2xl border border-border p-6 flex flex-col justify-between shadow-xs min-h-75">
           <div className="flex justify-between items-center mb-6">
             <div>
@@ -472,88 +458,6 @@ export default function Stats() {
               </button>
             </div>
           )}
-        </div>
-
-        <div className="bg-surface rounded-2xl border border-border p-6 flex flex-col justify-between shadow-xs">
-          <div className="flex justify-between items-start mb-1">
-            <h2 className="text-base font-extrabold text-text-primary m-0">
-              {t('receiptParsingAccuracyTitle')}
-            </h2>
-            <button
-              onClick={() => navigate('/dashboard/ai-token-usage')}
-              className="bg-transparent border-none text-primary text-xs font-bold cursor-pointer flex items-center gap-1 hover:opacity-80 transition-opacity"
-            >
-              {t('logs')}
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                className="rtl:rotate-180"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-          <p className="text-xs text-text-secondary mb-6 mt-0">
-            {t('receiptParsingAccuracySubtitle')}
-          </p>
-
-          <div className="flex gap-6 items-center">
-            <div
-              className="w-28 h-28 rounded-full relative flex items-center justify-center p-3 shrink-0"
-              style={{
-                background: `conic-gradient(var(--color-primary) 0deg ${autoDeg}deg, var(--color-accent) ${autoDeg}deg ${autoDeg + manualDeg}deg, var(--color-status-error) ${autoDeg + manualDeg}deg 360deg)`,
-              }}
-            >
-              <div className="w-full h-full bg-surface rounded-full flex flex-col items-center justify-center shadow-xs">
-                <span className="text-xl font-black text-text-primary">
-                  {(visionHealth.autoParsedPercentage || 100).toFixed(0)}%
-                </span>
-                <span className="text-[9px] font-bold text-text-secondary uppercase tracking-wider">
-                  {t('success')}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex-1 flex flex-col gap-3">
-              {[
-                {
-                  label: t('autoParsed'),
-                  val: visionHealth.autoParsedPercentage || 100,
-                  color: 'var(--color-primary)',
-                },
-                {
-                  label: t('manualFallback'),
-                  val: visionHealth.manualFallbackPercentage || 0,
-                  color: 'var(--color-accent)',
-                },
-                {
-                  label: t('failed'),
-                  val: visionHealth.failedPercentage || 0,
-                  color: 'var(--color-status-error)',
-                },
-              ].map((item) => (
-                <div key={item.label}>
-                  <div className="flex justify-between text-xs font-bold mb-1">
-                    <span className="flex items-center gap-1.5 text-text-primary">
-                      <span className="w-2 h-2 rounded-full" style={{ background: item.color }} />
-                      {item.label}
-                    </span>
-                    <span className="text-text-primary font-extrabold">{item.val.toFixed(1)}%</span>
-                  </div>
-                  <div className="h-1.5 bg-surface-variant rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${item.val}%`, background: item.color }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 

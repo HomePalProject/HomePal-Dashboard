@@ -25,6 +25,7 @@
   "avgHouseholderAge": "متوسط عمر رب الأسرة",
   "avgOverallUserAge": "متوسط أعمار الأفراد",
   "years": "{{count}} سنة",
+  "yearText": "سنة",
   "topGroceryCategory": "التصنيف الأكثر طلباً",
   "topGrocerySubtitle": "حسب حجم الطلب في المنطقة",
   "hhSizeDistribution": "توزيع الأسر حسب العدد",
@@ -32,5 +33,10 @@
   "liveAnalytics": "تحليلات لحظية",
   "exportSuccess": "تم تصدير التقرير بنجاح.",
   "dataRefreshed": "تم تحديث البيانات بنجاح.",
-  "loadingGeographic": "جاري تحميل البيانات الجغرافية..."
+  "loadingGeographic": "جاري تحميل البيانات الجغرافية...",
+  "genderSplitTitle": "توزيع الجنسين",
+  "householders": "أرباب الأسر",
+  "appUsers": "المستخدمين",
+  "male": "ذكور",
+  "female": "إناث"
 }

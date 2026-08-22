@@ -25,6 +25,7 @@
   "avgHouseholderAge": "Avg. Householder Age",
   "avgOverallUserAge": "Avg. Overall User Age",
   "years": "{{count}} yrs",
+  "yearText": "yrs",
   "topGroceryCategory": "Top Grocery Category",
   "topGrocerySubtitle": "By volume in Northern Region",
   "hhSizeDistribution": "Household Size Distribution",
@@ -32,5 +33,10 @@
   "liveAnalytics": "Live Analytics",
   "exportSuccess": "Report exported successfully",
   "dataRefreshed": "Data refreshed successfully",
-  "loadingGeographic": "Loading geographic data..."
+  "loadingGeographic": "Loading geographic data...",
+  "genderSplitTitle": "Gender Distribution",
+  "householders": "Householders",
+  "appUsers": "App Users",
+  "male": "Male",
+  "female": "Female"
 }

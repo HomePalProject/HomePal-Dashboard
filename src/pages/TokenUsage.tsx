@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { analyticsService } from '@services/analyticsService';
 import type { TokenUsageMetrics } from '@typeDefs/tokenUsageTypes';
+import { useTranslation } from 'react-i18next';
 
 export default function TokenUsage() {
+  const { t } = useTranslation('tokenUsage');
   const [data, setData] = useState<TokenUsageMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(7);
@@ -42,7 +44,7 @@ export default function TokenUsage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-1">
-            <span>Analytics & Performance</span>
+            <span>{t('analyticsAndPerformance')}</span>
             <svg
               width="12"
               height="12"
@@ -50,14 +52,13 @@ export default function TokenUsage() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              className="rtl:rotate-180"
             >
               <path d="m9 18 6-6-6-6" />
             </svg>
-            <span className="text-slate-900 font-bold">AI Token Usage & Spend</span>
+            <span className="text-slate-900 font-bold">{t('aiTokenUsageAndSpend')}</span>
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-slate-900 m-0">
-            Token Usage & Cost Center
-          </h1>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 m-0">{t('title')}</h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 shrink-0 mt-4 sm:mt-0">
@@ -66,9 +67,9 @@ export default function TokenUsage() {
             onChange={(e) => setDays(Number(e.target.value))}
             className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-white outline-none cursor-pointer hover:border-slate-300 transition-colors shadow-xs"
           >
-            <option value={1}>Last 24 Hours</option>
-            <option value={7}>Last 7 Days</option>
-            <option value={30}>Last 30 Days</option>
+            <option value={1}>{t('last24Hours')}</option>
+            <option value={7}>{t('last7Days')}</option>
+            <option value={30}>{t('last30Days')}</option>
           </select>
 
           <button
@@ -94,14 +95,14 @@ export default function TokenUsage() {
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            Export CSV
+            {t('exportCsv')}
           </button>
         </div>
       </div>
 
       {loading ? (
         <div className="p-16 text-center text-xs font-semibold text-slate-400 bg-white rounded-2xl border border-slate-200">
-          Loading live token metrics from API...
+          {t('loading')}
         </div>
       ) : (
         <>
@@ -111,7 +112,7 @@ export default function TokenUsage() {
             <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Total Tokens
+                  {t('totalTokens')}
                 </span>
                 <span className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
                   <svg
@@ -131,8 +132,8 @@ export default function TokenUsage() {
                   {totalTokens.toLocaleString()}
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 font-medium">
-                  <span className="text-emerald-600 font-bold">Live API Data</span>
-                  <span>• {days}d window</span>
+                  <span className="text-emerald-600 font-bold">{t('liveApiData')}</span>
+                  <span>• {t('dayWindow', { count: days })}</span>
                 </div>
               </div>
             </div>
@@ -141,7 +142,7 @@ export default function TokenUsage() {
             <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Input Prompt Tokens
+                  {t('inputPromptTokens')}
                 </span>
                 <span className="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
                   <svg
@@ -164,7 +165,7 @@ export default function TokenUsage() {
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 font-medium">
                   <span className="text-blue-600 font-bold">{inputPercentage}%</span>
-                  <span>of total volume</span>
+                  <span>{t('ofTotalVolume')}</span>
                 </div>
               </div>
             </div>
@@ -173,7 +174,7 @@ export default function TokenUsage() {
             <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Output Completion Tokens
+                  {t('outputCompletionTokens')}
                 </span>
                 <span className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
                   <svg
@@ -196,7 +197,7 @@ export default function TokenUsage() {
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 font-medium">
                   <span className="text-purple-600 font-bold">{outputPercentage}%</span>
-                  <span>completion ratio</span>
+                  <span>{t('completionRatio')}</span>
                 </div>
               </div>
             </div>
@@ -205,7 +206,7 @@ export default function TokenUsage() {
             <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  Total API Cost
+                  {t('totalApiCost')}
                 </span>
                 <span className="p-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100">
                   <svg
@@ -226,22 +227,24 @@ export default function TokenUsage() {
                   ${totalCost.toFixed(2)} USD
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1 font-medium">
-                  <span className="text-amber-600 font-bold">API Verified</span>
-                  <span>real-time compute</span>
+                  <span className="text-amber-600 font-bold">{t('apiVerified')}</span>
+                  <span>{t('realTimeCompute')}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* ── Visual Consumption Ratio & Pipeline Telemetry ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="w-full">
             {/* Input vs Output Visual Progress Bar */}
-            <div className="lg:col-span-2 p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-5">
+            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900 m-0">Token Distribution Ratio</h3>
+                  <h3 className="text-sm font-bold text-slate-900 m-0">
+                    {t('tokenDistributionRatio')}
+                  </h3>
                   <p className="text-xs text-slate-500 m-0 mt-0.5">
-                    Comparison between input context tokens and output generated tokens
+                    {t('tokenDistributionSubtitle')}
                   </p>
                 </div>
                 <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-extrabold">
@@ -266,40 +269,14 @@ export default function TokenUsage() {
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
                     <span className="font-semibold text-slate-700">
-                      Input Prompts ({inputTokens.toLocaleString()} tokens)
+                      {t('inputPromptsTokens', { tokens: inputTokens.toLocaleString() })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 rounded-full bg-purple-500 shrink-0" />
                     <span className="font-semibold text-slate-700">
-                      Output Completions ({outputTokens.toLocaleString()} tokens)
+                      {t('outputCompletionsTokens', { tokens: outputTokens.toLocaleString() })}
                     </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Model Infrastructure Info */}
-            <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
-              <h3 className="text-sm font-bold text-slate-900 m-0">AI Engine Specifications</h3>
-              <p className="text-xs text-slate-500 m-0">Google Gemini Model Pipeline</p>
-
-              <div className="space-y-4 pt-2">
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                  <div className="text-xs font-bold text-slate-900">
-                    Gemini 1.5 Pro (Multimodal Vision)
-                  </div>
-                  <div className="text-sm text-slate-500">
-                    Supermarket flyer parsing & visual offer extraction
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                  <div className="text-xs font-bold text-slate-900">
-                    Gemini 1.5 Flash (OCR Normalization)
-                  </div>
-                  <div className="text-sm text-slate-500">
-                    High-speed category normalization & price verification
                   </div>
                 </div>
               </div>

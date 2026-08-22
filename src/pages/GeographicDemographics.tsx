@@ -8,7 +8,6 @@ import { Button } from '@components/ui/Button';
 import { Skeleton } from '@components/ui/Skeleton';
 import { analyticsService } from '@services/analyticsService';
 import type { GeographicDemographicsData } from '@typeDefs/demographicsTypes';
-import type { UserDemographicsData } from '@typeDefs/analyticsTypes';
 import { formatCurrencyString } from '@lib/formatters';
 
 function RecenterButton({ center, zoom }: { center: [number, number]; zoom: number }) {
@@ -163,7 +162,6 @@ export default function GeographicDemographics() {
     return t(sizeStr, sizeStr);
   };
   const [data, setData] = useState<GeographicDemographicsData | null>(null);
-  const [userDemographics, setUserDemographics] = useState<UserDemographicsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -179,13 +177,9 @@ export default function GeographicDemographics() {
   const fetchData = useCallback(async () => {
     try {
       setError(null);
-      const [result, userDemoRes] = await Promise.all([
-        analyticsService.getDemographics(),
-        analyticsService.getUserDemographics().catch(() => null),
-      ]);
+      const result = await analyticsService.getDemographics();
       if (!result) throw new Error('No demographic data found');
       setData(result);
-      if (userDemoRes) setUserDemographics(userDemoRes);
     } catch (err) {
       const msg = getErrorMessage(err);
       setError(msg);
@@ -314,8 +308,8 @@ export default function GeographicDemographics() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
-        <div className="bg-surface rounded-2xl border border-border p-6 relative">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-stretch">
+        <div className="bg-surface rounded-2xl border border-border p-6 relative flex flex-col">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-base font-bold text-text-primary mb-1">{t('mapTitle')}</h2>
@@ -327,7 +321,7 @@ export default function GeographicDemographics() {
             </div>
           </div>
 
-          <div className="relative w-full h-100 sm:h-125 rounded-3xl overflow-hidden border border-border z-0">
+          <div className="relative w-full h-100 sm:h-125 lg:h-auto flex-1 min-h-87.5 rounded-3xl overflow-hidden border border-border z-0">
             <div className="absolute left-4 bottom-4 bg-surface/90 px-4 py-3 rounded-3xl shadow-md z-1000 backdrop-blur-sm">
               <div className="text-sm font-bold text-text-secondary mb-2 uppercase">
                 {t('densityIntensity')}
@@ -427,29 +421,78 @@ export default function GeographicDemographics() {
             </div>
           </div>
 
-          {userDemographics && (
-            <div className="bg-surface rounded-2xl border border-border p-6">
-              <div className="text-sm font-bold text-text-primary mb-3">
-                {t('avgUserAgeBreakdown')}
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-3xl bg-surface-variant/50">
-                  <div className="text-xs text-text-secondary">{t('avgHouseholderAge')}</div>
-                  <div className="text-xl font-bold text-primary mt-1">
-                    {t('years', {
-                      count: userDemographics.avgAgeHouseholders || 28,
-                    })}
+          {(data.ageSplit || data.genderSplit) && (
+            <div className="bg-surface rounded-2xl border border-border p-6 flex flex-col gap-6">
+              {/* Age Breakdown */}
+              {data.ageSplit && data.ageSplit.length > 0 && (
+                <div>
+                  <div className="text-sm font-bold text-text-primary mb-3">
+                    {t('avgUserAgeBreakdown')}
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {data.ageSplit.map((item, idx) => (
+                      <div key={idx}>
+                        <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-1.5">
+                          <span dir="ltr">
+                            {item.range} {t('yearText', 'yrs')}
+                          </span>
+                          <span className="text-text-secondary">{item.percentage}%</span>
+                        </div>
+                        <div className="h-1.5 bg-surface-variant rounded-3xl overflow-hidden">
+                          <div
+                            className="h-full bg-primary rounded-3xl transition-all duration-500 ease-out"
+                            style={{ width: `${item.percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="p-3 rounded-3xl bg-surface-variant/50">
-                  <div className="text-xs text-text-secondary">{t('avgOverallUserAge')}</div>
-                  <div className="text-xl font-bold text-primary mt-1">
-                    {t('years', {
-                      count: userDemographics.avgAgeUsers || 26,
-                    })}
+              )}
+
+              {/* Gender Split */}
+              {data.genderSplit && data.genderSplit.length > 0 && (
+                <div className="pt-6 border-t border-border/50">
+                  <div className="text-sm font-bold text-text-primary mb-4">
+                    {t('genderSplitTitle', 'Gender Distribution')}
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-[13px] font-semibold text-text-primary mb-2">
+                      <div className="flex gap-3 text-xs w-full justify-between">
+                        <span className="text-emerald-700">
+                          {data.genderSplit.find(
+                            (g) => g.gender.toLowerCase() === 'male' || g.gender === 'ذكر'
+                          )?.percentage || 0}
+                          % {t('male', 'Male')}
+                        </span>
+                        <span className="text-amber-600">
+                          {data.genderSplit.find(
+                            (g) =>
+                              g.gender.toLowerCase() === 'female' ||
+                              g.gender === 'أنثى' ||
+                              g.gender === 'انثى'
+                          )?.percentage || 0}
+                          % {t('female', 'Female')}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="h-2 flex rounded-3xl overflow-hidden bg-surface-variant">
+                      <div
+                        className="bg-emerald-500 h-full transition-all duration-500"
+                        style={{
+                          width: `${data.genderSplit.find((g) => g.gender.toLowerCase() === 'male' || g.gender === 'ذكر')?.percentage || 0}%`,
+                        }}
+                      />
+                      <div
+                        className="bg-amber-400 h-full transition-all duration-500"
+                        style={{
+                          width: `${data.genderSplit.find((g) => g.gender.toLowerCase() === 'female' || g.gender === 'أنثى' || g.gender === 'انثى')?.percentage || 0}%`,
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 

@@ -14,7 +14,7 @@ export function AuthHeader({ title, subtitle }: AuthHeaderProps) {
         <div className="w-7 h-7 md:w-9 md:h-9 rounded-3xl flex items-center justify-center">
           <img
             src="/logo.svg"
-            alt="HomePal Logo"
+            alt={t('homepal')}
             className="w-full h-full object-contain"
             fetchPriority="high"
           />

@@ -38,7 +38,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             onClick={() => onClose()}
             className="flex items-center gap-2.5 hover:opacity-80 transition-opacity no-underline select-none"
           >
-            <img src="/logo-light.svg" alt="HomePal" className="w-8 h-8 object-contain" />
+            <img src="/logo-light.svg" alt={t('homepal')} className="w-8 h-8 object-contain" />
             <div>
               <div className="text-white font-extrabold text-sm leading-none tracking-tight">
                 {t('homepal')}

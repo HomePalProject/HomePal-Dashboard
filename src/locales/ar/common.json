@@ -1,5 +1,5 @@
 {
-  "homepal": "HomePal",
+  "homepal": "هوم بال",
   "logout": "تسجيل الخروج",
   "cancel": "إلغاء",
   "save": "حفظ",
@@ -10,5 +10,8 @@
   "grid": "شبكة",
   "table": "جدول",
   "totalUnits": "الإجمالي: {{count}}",
-  "managementSystem": "نظام إدارة HomePal إصدار 2.4"
+  "managementSystem": "نظام إدارة هوم بال إصدار 2.4",
+  "pageNotFound": "الصفحة غير موجودة",
+  "pageNotFoundDesc": "الصفحة التي تبحث عنها غير موجودة أو ليس لديك صلاحية للوصول إليها.",
+  "returnToLogin": "العودة إلى تسجيل الدخول"
 }

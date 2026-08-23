@@ -101,18 +101,18 @@ export default function OffersHub() {
       setSupermarkets(marketsData || []);
       setCategories(categoriesData || []);
 
-      // Check session storage for recently scraped offers from ScrapingPipeline
-      const sessionScrapedRaw = sessionStorage.getItem('homepal_recent_scraped_offers');
-      let scrapedSessionOffers: Offer[] = [];
-      if (sessionScrapedRaw) {
+      // Check session storage for recently ingested offers from IngestionPipeline
+      const sessionIngestedRaw = sessionStorage.getItem('homepal_recent_ingested_offers');
+      let ingestedSessionOffers: Offer[] = [];
+      if (sessionIngestedRaw) {
         try {
-          scrapedSessionOffers = JSON.parse(sessionScrapedRaw);
+          ingestedSessionOffers = JSON.parse(sessionIngestedRaw);
         } catch (e) {
-          console.error('Failed to parse session scraped offers', e);
+          console.error('Failed to parse session ingested offers', e);
         }
       }
 
-      const combined = [...scrapedSessionOffers, ...(backendOffers || [])];
+      const combined = [...ingestedSessionOffers, ...(backendOffers || [])];
 
       // Deduplicate offers by ID or signature
       const seen = new Set<string>();
@@ -295,7 +295,7 @@ export default function OffersHub() {
     setOffers((prev) => prev.map((o) => (o.id === offer.id ? newOfferState : o)));
 
     // Update in session storage too if present
-    const sessionRaw = sessionStorage.getItem('homepal_recent_scraped_offers');
+    const sessionRaw = sessionStorage.getItem('homepal_recent_ingested_offers');
     if (sessionRaw) {
       try {
         const sessionOffers: Offer[] = JSON.parse(sessionRaw);
@@ -313,7 +313,7 @@ export default function OffersHub() {
           }
           return o;
         });
-        sessionStorage.setItem('homepal_recent_scraped_offers', JSON.stringify(updatedSession));
+        sessionStorage.setItem('homepal_recent_ingested_offers', JSON.stringify(updatedSession));
       } catch (e) {
         console.error(e);
       }
@@ -384,7 +384,7 @@ export default function OffersHub() {
       );
 
       // 2. Remove from session storage so refresh doesn't restore deleted items
-      const sessionRaw = sessionStorage.getItem('homepal_recent_scraped_offers');
+      const sessionRaw = sessionStorage.getItem('homepal_recent_ingested_offers');
       if (sessionRaw) {
         try {
           const sessionOffers: Offer[] = JSON.parse(sessionRaw);
@@ -395,7 +395,7 @@ export default function OffersHub() {
             if (oTitle === targetTitle && oPrice === targetPrice) return false;
             return true;
           });
-          sessionStorage.setItem('homepal_recent_scraped_offers', JSON.stringify(filteredSession));
+          sessionStorage.setItem('homepal_recent_ingested_offers', JSON.stringify(filteredSession));
         } catch (e) {
           console.error('Failed updating session storage after delete', e);
         }
@@ -429,9 +429,15 @@ export default function OffersHub() {
         if (!isUnver) return false;
       }
       if (activeTab === 'expiring') {
-        const isExp =
-          off.status === 'Expiring' ||
-          (off.validTo && new Date(off.validTo) <= new Date(Date.now() + 3 * 86400000));
+        let isExp = off.status === 'Expiring';
+        if (off.validTo) {
+          const validToMidnight = new Date(new Date(off.validTo).setHours(0, 0, 0, 0)).getTime();
+          const todayMidnight = new Date(new Date().setHours(0, 0, 0, 0)).getTime();
+          const diffDays = Math.round((validToMidnight - todayMidnight) / 86400000);
+          if (diffDays >= 0 && diffDays <= 3) {
+            isExp = true;
+          }
+        }
         if (!isExp) return false;
       }
 
@@ -626,7 +632,7 @@ export default function OffersHub() {
           </button>
 
           <button
-            onClick={() => navigate('/dashboard/scraping-pipeline')}
+            onClick={() => navigate('/dashboard/ingestion-pipeline')}
             className="ms-auto flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:underline border-none bg-transparent cursor-pointer shrink-0 whitespace-nowrap"
           >
             <svg
@@ -639,7 +645,7 @@ export default function OffersHub() {
             >
               <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
             </svg>
-            {t('goToScrapers')}
+            {t('goToIngestions')}
           </button>
         </div>
 
@@ -904,38 +910,39 @@ export default function OffersHub() {
 
                       {/* VALIDITY Column */}
                       <td className="px-4 py-4 text-slate-600 font-semibold whitespace-nowrap">
-                        {off.status === 'Expiring' ||
-                        (off.validTo &&
-                          new Date(off.validTo) <= new Date(Date.now() + 86400000)) ? (
-                          <span className="inline-flex items-center gap-1 text-red-600 font-bold">
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.5"
-                            >
-                              <circle cx="12" cy="12" r="10" />
-                              <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                            {t('expiresToday')}
-                          </span>
-                        ) : off.validTo ? (
-                          <span>
-                            {t('endsInDays', {
-                              count: Math.max(
-                                1,
-                                Math.ceil(
-                                  (new Date(off.validTo).getTime() - Date.now()) /
-                                    (1000 * 3600 * 24)
-                                )
-                              ),
-                            })}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400">—</span>
-                        )}
+                        {(() => {
+                          if (!off.validTo) return <span className="text-slate-400">—</span>;
+                          const validToMidnight = new Date(
+                            new Date(off.validTo).setHours(0, 0, 0, 0)
+                          ).getTime();
+                          const todayMidnight = new Date(new Date().setHours(0, 0, 0, 0)).getTime();
+                          const diffDays = Math.round((validToMidnight - todayMidnight) / 86400000);
+
+                          if (diffDays < 0) {
+                            return (
+                              <span className="text-red-800 font-bold">{t('statusExpired')}</span>
+                            );
+                          } else if (diffDays === 0 || off.status === 'Expiring') {
+                            return (
+                              <span className="inline-flex items-center gap-1 text-red-600 font-bold">
+                                <svg
+                                  width="12"
+                                  height="12"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2.5"
+                                >
+                                  <circle cx="12" cy="12" r="10" />
+                                  <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                                {t('expiresToday')}
+                              </span>
+                            );
+                          } else {
+                            return <span>{t('endsInDays', { count: diffDays })}</span>;
+                          }
+                        })()}
                       </td>
 
                       {/* STATUS Column */}
@@ -1278,7 +1285,7 @@ export default function OffersHub() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#1F3D32] hover:bg-[#162D25] cursor-pointer transition-all shadow-xs border-none"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-active cursor-pointer transition-all shadow-xs border-none"
               >
                 {saving ? t('saving') : t('saveOffer')}
               </button>

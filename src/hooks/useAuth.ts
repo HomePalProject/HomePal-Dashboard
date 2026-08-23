@@ -9,7 +9,13 @@ export const useAuth = () => {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
+    mutationFn: async (credentials: LoginCredentials) => {
+      const response = await authService.login(credentials);
+      if (!response.user?.roles?.includes('Admin')) {
+        throw new Error('adminRequired');
+      }
+      return response;
+    },
     onSuccess: ({ token, user }) => {
       setAuth(token, user);
       navigate('/dashboard');

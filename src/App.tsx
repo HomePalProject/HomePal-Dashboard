@@ -20,10 +20,20 @@ const ScrapingPipeline = lazy(() => import('./pages/ScrapingPipeline'));
 const ProductCategories = lazy(() => import('./pages/ProductCategories'));
 const OffersHub = lazy(() => import('./pages/OffersHub'));
 const MeasuringUnits = lazy(() => import('./pages/MeasuringUnits'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
+
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  const isAdmin = user?.roles?.includes('Admin');
+  if (!isAdmin) {
+    // Show a 404/NotFound page to hide the existence of the admin route
+    return <NotFound />;
+  }
+
   return <>{children}</>;
 }
 
@@ -66,7 +76,7 @@ function App() {
             <Route path="measuring-units" element={<MeasuringUnits />} />
           </Route>
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

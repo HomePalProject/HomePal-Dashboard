@@ -29,6 +29,7 @@ export default function Login() {
       return error.response?.data?.message || error.response?.data?.title || t('loginFailed');
     }
     if (error instanceof Error) {
+      if (error.message === 'adminRequired') return t('adminRequired');
       return error.message;
     }
     return t('loginFailed');

@@ -15,7 +15,6 @@
   "selectSupermarket": "Select Supermarket Chain",
   "noSupermarkets": "No supermarkets found in database.",
   "addSupermarketLink": "Add Supermarket →",
-  "branchesCount": "{{count}}+ Branches",
   "facebookUrl": "Target Facebook Page URL",
   "ingestDepth": "Ingest Depth (Days Back)",
   "depth1": "Last 24 Hours (1 Day)",

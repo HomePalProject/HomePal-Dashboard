@@ -4,7 +4,6 @@ export type LocalizedValue =
 export interface Supermarket {
   id: string;
   name: LocalizedValue;
-  branches?: number;
   logoPath?: string | null;
   address?: string | null;
   websiteUrl?: string | null;

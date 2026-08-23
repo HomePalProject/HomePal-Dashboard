@@ -15,7 +15,6 @@
   "selectSupermarket": "اختر المتجر المستهدف",
   "noSupermarkets": "لم يتم العثور على أي متجر في قاعدة البيانات.",
   "addSupermarketLink": "إضافة متجر جديد ←",
-  "branchesCount": "+{{count}} فروع",
   "facebookUrl": "رابط صفحة فيسبوك المستهدفة",
   "ingestDepth": "المدى الزمني للاستخراج",
   "depth1": "آخر 24 ساعة",

@@ -34,7 +34,6 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
   return (
     <div className="p-3.5 bg-background border border-border rounded-xl flex items-center justify-between gap-4 hover:bg-surface-variant transition-colors">
       <div className="flex items-center gap-3.5 min-w-0">
-        {/* Product Image Thumbnail */}
         {imageUrl && !imgError ? (
           <img
             src={imageUrl}
@@ -49,12 +48,10 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
         )}
 
         <div className="min-w-0 flex flex-col gap-0.5">
-          {/* Title */}
           <div className="text-xs font-bold text-text-primary truncate" title={title}>
             {title}
           </div>
 
-          {/* Description, Unit, Category */}
           <div className="flex items-center gap-2 text-sm text-text-secondary flex-wrap">
             {description && description !== '—' && (
               <span className="font-medium text-text-primary">{description}</span>
@@ -70,7 +67,6 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
             </span>
           </div>
 
-          {/* Supermarket Name */}
           {offer.supermarketName && (
             <div className="flex items-center gap-1.5 mt-0.5">
               {supermarketLogoUrl && (
@@ -88,7 +84,6 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
         </div>
       </div>
 
-      {/* Price tag */}
       <div className="flex flex-col items-end shrink-0">
         {currentPrice !== undefined && currentPrice !== null ? (
           <div className="flex flex-col items-end gap-0.5">
@@ -730,7 +725,6 @@ export default function IngestionPipeline() {
 
   return (
     <div className="w-full flex flex-col gap-6 font-sans pb-16 px-4 sm:px-0">
-      {/* ── Toast Notification ── */}
       {toastMessage && (
         <div className="fixed top-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-3 animate-fade-in border border-slate-700">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -738,7 +732,6 @@ export default function IngestionPipeline() {
         </div>
       )}
 
-      {/* ── Header ── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
@@ -752,7 +745,6 @@ export default function IngestionPipeline() {
           <p className="text-sm text-slate-500 mt-1 m-0">{t('subtitle')}</p>
         </div>
 
-        {/* Top Header Buttons */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-wrap shrink-0">
           <label className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-200 cursor-pointer select-none transition-colors shrink-0 w-full sm:w-auto">
             <input
@@ -860,11 +852,8 @@ export default function IngestionPipeline() {
         </div>
       )}
 
-      {/* ── Main Control Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
-        {/* Left: Ingestion Control Card */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-          {/* Tabs */}
           <div className="flex border-b border-slate-200 mb-6 gap-6">
             <button
               onClick={() => setActiveTab('facebook')}
@@ -890,10 +879,8 @@ export default function IngestionPipeline() {
             </button>
           </div>
 
-          {/* Facebook Form */}
           {activeTab === 'facebook' && (
             <form onSubmit={handleRunSingleUrlIngest} className="flex flex-col gap-5">
-              {/* Supermarket Selection */}
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-700">{t('selectSupermarket')}</label>
                 {supermarkets.length === 0 ? (
@@ -936,7 +923,6 @@ export default function IngestionPipeline() {
                 )}
               </div>
 
-              {/* Selected Supermarket Card Preview */}
               {selectedMarket && (
                 <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3 min-w-0">
@@ -960,14 +946,9 @@ export default function IngestionPipeline() {
                       </div>
                     </div>
                   </div>
-
-                  <span className="px-2.5 py-1 bg-white border border-slate-200 rounded-md text-sm font-bold text-slate-700 shrink-0">
-                    {t('branchesCount', { count: selectedMarket.branches || 10 })}
-                  </span>
                 </div>
               )}
 
-              {/* Page URL input */}
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-700">{t('facebookUrl')}</label>
                 <div className="relative">
@@ -994,7 +975,6 @@ export default function IngestionPipeline() {
                 </div>
               </div>
 
-              {/* Ingest Depth & Limit */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-slate-700">{t('ingestDepth')}</label>
@@ -1087,7 +1067,6 @@ export default function IngestionPipeline() {
             </form>
           )}
 
-          {/* Flyer Upload Form */}
           {activeTab === 'upload' && (
             <form onSubmit={handleRunImageUploadIngest} className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
@@ -1106,7 +1085,6 @@ export default function IngestionPipeline() {
                 </select>
               </div>
 
-              {/* Image Drag & Drop File Selector */}
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-700">{t('labelFlyerImage')}</label>
                 <div className="p-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 flex flex-col items-center justify-center text-center gap-3 relative hover:border-slate-400 transition-colors">
@@ -1161,7 +1139,6 @@ export default function IngestionPipeline() {
                 </div>
               </div>
 
-              {/* Optional Caption & OCR text */}
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-700">{t('optionalCaption')}</label>
                 <input
@@ -1210,7 +1187,6 @@ export default function IngestionPipeline() {
           )}
         </div>
 
-        {/* Right: Live Ingestion Status Card & Desk View Metrics widgets */}
         <div className="flex flex-col gap-6">
           <LiveIngestionStatus
             isRunning={!!jobStatus?.isRunning}
@@ -1226,7 +1202,6 @@ export default function IngestionPipeline() {
         </div>
       </div>
 
-      {/* ── Recent Ingestion Jobs Table ── */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
@@ -1313,7 +1288,6 @@ export default function IngestionPipeline() {
         )}
       </div>
 
-      {/* ── Extracted Offers Review Modal ── */}
       {reviewOffers && (
         <Modal
           title={t('extractedOffersTitle', { count: reviewOffers.length })}

@@ -8,8 +8,8 @@
   "offersPage": "مركز العروض",
   "stats": "التحليلات الشاملة",
   "users": "المستخدمين",
-  "scrapingNav": "استخراج العروض",
-  "scrapingPage": "محرك استخراج البيانات",
+  "ingestionNav": "استخراج العروض",
+  "ingestionPage": "محرك استخراج البيانات",
   "measuringUnits": "وحدات القياس",
   "profile": "إعدادات الحساب",
   "aiToken": "استهلاك الذكاء الاصطناعي"

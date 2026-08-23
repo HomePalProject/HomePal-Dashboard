@@ -1,27 +1,27 @@
 import api from './api';
 import type {
-  ScrapeFacebookPageRequest,
-  ScraperJobStatus,
-  OfferScraperResult,
-} from '@typeDefs/scraperTypes';
+  IngestFacebookPageRequest,
+  IngestionJobStatus,
+  OfferIngestionResult,
+} from '@typeDefs/ingestionTypes';
 
-export const scraperService = {
-  getJobStatus: async (): Promise<ScraperJobStatus> => {
+export const ingestionService = {
+  getJobStatus: async (): Promise<IngestionJobStatus> => {
     const response = await api.get('/offers/scrape/status');
     return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
-  scrapeFacebookPage: async (data: ScrapeFacebookPageRequest): Promise<OfferScraperResult> => {
+  ingestFacebookPage: async (data: IngestFacebookPageRequest): Promise<OfferIngestionResult> => {
     const response = await api.post('/offers/scrape/facebook-page', data);
     return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
-  scrapeImageFile: async (
+  ingestImageFile: async (
     supermarketId: string,
     file: File,
     ocrText?: string,
     caption?: string
-  ): Promise<OfferScraperResult> => {
+  ): Promise<OfferIngestionResult> => {
     const formData = new FormData();
     formData.append('SupermarketId', supermarketId);
     formData.append('ImageFile', file);

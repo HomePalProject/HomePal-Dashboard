@@ -1,23 +1,23 @@
 import type { Offer } from './catalogTypes';
 
-export interface ScrapeFacebookPageRequest {
+export interface IngestFacebookPageRequest {
   supermarketId: string;
   pageUrl: string;
   daysBack?: number;
   resultsLimit?: number;
 }
 
-export interface ScrapeImageFileRequest {
+export interface IngestImageFileRequest {
   supermarketId: string;
   imageFile: File;
   ocrText?: string;
   caption?: string;
 }
 
-export interface ScraperJobStatus {
+export interface IngestionJobStatus {
   isRunning: boolean;
   supermarketId?: string | null;
-  totalScrapedImages?: number;
+  totalIngestedImages?: number;
   totalExtractedOffers?: number;
   startedAt?: string | null;
   completedAt?: string | null;
@@ -25,13 +25,13 @@ export interface ScraperJobStatus {
   errorMessage?: string | null;
 }
 
-export interface OfferScraperResult {
+export interface OfferIngestionResult {
   createdOffers?: Offer[];
-  totalScrapedImages?: number;
+  totalIngestedImages?: number;
   totalExtractedOffers?: number;
 }
 
-export interface ScraperHistoryItem {
+export interface IngestionHistoryItem {
   id: string;
   source: 'Facebook' | 'Flyer Upload';
   brand: string;

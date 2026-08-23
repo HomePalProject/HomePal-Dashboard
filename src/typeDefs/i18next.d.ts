@@ -12,7 +12,7 @@ import auth from '../locales/en/auth.json';
 import tokenUsage from '../locales/en/tokenUsage.json';
 import measuringUnits from '../locales/en/measuringUnits.json';
 import geographicDemographics from '../locales/en/geographicDemographics.json';
-import scrapingPipeline from '../locales/en/scrapingPipeline.json';
+import ingestionPipeline from '../locales/en/ingestionPipeline.json';
 import users from '../locales/en/users.json';
 import profile from '../locales/en/profile.json';
 
@@ -33,7 +33,7 @@ declare module 'react-i18next' {
       tokenUsage: typeof tokenUsage;
       measuringUnits: typeof measuringUnits;
       geographicDemographics: typeof geographicDemographics;
-      scrapingPipeline: typeof scrapingPipeline;
+      ingestionPipeline: typeof ingestionPipeline;
       users: typeof users;
       profile: typeof profile;
     };

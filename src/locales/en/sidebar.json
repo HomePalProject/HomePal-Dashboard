@@ -8,8 +8,8 @@
   "offersPage": "Offers Hub",
   "stats": "Analytics",
   "users": "User Management",
-  "scrapingNav": "Scraping Pipeline",
-  "scrapingPage": "Offer Scraping Pipeline",
+  "ingestionNav": "Ingestion Pipeline",
+  "ingestionPage": "Offer Ingestion Pipeline",
   "measuringUnits": "Measuring Units",
   "profile": "Account Settings",
   "aiToken": "AI Token Usage"

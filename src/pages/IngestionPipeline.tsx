@@ -2,18 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn, getErrorMessage } from '@lib/utils';
 import { catalogService } from '@services/catalogService';
-import { scraperService } from '@services/scraperService';
+import { ingestionService } from '@services/ingestionService';
 import { Button } from '@components/ui/Button';
 import type { Supermarket, Offer } from '@typeDefs/catalogTypes';
-import type { ScraperJobStatus, ScraperHistoryItem } from '@typeDefs/scraperTypes';
+import type { IngestionJobStatus, IngestionHistoryItem } from '@typeDefs/ingestionTypes';
 import { getLocalString, getImageUrl } from '@lib/formatters';
 import { Modal } from '@components/ui/Modal';
 import { useTranslation } from 'react-i18next';
-import LiveScraperStatus from '@components/scraping/LiveScraperStatus';
-import DeskViewMetrics from '@components/scraping/DeskViewMetrics';
+import LiveIngestionStatus from '@components/ingestion/LiveIngestionStatus';
+import DeskViewMetrics from '@components/ingestion/DeskViewMetrics';
 
 function ExtractedOfferCard({ offer }: { offer: Offer }) {
-  const { t } = useTranslation('scrapingPipeline');
+  const { t } = useTranslation('ingestionPipeline');
   const [imgError, setImgError] = useState(false);
 
   const title = getLocalString(offer.name || offer.title);
@@ -109,8 +109,8 @@ function ExtractedOfferCard({ offer }: { offer: Offer }) {
   );
 }
 
-export default function ScrapingPipeline() {
-  const { t, i18n } = useTranslation(['scrapingPipeline', 'common']);
+export default function IngestionPipeline() {
+  const { t, i18n } = useTranslation(['ingestionPipeline', 'common']);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'facebook' | 'upload'>('facebook');
 
@@ -127,7 +127,7 @@ export default function ScrapingPipeline() {
   const [uploadCaption, setUploadCaption] = useState('');
   const [ocrText, setOcrText] = useState('');
 
-  // Batch Scraping Progress state
+  // Batch Ingestion Progress state
   const [isBatchRunning, setIsBatchRunning] = useState(false);
   const [batchProgress, setBatchProgress] = useState<{
     current: number;
@@ -136,12 +136,12 @@ export default function ScrapingPipeline() {
   } | null>(null);
 
   // Status & Job state from Backend
-  const [jobStatus, setJobStatus] = useState<ScraperJobStatus | null>(null);
+  const [jobStatus, setJobStatus] = useState<IngestionJobStatus | null>(null);
 
-  // Cool-down & Last Scraped Timestamps Helper (24 Hours Rule)
-  const LAST_SCRAPED_KEY = 'homepal_supermarket_last_scraped_map';
+  // Cool-down & Last Ingested Timestamps Helper (24 Hours Rule)
+  const LAST_SCRAPED_KEY = 'homepal_supermarket_last_ingested_map';
 
-  const getLastScrapedMap = (): Record<string, string> => {
+  const getLastIngestedMap = (): Record<string, string> => {
     try {
       const raw = localStorage.getItem(LAST_SCRAPED_KEY);
       return raw ? JSON.parse(raw) : {};
@@ -150,20 +150,20 @@ export default function ScrapingPipeline() {
     }
   };
 
-  const recordSupermarketScraped = (supermarketId: string) => {
+  const recordSupermarketIngested = (supermarketId: string) => {
     try {
-      const map = getLastScrapedMap();
+      const map = getLastIngestedMap();
       map[supermarketId] = new Date().toISOString();
       localStorage.setItem(LAST_SCRAPED_KEY, JSON.stringify(map));
     } catch (e) {
-      console.error('Failed to record last scraped timestamp:', e);
+      console.error('Failed to record last ingested timestamp:', e);
     }
   };
 
   const check24HourCooldown = (
     supermarketId: string
   ): { isCoolingDown: boolean; timeAgoText?: string } => {
-    const map = getLastScrapedMap();
+    const map = getLastIngestedMap();
     const iso = map[supermarketId];
     if (!iso) return { isCoolingDown: false };
 
@@ -181,13 +181,13 @@ export default function ScrapingPipeline() {
     return { isCoolingDown: false };
   };
 
-  // Toggle for skipping chains scraped in the last 24h
-  const [skipRecentlyScraped, setSkipRecentlyScraped] = useState(true);
+  // Toggle for skipping chains ingested in the last 24h
+  const [skipRecentlyIngested, setSkipRecentlyIngested] = useState(true);
 
   // History Persistence Helper
-  const STORAGE_KEY = 'homepal_scraping_audit_history';
+  const STORAGE_KEY = 'homepal_ingestion_audit_history';
 
-  const loadHistory = (): ScraperHistoryItem[] => {
+  const loadHistory = (): IngestionHistoryItem[] => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -202,9 +202,9 @@ export default function ScrapingPipeline() {
     return [];
   };
 
-  const [history, setHistoryState] = useState<ScraperHistoryItem[]>(loadHistory);
+  const [history, setHistoryState] = useState<IngestionHistoryItem[]>(loadHistory);
 
-  const updateHistory = (updater: (prev: ScraperHistoryItem[]) => ScraperHistoryItem[]) => {
+  const updateHistory = (updater: (prev: IngestionHistoryItem[]) => IngestionHistoryItem[]) => {
     setHistoryState((prev) => {
       const next = updater(prev);
       try {
@@ -247,26 +247,26 @@ export default function ScrapingPipeline() {
     try {
       const [marketsRes, statusRes, offersRes] = await Promise.all([
         catalogService.getSupermarkets().catch(() => []),
-        scraperService.getJobStatus().catch(() => null),
+        ingestionService.getJobStatus().catch(() => null),
         catalogService.getOffers({ onlyVerified: false, pageSize: 1000 }).catch(() => []),
       ]);
 
       const marketsList = Array.isArray(marketsRes) ? marketsRes : [];
       setSupermarkets(marketsList);
 
-      // Combine backend offers with recent session scraped offers for 100% consistency across pages
-      const sessionScrapedRaw = sessionStorage.getItem('homepal_recent_scraped_offers');
-      let scrapedSessionOffers: Offer[] = [];
-      if (sessionScrapedRaw) {
+      // Combine backend offers with recent session ingested offers for 100% consistency across pages
+      const sessionIngestedRaw = sessionStorage.getItem('homepal_recent_ingested_offers');
+      let ingestedSessionOffers: Offer[] = [];
+      if (sessionIngestedRaw) {
         try {
-          scrapedSessionOffers = JSON.parse(sessionScrapedRaw);
+          ingestedSessionOffers = JSON.parse(sessionIngestedRaw);
         } catch (e) {
-          console.error('Failed to parse session scraped offers', e);
+          console.error('Failed to parse session ingested offers', e);
         }
       }
 
       const rawOffersList = Array.isArray(offersRes) ? offersRes : [];
-      const combined = [...scrapedSessionOffers, ...rawOffersList];
+      const combined = [...ingestedSessionOffers, ...rawOffersList];
 
       const seen = new Set<string>();
       const deduplicated = combined.filter((o) => {
@@ -339,11 +339,11 @@ export default function ScrapingPipeline() {
     void fetchInitialData();
   }, [fetchInitialData]);
 
-  // Poll scraper status every 6s
+  // Poll ingestion status every 6s
   useEffect(() => {
     const timer = setInterval(async () => {
       try {
-        const res = await scraperService.getJobStatus();
+        const res = await ingestionService.getJobStatus();
         if (res) setJobStatus(res);
       } catch {
         // silent
@@ -352,7 +352,7 @@ export default function ScrapingPipeline() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleRunSingleUrlScrape = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleRunSingleUrlIngest = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedSupermarket || !pageUrl) {
       setErrorMessage(t('toastUrlReq'));
@@ -365,7 +365,7 @@ export default function ScrapingPipeline() {
     const brandName = selectedMarket ? getLocalString(selectedMarket.name) : 'Supermarket';
     const jobId = `#JOB-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const newJob: ScraperHistoryItem = {
+    const newJob: IngestionHistoryItem = {
       id: jobId,
       source: 'Facebook',
       brand: brandName,
@@ -378,7 +378,7 @@ export default function ScrapingPipeline() {
     updateHistory((prev) => [newJob, ...prev]);
 
     try {
-      const res = await scraperService.scrapeFacebookPage({
+      const res = await ingestionService.ingestFacebookPage({
         supermarketId: selectedSupermarket,
         pageUrl,
         daysBack,
@@ -388,7 +388,7 @@ export default function ScrapingPipeline() {
       showToast(t('toastInitiated', { brand: brandName }));
 
       if (res?.createdOffers && res.createdOffers.length > 0) {
-        recordSupermarketScraped(selectedSupermarket);
+        recordSupermarketIngested(selectedSupermarket);
         updateHistory((prev) =>
           prev.map((item) =>
             item.id === jobId
@@ -416,7 +416,7 @@ export default function ScrapingPipeline() {
           attempts++;
 
           try {
-            const statusRes = await scraperService.getJobStatus();
+            const statusRes = await ingestionService.getJobStatus();
             if (statusRes) {
               setJobStatus(statusRes);
               if (statusRes.isRunning === false) {
@@ -478,7 +478,7 @@ export default function ScrapingPipeline() {
   const syncExtractedOffersToOffersHub = (newOffers: Offer[]) => {
     if (!newOffers || newOffers.length === 0) return;
     try {
-      const existingRaw = sessionStorage.getItem('homepal_recent_scraped_offers');
+      const existingRaw = sessionStorage.getItem('homepal_recent_ingested_offers');
       const existing: Offer[] = existingRaw ? JSON.parse(existingRaw) : [];
 
       const offerKey = (o: Offer) =>
@@ -493,7 +493,7 @@ export default function ScrapingPipeline() {
       const uniqueNew = stampedNew.filter((o) => !existingKeys.has(offerKey(o)));
 
       const updated = [...uniqueNew, ...existing];
-      sessionStorage.setItem('homepal_recent_scraped_offers', JSON.stringify(updated));
+      sessionStorage.setItem('homepal_recent_ingested_offers', JSON.stringify(updated));
 
       // Update state live so Daily Ingestion Rate immediately increments
       setCatalogOffers((prev) => {
@@ -507,7 +507,7 @@ export default function ScrapingPipeline() {
     }
   };
 
-  const handleRunImageUploadScrape = async (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleRunImageUploadIngest = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedSupermarket || !uploadFile) {
       setErrorMessage(t('toastImgReq'));
@@ -520,7 +520,7 @@ export default function ScrapingPipeline() {
     const brandName = selectedMarket ? getLocalString(selectedMarket.name) : 'Supermarket';
 
     try {
-      const result = await scraperService.scrapeImageFile(
+      const result = await ingestionService.ingestImageFile(
         selectedSupermarket,
         uploadFile,
         ocrText,
@@ -530,7 +530,7 @@ export default function ScrapingPipeline() {
       const createdOffersList = result?.createdOffers || [];
       const parsedCount = result?.totalExtractedOffers || createdOffersList.length || 0;
 
-      const newJob: ScraperHistoryItem = {
+      const newJob: IngestionHistoryItem = {
         id: `#JOB-${Math.floor(1000 + Math.random() * 9000)}`,
         source: 'Flyer Upload',
         brand: brandName,
@@ -560,7 +560,7 @@ export default function ScrapingPipeline() {
     }
   };
 
-  const handleRunBatchScrape = async () => {
+  const handleRunBatchIngest = async () => {
     if (supermarkets.length === 0) {
       showToast(t('toastNoSupermarkets'));
       return;
@@ -578,18 +578,18 @@ export default function ScrapingPipeline() {
       setBatchProgress({ current: i + 1, total: supermarkets.length, name });
 
       // ── 24 Hours Cool-down Check ──
-      if (skipRecentlyScraped) {
+      if (skipRecentlyIngested) {
         const { isCoolingDown, timeAgoText } = check24HourCooldown(market.id);
         if (isCoolingDown) {
           skippedCount++;
-          const skippedJob: ScraperHistoryItem = {
+          const skippedJob: IngestionHistoryItem = {
             id: `#JOB-SKIPPED-${Math.floor(1000 + Math.random() * 9000)}`,
             source: 'Facebook',
             brand: name,
             supermarketId: market.id,
             status: 'Completed',
             parsedCount: 0,
-            startedAt: `Skipped (Scraped ${timeAgoText})`,
+            startedAt: `Skipped (Ingested ${timeAgoText})`,
           };
           updateHistory((prev) => [skippedJob, ...prev]);
           showToast(t('toastBatchSkipped', { brand: name, timeAgo: timeAgoText }));
@@ -603,7 +603,7 @@ export default function ScrapingPipeline() {
       const jobId = `#JOB-${Math.floor(1000 + Math.random() * 9000)}`;
 
       // 1. Log job start in Audit History
-      const runningJob: ScraperHistoryItem = {
+      const runningJob: IngestionHistoryItem = {
         id: jobId,
         source: 'Facebook',
         brand: name,
@@ -616,9 +616,9 @@ export default function ScrapingPipeline() {
       updateHistory((prev) => [runningJob, ...prev]);
 
       try {
-        // 2. Trigger scraper for supermarket `i`
-        const res = await scraperService
-          .scrapeFacebookPage({
+        // 2. Trigger ingestion for supermarket `i`
+        const res = await ingestionService
+          .ingestFacebookPage({
             supermarketId: market.id,
             pageUrl: targetUrl,
             daysBack,
@@ -636,7 +636,7 @@ export default function ScrapingPipeline() {
           pollAttempts++;
 
           try {
-            const statusRes = await scraperService.getJobStatus();
+            const statusRes = await ingestionService.getJobStatus();
             if (statusRes) {
               setJobStatus(statusRes);
               if (statusRes.isRunning === false) {
@@ -649,7 +649,7 @@ export default function ScrapingPipeline() {
         }
 
         // Record timestamp for 24h cool-down
-        recordSupermarketScraped(market.id);
+        recordSupermarketIngested(market.id);
 
         // 4. Job completed for supermarket `i`, fetch extracted offers
         const createdOffersList = res?.createdOffers || [];
@@ -690,7 +690,7 @@ export default function ScrapingPipeline() {
           )
         );
       } catch (e) {
-        console.error(`Batch scrape error for ${name}:`, e);
+        console.error(`Batch ingest error for ${name}:`, e);
         updateHistory((prev) =>
           prev.map((item) => (item.id === jobId ? { ...item, status: 'Failed' } : item))
         );
@@ -707,7 +707,7 @@ export default function ScrapingPipeline() {
         syncExtractedOffersToOffersHub(freshOffers);
       }
     } catch (e) {
-      console.error('Failed to refresh offers after batch scrape:', e);
+      console.error('Failed to refresh offers after batch ingest:', e);
     }
 
     setIsBatchRunning(false);
@@ -744,7 +744,7 @@ export default function ScrapingPipeline() {
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
             <span>{t('catalogPipeline')}</span>
             <span>/</span>
-            <span className="text-slate-900 font-bold">{t('scrapingIngestion')}</span>
+            <span className="text-slate-900 font-bold">{t('ingestionIngestion')}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">
             {t('title')}
@@ -757,16 +757,16 @@ export default function ScrapingPipeline() {
           <label className="flex items-center justify-center gap-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 px-3.5 py-2.5 rounded-xl border border-slate-200 cursor-pointer select-none transition-colors shrink-0 w-full sm:w-auto">
             <input
               type="checkbox"
-              checked={skipRecentlyScraped}
-              onChange={(e) => setSkipRecentlyScraped(e.target.checked)}
-              className="w-4 h-4 accent-[#1F3D32] rounded cursor-pointer"
+              checked={skipRecentlyIngested}
+              onChange={(e) => setSkipRecentlyIngested(e.target.checked)}
+              className="w-4 h-4 accent-primary rounded cursor-pointer"
             />
-            <span>{t('skipScraped')}</span>
+            <span>{t('skipIngested')}</span>
           </label>
 
           <Button
             variant="primary"
-            onClick={handleRunBatchScrape}
+            onClick={handleRunBatchIngest}
             disabled={isBatchRunning || supermarkets.length === 0}
             className={cn(
               'flex items-center gap-2 shrink-0 w-full sm:w-auto',
@@ -776,7 +776,7 @@ export default function ScrapingPipeline() {
           >
             {isBatchRunning ? (
               <span>
-                {t('scrapingProgress', {
+                {t('ingestionProgress', {
                   current: batchProgress?.current,
                   total: batchProgress?.total,
                   name: batchProgress?.name,
@@ -794,7 +794,7 @@ export default function ScrapingPipeline() {
                 >
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-10.42" />
                 </svg>
-                <span>{t('scrapeAll')}</span>
+                <span>{t('ingestAll')}</span>
               </>
             )}
           </Button>
@@ -830,7 +830,7 @@ export default function ScrapingPipeline() {
                 });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = 'scraping_pipeline_logs.csv';
+                link.download = 'ingestion_pipeline_logs.csv';
                 link.click();
                 showToast(t('logsExportSuccess'));
               }}
@@ -862,7 +862,7 @@ export default function ScrapingPipeline() {
 
       {/* ── Main Control Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
-        {/* Left: Scraper Control Card */}
+        {/* Left: Ingestion Control Card */}
         <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
           {/* Tabs */}
           <div className="flex border-b border-slate-200 mb-6 gap-6">
@@ -875,7 +875,7 @@ export default function ScrapingPipeline() {
                   : 'text-slate-500 hover:text-slate-900'
               )}
             >
-              {t('tabScraper')}
+              {t('tabIngestion')}
             </button>
             <button
               onClick={() => setActiveTab('upload')}
@@ -892,7 +892,7 @@ export default function ScrapingPipeline() {
 
           {/* Facebook Form */}
           {activeTab === 'facebook' && (
-            <form onSubmit={handleRunSingleUrlScrape} className="flex flex-col gap-5">
+            <form onSubmit={handleRunSingleUrlIngest} className="flex flex-col gap-5">
               {/* Supermarket Selection */}
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-700">{t('selectSupermarket')}</label>
@@ -994,10 +994,10 @@ export default function ScrapingPipeline() {
                 </div>
               </div>
 
-              {/* Scrape Depth & Limit */}
+              {/* Ingest Depth & Limit */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-slate-700">{t('scrapeDepth')}</label>
+                  <label className="text-xs font-bold text-slate-700">{t('ingestDepth')}</label>
                   <div className="relative w-full flex items-center">
                     <select
                       value={daysBack}
@@ -1065,11 +1065,11 @@ export default function ScrapingPipeline() {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    {t('executingScraper')}
+                    {t('executingIngestion')}
                   </>
                 ) : (
                   <>
-                    {t('runScraper')}
+                    {t('runIngestion')}
                     <svg
                       width="15"
                       height="15"
@@ -1089,7 +1089,7 @@ export default function ScrapingPipeline() {
 
           {/* Flyer Upload Form */}
           {activeTab === 'upload' && (
-            <form onSubmit={handleRunImageUploadScrape} className="flex flex-col gap-5">
+            <form onSubmit={handleRunImageUploadIngest} className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-700">{t('labelSupermarket')}</label>
                 <select
@@ -1210,9 +1210,9 @@ export default function ScrapingPipeline() {
           )}
         </div>
 
-        {/* Right: Live Scraper Status Card & Desk View Metrics widgets */}
+        {/* Right: Live Ingestion Status Card & Desk View Metrics widgets */}
         <div className="flex flex-col gap-6">
-          <LiveScraperStatus
+          <LiveIngestionStatus
             isRunning={!!jobStatus?.isRunning}
             totalParsedCount={totalParsedCount}
           />
@@ -1226,18 +1226,17 @@ export default function ScrapingPipeline() {
         </div>
       </div>
 
-      {/* ── Recent Scraping Jobs Table ── */}
+      {/* ── Recent Ingestion Jobs Table ── */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-extrabold text-slate-900 m-0">
-              {t('recentScrapingHistory')}
+              {t('recentIngestionHistory')}
             </h2>
             <p className="text-xs text-slate-500 m-0 mt-0.5">{t('auditDesc')}</p>
           </div>
-          <div className="flex flex-col items-center justify-center w-12 h-12 bg-slate-50 border border-slate-200 rounded-full text-slate-700 shadow-2xs">
-            <span className="text-sm font-black leading-none">{history.length}</span>
-            <span className="text-xs font-bold leading-none mt-0.5">{t('jobs')}</span>
+          <div className="flex items-center justify-center px-4 h-9 bg-slate-50 border border-slate-200 rounded-full text-slate-700 shadow-2xs">
+            <span className="text-xs font-bold">{t('jobs', { count: history.length })}</span>
           </div>
         </div>
 
@@ -1333,7 +1332,7 @@ export default function ScrapingPipeline() {
                   setReviewOffers(null);
                   navigate('/dashboard/offers');
                 }}
-                className="px-3.5 py-1.5 bg-[#1F3D32] hover:bg-[#162D25] text-white rounded-lg text-xs font-bold cursor-pointer border-none shadow-xs flex items-center gap-1.5 shrink-0"
+                className="px-3.5 py-1.5 bg-primary hover:bg-primary-active text-white rounded-lg text-xs font-bold cursor-pointer border-none shadow-xs flex items-center gap-1.5 shrink-0"
               >
                 <span>{t('publishButton')}</span>
                 <span>→</span>

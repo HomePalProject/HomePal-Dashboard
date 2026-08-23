@@ -16,7 +16,7 @@ const SupermarketPerformance = lazy(() => import('./pages/SupermarketPerformance
 const PnLDeepDive = lazy(() => import('./pages/PnLDeepDive'));
 const GeographicDemographics = lazy(() => import('./pages/GeographicDemographics'));
 const UserManagement = lazy(() => import('./pages/UserManagement'));
-const ScrapingPipeline = lazy(() => import('./pages/ScrapingPipeline'));
+const IngestionPipeline = lazy(() => import('./pages/IngestionPipeline'));
 const ProductCategories = lazy(() => import('./pages/ProductCategories'));
 const OffersHub = lazy(() => import('./pages/OffersHub'));
 const MeasuringUnits = lazy(() => import('./pages/MeasuringUnits'));
@@ -73,7 +73,7 @@ function App() {
             <Route path="geographic-demographics" element={<GeographicDemographics />} />
             <Route path="profile" element={<Profile />} />
             <Route path="users" element={<UserManagement />} />
-            <Route path="scraping-pipeline" element={<ScrapingPipeline />} />
+            <Route path="ingestion-pipeline" element={<IngestionPipeline />} />
             <Route path="measuring-units" element={<MeasuringUnits />} />
           </Route>
 

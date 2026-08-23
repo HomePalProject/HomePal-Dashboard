@@ -166,8 +166,8 @@ export const NAV_ITEMS = [
     ),
   },
   {
-    label: 'sidebar:scrapingNav',
-    to: '/dashboard/scraping-pipeline',
+    label: 'sidebar:ingestionNav',
+    to: '/dashboard/ingestion-pipeline',
     end: false,
     icon: (
       <svg
@@ -216,7 +216,7 @@ export const PAGE_LABELS: Record<string, string> = {
   '/dashboard/offers': 'sidebar:offersPage',
   '/dashboard/stats': 'sidebar:stats',
   '/dashboard/users': 'sidebar:users',
-  '/dashboard/scraping-pipeline': 'sidebar:scrapingPage',
+  '/dashboard/ingestion-pipeline': 'sidebar:ingestionPage',
   '/dashboard/measuring-units': 'sidebar:measuringUnits',
   '/dashboard/profile': 'sidebar:profile',
   '/dashboard/ai-token-usage': 'sidebar:aiToken',

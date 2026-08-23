@@ -1,13 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { cn } from '@lib/utils';
 
-interface LiveScraperStatusProps {
+interface LiveIngestionStatusProps {
   isRunning: boolean;
   totalParsedCount: number;
 }
 
-export default function LiveScraperStatus({ isRunning, totalParsedCount }: LiveScraperStatusProps) {
-  const { t } = useTranslation('scrapingPipeline');
+export default function LiveIngestionStatus({
+  isRunning,
+  totalParsedCount,
+}: LiveIngestionStatusProps) {
+  const { t } = useTranslation('ingestionPipeline');
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-col gap-4">
@@ -32,17 +35,17 @@ export default function LiveScraperStatus({ isRunning, totalParsedCount }: LiveS
         <div className="flex justify-between py-1 border-b border-slate-100">
           <span className="text-slate-500">{t('backendEndpoint')}</span>
           <span className="font-mono font-medium text-slate-900 truncate max-w-37.5">
-            /scrape/facebook-page
+            /ingest/facebook-page
           </span>
         </div>
         <div className="flex justify-between py-1 border-b border-slate-100">
           <span className="text-slate-500">{t('imageIngestion')}</span>
           <span className="font-mono font-medium text-slate-900 truncate max-w-37.5">
-            /scrape/image-file
+            /ingest/image-file
           </span>
         </div>
         <div className="flex justify-between py-1">
-          <span className="text-slate-500">{t('totalScraped')}</span>
+          <span className="text-slate-500">{t('totalIngested')}</span>
           <span className="font-bold text-slate-900">{totalParsedCount}</span>
         </div>
       </div>

@@ -343,7 +343,7 @@ export default function MeasuringUnits() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('searchPlaceholder')}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none hover:border-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-[#1F3D32]/10 transition-all shadow-2xs"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 placeholder:text-slate-400 outline-none hover:border-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-primary/10 transition-all shadow-2xs"
             />
           </div>
 

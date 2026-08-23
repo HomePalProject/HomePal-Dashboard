@@ -88,7 +88,7 @@ export default function Overview() {
 
       <div className="flex flex-col xl:grid xl:grid-cols-3 gap-6 md:gap-8">
         <div className="xl:col-start-3 xl:row-start-1 order-1">
-          <div className="min-h-[220px] h-full">
+          <div className="min-h-55 h-full">
             <SystemHealthCard delay={100} />
           </div>
         </div>
@@ -378,23 +378,12 @@ export default function Overview() {
                               'Category'}
                           </span>
                         </div>
-                        <svg
-                          className="w-3.5 h-3.5 text-text-disabled opacity-0 group-hover:opacity-100 transition-opacity rtl:rotate-180"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="9 18 15 12 9 6" />
-                        </svg>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <div className="h-full min-h-[200px] flex items-center justify-center text-xs font-medium text-text-disabled">
+                <div className="h-full min-h-50 flex items-center justify-center text-xs font-medium text-text-disabled">
                   {loading ? t('loading') : t('noCategories')}
                 </div>
               )}

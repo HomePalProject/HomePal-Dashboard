@@ -167,7 +167,7 @@ export function SupermarketFormModal({
           </Field>
         </div>
 
-        <Field label={t('scraperUrl')}>
+        <Field label={t('ingestionUrl')}>
           <input
             className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs outline-none bg-white text-slate-900 focus:border-slate-400 box-border"
             value={websiteUrl}

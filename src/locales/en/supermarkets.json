@@ -31,7 +31,7 @@
   "logoLimits": "PNG, JPG or WEBP (max. 5MB)",
   "nameEn": "English Name",
   "nameAr": "Arabic Name",
-  "scraperUrl": "Facebook Page / Scraper URL",
+  "ingestionUrl": "Facebook Page / Ingestion URL",
   "address": "Address / Region",
   "saveChanges": "Save Changes",
   "endpointLabel": "SCRAPER ENDPOINT",
@@ -40,7 +40,7 @@
   "tableHeaderChain": "Supermarket Chain",
   "tableHeaderBranches": "Branches",
   "tableHeaderLocation": "Location",
-  "tableHeaderEndpoint": "Scraper Endpoint",
+  "tableHeaderEndpoint": "Ingestion Endpoint",
   "tableHeaderActions": "Actions",
   "idPrefix": "ID: "
 }

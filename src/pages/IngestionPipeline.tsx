@@ -114,7 +114,7 @@ export default function IngestionPipeline() {
   const [selectedSupermarket, setSelectedSupermarket] = useState<string>('');
   const [pageUrl, setPageUrl] = useState<string>('');
   const [daysBack, setDaysBack] = useState<number>(7);
-  const [resultsLimit, setResultsLimit] = useState<number>(100);
+  const [resultsLimit, setResultsLimit] = useState<number>(5);
 
   // Manual Image Upload file state
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -1012,10 +1012,10 @@ export default function IngestionPipeline() {
                       onChange={(e) => setResultsLimit(Number(e.target.value))}
                       className="w-full appearance-none pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-900 bg-white outline-none cursor-pointer"
                     >
+                      <option value={1}>{t('limit1')}</option>
+                      <option value={3}>{t('limit3')}</option>
+                      <option value={5}>{t('limit5')}</option>
                       <option value={10}>{t('limit10')}</option>
-                      <option value={25}>{t('limit25')}</option>
-                      <option value={50}>{t('limit50')}</option>
-                      <option value={100}>{t('limit100')}</option>
                     </select>
                     <svg
                       width="14"

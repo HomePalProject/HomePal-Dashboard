@@ -230,7 +230,7 @@ export default function GeographicDemographics() {
   };
 
   // Returns an HSL color where lightness decreases as population increases
-  const popColor = (pop: string, allDistricts: typeof data.districts): string => {
+  const popColor = (pop: string, allDistricts: { pop: string }[]): string => {
     const values = allDistricts.map((d) => parsePop(d.pop));
     const min = Math.min(...values);
     const max = Math.max(...values);

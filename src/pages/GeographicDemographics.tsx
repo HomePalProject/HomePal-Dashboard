@@ -221,12 +221,23 @@ export default function GeographicDemographics() {
     showToast(t('dataRefreshed'));
   };
 
-  const interpolateColor = (intensity: number) => {
-    // Light to dark green based on intensity
-    if (intensity >= 0.8) return '#166534'; // High
-    if (intensity >= 0.6) return '#15803d'; // Med-High
-    if (intensity >= 0.4) return '#22c55e'; // Med
-    return '#86efac'; // Low
+  // Parses population strings like "2.3M", "450K", "1,200,000" into a raw number
+  const parsePop = (pop: string): number => {
+    const clean = pop.replace(/,/g, '').trim().toUpperCase();
+    if (clean.endsWith('M')) return parseFloat(clean) * 1_000_000;
+    if (clean.endsWith('K')) return parseFloat(clean) * 1_000;
+    return parseFloat(clean) || 0;
+  };
+
+  // Returns an HSL color where lightness decreases as population increases
+  const popColor = (pop: string, allDistricts: typeof data.districts): string => {
+    const values = allDistricts.map((d) => parsePop(d.pop));
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const normalized = max === min ? 0.5 : (parsePop(pop) - min) / (max - min);
+    // Lightness: 72% (low pop / light green) → 20% (high pop / dark green)
+    const lightness = Math.round(72 - normalized * 52);
+    return `hsl(142, 70%, ${lightness}%)`;
   };
 
   if (loading) {
@@ -351,9 +362,9 @@ export default function GeographicDemographics() {
                   center={[district.lat, district.lng]}
                   radius={district.radius}
                   pathOptions={{
-                    fillColor: interpolateColor(district.intensity),
+                    fillColor: popColor(district.pop, data.districts),
                     fillOpacity: 0.6,
-                    color: interpolateColor(district.intensity),
+                    color: popColor(district.pop, data.districts),
                     weight: 2,
                   }}
                 >

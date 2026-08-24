@@ -71,9 +71,9 @@ export default function Households() {
           <div className="text-[32px] font-extrabold text-text-primary">
             {data.totalHouseholds.toLocaleString()}
           </div>
-          <div className="text-xs font-semibold text-primary mt-1">
-            {data.growthRate} {t('yoy')}
-          </div>
+          {/* <div className="text-xs font-semibold text-primary mt-1">
+            {data.growthRate}
+          </div> */}
         </div>
 
         <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">

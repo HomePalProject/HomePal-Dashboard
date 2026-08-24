@@ -1,6 +1,7 @@
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 import { useTranslation } from 'react-i18next';
 import { CategoryRow } from './CategoryRow';
+import { Table, TableHeader, TableRow, TableHead, TableBody } from '@components/ui/Table';
 
 interface TableProps {
   categories: ProductCategory[];
@@ -17,34 +18,36 @@ export default function TableView({
   onDelete,
   loadingEditId,
 }: TableProps) {
-  const { t } = useTranslation('categories');
+  const { t, i18n } = useTranslation('categories');
+  const isArabicActive = i18n.resolvedLanguage === 'ar';
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-      <div className="overflow-x-auto">
-        <table className="w-full text-start border-collapse">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200 text-sm font-bold text-slate-500 uppercase tracking-wider">
-              <th className="px-16 py-3 whitespace-nowrap">{t('tableHeaderCover')}</th>
-              <th className="px-16 py-3 whitespace-nowrap">{t('tableHeaderEn')}</th>
-              <th className="px-16 py-3 text-end whitespace-nowrap">{t('tableHeaderAr')}</th>
-              <th className="px-16 py-3 whitespace-nowrap">{t('tableHeaderCount')}</th>
-              <th className="px-16 py-3 text-end whitespace-nowrap">{t('tableHeaderActions')}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 text-xs">
-            {categories.map((cat) => (
-              <CategoryRow
-                key={cat.id}
-                category={cat}
-                onEdit={onEdit}
-                onUpload={onUpload}
-                onDelete={onDelete}
-                loadingEditId={loadingEditId}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="bg-surface rounded-xl border border-border overflow-hidden shadow-xs">
+      <Table className="min-w-[800px]">
+        <TableHeader>
+          <TableRow>
+            <TableHead>{t('tableHeaderCover')}</TableHead>
+            <TableHead>{isArabicActive ? t('tableHeaderAr') : t('tableHeaderEn')}</TableHead>
+            <TableHead className="text-end">
+              {isArabicActive ? t('tableHeaderEn') : t('tableHeaderAr')}
+            </TableHead>
+            <TableHead>{t('tableHeaderCount')}</TableHead>
+            <TableHead className="text-end">{t('tableHeaderActions')}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {categories.map((cat) => (
+            <CategoryRow
+              key={cat.id}
+              category={cat}
+              onEdit={onEdit}
+              onUpload={onUpload}
+              onDelete={onDelete}
+              loadingEditId={loadingEditId}
+            />
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

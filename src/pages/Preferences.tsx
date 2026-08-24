@@ -17,6 +17,14 @@ import { Skeleton } from '@components/ui/Skeleton';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
 import { PreferenceFormModal } from '@components/preferences/PreferenceFormModal';
 import { CategoryFormModal } from '@components/preferences/CategoryFormModal';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@components/ui/Table';
 
 // ── Main Page ──
 import { useTranslation } from 'react-i18next';
@@ -305,227 +313,214 @@ export default function Preferences() {
         </div>
       )}
 
-      <div className="bg-surface rounded-xl border border-border overflow-x-auto">
-        <div className="min-w-200">
-          <div
-            className={cn(
-              'grid px-5 py-4 border-b border-border bg-surface-variant items-center',
-              cols,
-              'gap-4'
-            )}
-          >
-            {headers.map((h) => (
-              <span
-                key={h}
-                className="text-sm font-bold text-text-secondary tracking-widest uppercase whitespace-nowrap"
-              >
-                {h}
-              </span>
-            ))}
-          </div>
+      <div className="bg-surface rounded-xl border border-border overflow-hidden shadow-xs">
+        <Table className="min-w-[800px]">
+          <TableHeader>
+            <TableRow>
+              {headers.map((h) => (
+                <TableHead key={h} className={h === t('headerActions') ? 'text-end' : ''}>
+                  {h}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading &&
+              Array.from({ length: 6 }).map((_, i) => (
+                <TableRow key={i}>
+                  {headers.map((h, j) => (
+                    <TableCell key={h} className={j === headers.length - 1 ? 'text-end' : ''}>
+                      <Skeleton
+                        className={cn(
+                          'h-3 rounded',
+                          j === headers.length - 1
+                            ? 'h-6 w-6 rounded-lg ml-auto rtl:mr-auto rtl:ml-0'
+                            : j === 1 && isPrefsTab
+                              ? 'h-5 w-16 rounded-full'
+                              : 'w-3/4'
+                        )}
+                      />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
 
-          {loading &&
-            Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  'grid px-5 py-4 items-center gap-4',
-                  i < 5 && 'border-b border-border',
-                  cols
-                )}
-              >
-                {headers.map((h, j) => (
-                  <Skeleton
-                    key={h}
-                    className={cn(
-                      'h-3 rounded',
-                      j === headers.length - 1
-                        ? 'h-6 w-6 rounded-lg justify-self-end'
-                        : j === 1 && isPrefsTab
-                          ? 'h-5 w-16 rounded-full'
-                          : 'w-3/4'
-                    )}
-                  />
-                ))}
-              </div>
-            ))}
-
-          {!loading && displayedItems.length === 0 && (
-            <div className="p-12 text-center text-text-secondary text-sm">
-              {searchQuery
-                ? t('noResults')
-                : isPrefsTab
-                  ? t('noPreferencesYet')
-                  : t('noCategoriesYet')}
-            </div>
-          )}
-
-          {!loading &&
-            isPrefsTab &&
-            preferences.map((pref, i) => {
-              const badge = getCategoryColor(pref.categoryName);
-              return (
-                <div
-                  key={pref.id}
-                  className={cn(
-                    'grid px-5 py-4 items-center transition-colors duration-150 hover:bg-surface-variant gap-4',
-                    i < preferences.length - 1 && 'border-b border-border',
-                    cols
-                  )}
+            {!loading && displayedItems.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={headers.length}
+                  className="text-center py-12 text-text-secondary"
                 >
-                  <span className="text-sm font-semibold text-text-primary">
-                    {getLocalizedCulture(pref.name, i18n.resolvedLanguage as 'en' | 'ar') ||
-                      getLocalString(pref.name)}
-                  </span>
-                  <span
-                    className={cn(
-                      'inline-block px-2.5 py-0.75 rounded-full text-sm font-bold tracking-wider uppercase w-fit whitespace-nowrap',
-                      badge.bg,
-                      badge.text
-                    )}
-                  >
-                    {t((pref.categoryName || '').toLowerCase(), pref.categoryName)}
-                  </span>
-                  <span className="text-13 text-text-secondary leading-relaxed truncate">
-                    {getLocalizedCulture(pref.description, i18n.resolvedLanguage as 'en' | 'ar') ||
-                      getLocalString(pref.description)}
-                  </span>
-                  <div className="flex gap-1 justify-end sm:justify-start">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title={t('edit')}
-                      disabled={loadingEditId === pref.id}
-                      onClick={() => void handleEditPreference(pref)}
-                      className="h-8 w-8 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
-                    >
-                      {loadingEditId === pref.id ? (
-                        <svg
-                          width="15"
-                          height="15"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          className="animate-spin"
-                        >
-                          <path d="M21 12a9 9 0 1 1-9-9" />
-                        </svg>
-                      ) : (
-                        <svg
-                          width="15"
-                          height="15"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                        >
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      title={t('delete')}
-                      onClick={() => setDeleteTarget({ type: 'preference', item: pref })}
-                      className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
-                    >
-                      <svg
-                        width="15"
-                        height="15"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                      </svg>
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+                  {searchQuery
+                    ? t('noResults')
+                    : isPrefsTab
+                      ? t('noPreferencesYet')
+                      : t('noCategoriesYet')}
+                </TableCell>
+              </TableRow>
+            )}
 
-          {!loading &&
-            !isPrefsTab &&
-            filteredCats.map((cat, i) => (
-              <div
-                key={cat.id}
-                className={cn(
-                  'grid px-6 sm:px-20 py-4 items-center transition-colors duration-150 hover:bg-surface-variant gap-4',
-                  i < filteredCats.length - 1 && 'border-b border-border',
-                  cols
-                )}
-              >
-                <span className="text-sm font-semibold text-text-primary">
-                  {getLocalizedCulture(cat.name, i18n.resolvedLanguage as 'en' | 'ar') ||
-                    getLocalString(cat.name)}
-                </span>
-                <span className="text-13 text-text-secondary leading-relaxed truncate">
-                  {getLocalizedCulture(cat.description, i18n.resolvedLanguage as 'en' | 'ar') ||
-                    getLocalString(cat.description)}
-                </span>
-                <div className="flex gap-1 justify-end sm:justify-start">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title={t('edit')}
-                    disabled={loadingEditId === cat.id}
-                    onClick={() => void handleEditCategory(cat)}
-                    className="h-8 w-8 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg"
-                  >
-                    {loadingEditId === cat.id ? (
-                      <svg
-                        width="15"
-                        height="15"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className="animate-spin"
+            {!loading &&
+              isPrefsTab &&
+              preferences.map((pref, i) => {
+                const badge = getCategoryColor(pref.categoryName);
+                return (
+                  <TableRow key={pref.id}>
+                    <TableCell className="font-semibold text-text-primary">
+                      {getLocalizedCulture(pref.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                        getLocalString(pref.name)}
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={cn(
+                          'inline-block px-2.5 py-0.75 rounded-full text-sm font-bold tracking-wider uppercase whitespace-nowrap',
+                          badge.bg,
+                          badge.text
+                        )}
                       >
-                        <path d="M21 12a9 9 0 1 1-9-9" />
-                      </svg>
-                    ) : (
-                      <svg
-                        width="15"
-                        height="15"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
+                        {t((pref.categoryName || '').toLowerCase(), pref.categoryName)}
+                      </span>
+                    </TableCell>
+                    <TableCell className="max-w-[300px] truncate">
+                      {getLocalizedCulture(
+                        pref.description,
+                        i18n.resolvedLanguage as 'en' | 'ar'
+                      ) || getLocalString(pref.description)}
+                    </TableCell>
+                    <TableCell className="text-end">
+                      <div className="flex gap-1 justify-end">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={t('edit')}
+                          disabled={loadingEditId === pref.id}
+                          onClick={() => void handleEditPreference(pref)}
+                          className="h-8 w-8 text-text-secondary hover:text-text-primary hover:bg-surface-variant rounded-lg"
+                        >
+                          {loadingEditId === pref.id ? (
+                            <svg
+                              width="15"
+                              height="15"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="animate-spin"
+                            >
+                              <path d="M21 12a9 9 0 1 1-9-9" />
+                            </svg>
+                          ) : (
+                            <svg
+                              width="15"
+                              height="15"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title={t('delete')}
+                          onClick={() => setDeleteTarget({ type: 'preference', item: pref })}
+                          className="h-8 w-8 text-status-error hover:text-status-error hover:bg-status-error-container rounded-lg"
+                        >
+                          <svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                          </svg>
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+
+            {!loading &&
+              !isPrefsTab &&
+              filteredCats.map((cat, i) => (
+                <TableRow key={cat.id}>
+                  <TableCell className="font-semibold text-text-primary">
+                    {getLocalizedCulture(cat.name, i18n.resolvedLanguage as 'en' | 'ar') ||
+                      getLocalString(cat.name)}
+                  </TableCell>
+                  <TableCell className="max-w-[300px] truncate">
+                    {getLocalizedCulture(cat.description, i18n.resolvedLanguage as 'en' | 'ar') ||
+                      getLocalString(cat.description)}
+                  </TableCell>
+                  <TableCell className="text-end">
+                    <div className="flex gap-1 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title={t('edit')}
+                        disabled={loadingEditId === cat.id}
+                        onClick={() => void handleEditCategory(cat)}
+                        className="h-8 w-8 text-text-secondary hover:text-text-primary hover:bg-surface-variant rounded-lg"
                       >
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title={t('delete')}
-                    onClick={() => setDeleteTarget({ type: 'category', item: cat })}
-                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg"
-                  >
-                    <svg
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                    </svg>
-                  </Button>
-                </div>
-              </div>
-            ))}
-        </div>
+                        {loadingEditId === cat.id ? (
+                          <svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            className="animate-spin"
+                          >
+                            <path d="M21 12a9 9 0 1 1-9-9" />
+                          </svg>
+                        ) : (
+                          <svg
+                            width="15"
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        title={t('delete')}
+                        onClick={() => setDeleteTarget({ type: 'category', item: cat })}
+                        className="h-8 w-8 text-status-error hover:text-status-error hover:bg-status-error-container rounded-lg"
+                      >
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
       </div>
 
       {prefModal.open && (

@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { cn, getErrorMessage } from '@lib/utils';
-import { Button } from '@components/ui/Button';
 import { catalogService } from '@services/catalogService';
 import { productCategoryService } from '@services/productCategoryService';
 import type { Offer, Supermarket } from '@typeDefs/catalogTypes';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 import { getImageUrl, getLocalString, getLocalizedCulture } from '@lib/formatters';
 import { fetchBilingual } from '@lib/localization';
-import { Modal } from '@components/ui/Modal';
+import { Button } from '@components/ui/Button';
 import { ConfirmDialog } from '@components/ui/ConfirmDialog';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@components/ui/Table';
+import { Modal } from '@components/ui/Modal';
 import { Skeleton } from '@components/ui/Skeleton';
 import { useTranslation } from 'react-i18next';
 
@@ -793,20 +801,20 @@ export default function OffersHub() {
             <p className="text-xs text-slate-400 m-0">{t('noOffersDesc')}</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-start border-collapse">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
-                  <th className="ps-6 pe-4 py-3.5 whitespace-nowrap">{t('thOffer')}</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thSupermarket')}</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thOriginalPrice')}</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thOfferPrice')}</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thValidity')}</th>
-                  <th className="px-4 py-3.5 whitespace-nowrap">{t('thStatus')}</th>
-                  <th className="pe-6 ps-4 py-3.5 text-end whitespace-nowrap">{t('thActions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-xs">
+          <div className="overflow-hidden">
+            <Table className="min-w-[800px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="ps-6">{t('thOffer')}</TableHead>
+                  <TableHead>{t('thSupermarket')}</TableHead>
+                  <TableHead>{t('thOriginalPrice')}</TableHead>
+                  <TableHead>{t('thOfferPrice')}</TableHead>
+                  <TableHead>{t('thValidity')}</TableHead>
+                  <TableHead>{t('thStatus')}</TableHead>
+                  <TableHead className="text-end pe-6">{t('thActions')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {paginatedOffers.map((off) => {
                   const titleText =
                     getLocalizedCulture(
@@ -821,11 +829,11 @@ export default function OffersHub() {
                   const hasDiscount = origPrice && origPrice > (discPrice || 0);
 
                   return (
-                    <tr key={off.id} className="hover:bg-slate-50/60 transition-colors">
+                    <TableRow key={off.id}>
                       {/* OFFER Column */}
-                      <td className="ps-6 pe-4 py-4 whitespace-nowrap">
+                      <TableCell className="ps-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-surface-variant border border-border overflow-hidden shrink-0 flex items-center justify-center">
                             {imgUrl ? (
                               <img
                                 src={imgUrl}
@@ -840,7 +848,7 @@ export default function OffersHub() {
                                 fill="none"
                                 stroke="currentColor"
                                 strokeWidth="1.5"
-                                className="text-slate-400"
+                                className="text-text-disabled"
                               >
                                 <rect x="3" y="3" width="18" height="18" rx="2" />
                                 <circle cx="8.5" cy="8.5" r="1.5" />
@@ -850,68 +858,68 @@ export default function OffersHub() {
                           </div>
                           <div className="flex flex-col">
                             <span
-                              className="font-bold text-slate-900 line-clamp-1 max-w-30"
+                              className="font-bold text-text-primary line-clamp-1 max-w-30"
                               title={titleText}
                             >
                               {titleText}
                             </span>
                             <span
-                              className="text-sm text-slate-400 font-semibold truncate max-w-30"
+                              className="text-xs text-text-disabled font-semibold truncate max-w-30"
                               title={categoryText}
                             >
                               {categoryText}
                             </span>
                           </div>
                         </div>
-                      </td>
+                      </TableCell>
 
                       {/* SUPERMARKET Column */}
-                      <td className="px-4 py-4 font-extrabold text-slate-800 whitespace-nowrap">
+                      <TableCell className="font-extrabold text-text-primary">
                         <div className="flex items-center gap-2">
                           {off.supermarketLogoPath && (
                             <img
                               src={getImageUrl(off.supermarketLogoPath)!}
                               alt={marketName}
-                              className="w-10 h-10 rounded-full object-cover border border-slate-200 shrink-0"
+                              className="w-10 h-10 rounded-full object-cover border border-border shrink-0"
                             />
                           )}
                           <span className="truncate max-w-30" title={marketName}>
                             {marketName}
                           </span>
                         </div>
-                      </td>
+                      </TableCell>
 
                       {/* ORIGINAL PRICE Column */}
-                      <td className="px-4 py-4 text-slate-500 font-semibold whitespace-nowrap">
+                      <TableCell className="text-text-disabled font-semibold">
                         {hasDiscount ? (
-                          <span className="line-through text-slate-400 text-xs">
+                          <span className="line-through text-text-disabled text-xs">
                             {origPrice} {t('currency')}
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-600">
+                          <span className="text-xs text-text-secondary">
                             {origPrice ? `${origPrice} ${t('currency')}` : '—'}
                           </span>
                         )}
-                      </td>
+                      </TableCell>
 
                       {/* OFFER PRICE Column */}
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-black text-slate-900">
+                          <span className="text-xs font-black text-text-primary">
                             {discPrice} {t('currency')}
                           </span>
                           {hasDiscount && (
-                            <span className="text-xs font-black px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
+                            <span className="text-xs font-black px-1.5 py-0.5 rounded-md bg-status-success-container text-status-success border border-status-success-container shrink-0">
                               -{Math.round(((origPrice - (discPrice || 0)) / origPrice) * 100)}%
                             </span>
                           )}
                         </div>
-                      </td>
+                      </TableCell>
 
                       {/* VALIDITY Column */}
-                      <td className="px-4 py-4 text-slate-600 font-semibold whitespace-nowrap">
+                      <TableCell className="text-text-secondary font-semibold">
                         {(() => {
-                          if (!off.validTo) return <span className="text-slate-400">—</span>;
+                          if (!off.validTo) return <span className="text-text-disabled">—</span>;
                           const validToMidnight = new Date(
                             new Date(off.validTo).setHours(0, 0, 0, 0)
                           ).getTime();
@@ -920,11 +928,13 @@ export default function OffersHub() {
 
                           if (diffDays < 0) {
                             return (
-                              <span className="text-red-800 font-bold">{t('statusExpired')}</span>
+                              <span className="text-status-error font-bold">
+                                {t('statusExpired')}
+                              </span>
                             );
                           } else if (diffDays === 0 || off.status === 'Expiring') {
                             return (
-                              <span className="inline-flex items-center gap-1 text-red-600 font-bold">
+                              <span className="inline-flex items-center gap-1 text-status-error font-bold">
                                 <svg
                                   width="12"
                                   height="12"
@@ -943,30 +953,30 @@ export default function OffersHub() {
                             return <span>{t('endsInDays', { count: diffDays })}</span>;
                           }
                         })()}
-                      </td>
+                      </TableCell>
 
                       {/* STATUS Column */}
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <TableCell>
                         {off.isVerified || off.status === 'Verified' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-status-success-container text-status-success">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-success" />
                             {t('statusVerified')}
                           </span>
                         ) : off.status === 'Expiring' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold bg-red-50 text-red-700 border border-red-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-status-error-container text-status-error">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-error" />
                             {t('statusExpiring')}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-status-warning-container text-status-warning">
+                            <span className="w-1.5 h-1.5 rounded-full bg-status-warning" />
                             {t('statusUnverified')}
                           </span>
                         )}
-                      </td>
+                      </TableCell>
 
                       {/* ACTIONS Column */}
-                      <td className="pe-6 ps-4 py-4 text-end">
+                      <TableCell className="pe-6 text-end">
                         <div className="flex items-center justify-end gap-1">
                           {/* Verify Button */}
                           <Button
@@ -1051,12 +1061,12 @@ export default function OffersHub() {
                             </svg>
                           </Button>
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         )}
 

@@ -4,6 +4,7 @@ import { cn } from '@lib/utils';
 import { Button } from '@components/ui/Button';
 import type { ProductCategory } from '@typeDefs/productCategoryTypes';
 import { useTranslation } from 'react-i18next';
+import { TableRow, TableCell } from '@components/ui/Table';
 
 interface CategoryRowProps {
   category: ProductCategory;
@@ -30,52 +31,46 @@ export function CategoryRow({
   const count = category.itemCount || category.productsCount || 0;
 
   return (
-    <tr className="hover:bg-slate-50/60 transition-colors">
-      <td className="px-16 py-3 whitespace-nowrap">
+    <TableRow>
+      <TableCell>
         {imgUrl ? (
           <>
             <img
               src={imgUrl}
               alt={primary}
-              className="w-10 h-10 rounded-3xl object-cover bg-slate-100 border border-slate-200"
+              className="w-10 h-10 rounded-3xl object-cover bg-surface-variant border border-border"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
                 e.currentTarget.nextElementSibling?.classList.remove('hidden');
                 e.currentTarget.nextElementSibling?.classList.add('flex');
               }}
             />
-            <div className="hidden flex-col items-center justify-center w-10 h-10 rounded-3xl bg-slate-100 border border-slate-200 text-slate-400 font-bold text-xs">
+            <div className="hidden flex-col items-center justify-center w-10 h-10 rounded-3xl bg-surface-variant border border-border text-text-disabled font-bold text-xs">
               {primary?.charAt(0).toUpperCase()}
             </div>
           </>
         ) : (
-          <div className="flex w-10 h-10 rounded-3xl bg-slate-100 border border-slate-200 items-center justify-center text-slate-400 font-bold text-xs">
+          <div className="flex w-10 h-10 rounded-3xl bg-surface-variant border border-border items-center justify-center text-text-disabled font-bold text-xs">
             {primary?.charAt(0).toUpperCase()}
           </div>
         )}
-      </td>
-      <td
+      </TableCell>
+      <TableCell
         className={cn(
-          'px-16 py-3 whitespace-nowrap',
-          isArabicActive ? 'text-end font-bold text-slate-900' : 'font-bold text-slate-900'
+          isArabicActive ? 'text-end font-bold text-text-primary' : 'font-bold text-text-primary'
         )}
         dir={isArabicActive ? 'rtl' : 'ltr'}
       >
         {primary}
-      </td>
-      <td
-        className={cn(
-          'px-16 py-3 whitespace-nowrap font-semibold text-slate-600',
-          isArabicActive ? '' : 'text-end'
-        )}
+      </TableCell>
+      <TableCell
+        className={cn('font-semibold text-text-secondary', isArabicActive ? '' : 'text-end')}
         dir={isArabicActive ? 'ltr' : 'rtl'}
       >
         {secondary || '—'}
-      </td>
-      <td className="px-16 py-3 font-bold text-slate-800 whitespace-nowrap">
-        {t('items', { count })}
-      </td>
-      <td className="px-16 py-3 text-end whitespace-nowrap">
+      </TableCell>
+      <TableCell className="font-bold text-text-primary">{t('items', { count })}</TableCell>
+      <TableCell className="text-end">
         <div className="flex items-center justify-end gap-1">
           <Button
             onClick={() => onEdit(category)}
@@ -134,7 +129,7 @@ export function CategoryRow({
             title={t('deleteCategory')}
             variant="ghost"
             size="icon"
-            className="text-red-600 hover:bg-red-50 hover:text-red-700"
+            className="text-status-error hover:bg-status-error-container"
           >
             <svg
               width="14"
@@ -149,7 +144,7 @@ export function CategoryRow({
             </svg>
           </Button>
         </div>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 }

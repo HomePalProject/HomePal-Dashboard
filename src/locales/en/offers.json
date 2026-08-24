@@ -23,6 +23,7 @@
   "allOffers_other": "All Offers ({{count}})",
   "needsVerification": "Needs Verification",
   "expiringSoon": "Expiring Soon",
+  "expired": "Expired",
   "goToIngestions": "Go to Ingestion Pipeline →",
   "labelSupermarket": "Supermarket:",
   "allSupermarkets_zero": "All Supermarkets (0)",

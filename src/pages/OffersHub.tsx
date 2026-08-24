@@ -40,7 +40,7 @@ function OffersTableSkeleton() {
   );
 }
 
-type FilterTab = 'all' | 'unverified' | 'expiring';
+type FilterTab = 'all' | 'unverified' | 'expiring' | 'expired';
 
 export default function OffersHub() {
   const { t, i18n } = useTranslation(['offers', 'common']);
@@ -58,10 +58,14 @@ export default function OffersHub() {
     'newest' | 'oldest' | 'discount' | 'price_low' | 'price_high'
   >('newest');
 
-  // Sync tab with URL parameter ?filter=unverified
   useEffect(() => {
     const filterParam = searchParams.get('filter');
-    if (filterParam === 'unverified' || filterParam === 'expiring' || filterParam === 'all') {
+    if (
+      filterParam === 'unverified' ||
+      filterParam === 'expiring' ||
+      filterParam === 'expired' ||
+      filterParam === 'all'
+    ) {
       setActiveTab(filterParam as FilterTab);
     }
   }, [searchParams]);
@@ -448,6 +452,12 @@ export default function OffersHub() {
         }
         if (!isExp) return false;
       }
+      if (activeTab === 'expired') {
+        if (!off.validTo) return false;
+        const expiredAt = new Date(off.validTo).getTime();
+        const todayMidnight = new Date(new Date().setHours(0, 0, 0, 0)).getTime();
+        if (expiredAt >= todayMidnight) return false;
+      }
 
       // 3. Supermarket Filter
       if (selectedSupermarketFilter !== 'all') {
@@ -637,6 +647,34 @@ export default function OffersHub() {
             )}
           >
             {t('expiringSoon')}
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('expired');
+              setCurrentPage(1);
+            }}
+            className={cn(
+              'px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border-none cursor-pointer flex items-center gap-1.5 whitespace-nowrap',
+              activeTab === 'expired'
+                ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
+                : 'bg-transparent text-slate-500 hover:text-slate-900'
+            )}
+          >
+            <span>{t('expired', 'Expired')}</span>
+            {(() => {
+              const count = offers.filter((o) => {
+                if (!o.validTo) return false;
+                return (
+                  new Date(o.validTo).getTime() <
+                  new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+                );
+              }).length;
+              return count > 0 ? (
+                <span className="px-1.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-100 text-slate-500">
+                  {count}
+                </span>
+              ) : null;
+            })()}
           </button>
 
           <button

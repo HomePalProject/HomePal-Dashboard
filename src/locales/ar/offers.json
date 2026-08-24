@@ -26,6 +26,7 @@
   "allOffers_other": "جميع العروض ({{count}})",
   "needsVerification": "قيد المراجعة",
   "expiringSoon": "ينتهي قريباً",
+  "expired": "منتهية الصلاحية",
   "goToIngestions": "محرك استخراج العروض ←",
   "labelSupermarket": "المتجر:",
   "allSupermarkets_zero": "جميع المتاجر (0)",

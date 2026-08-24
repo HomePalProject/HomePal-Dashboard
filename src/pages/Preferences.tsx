@@ -213,7 +213,6 @@ export default function Preferences() {
     : categories;
   const displayedItems = isPrefsTab ? preferences : filteredCats;
 
-  const cols = isPrefsTab ? 'grid-cols-[2fr_1.2fr_3fr_96px]' : 'grid-cols-[2fr_3fr_96px]';
   const headers = isPrefsTab
     ? [t('headerName'), t('headerCategory'), t('headerDesc'), t('headerActions')]
     : [t('headerCatName'), t('headerDesc'), t('headerActions')];
@@ -362,7 +361,7 @@ export default function Preferences() {
 
             {!loading &&
               isPrefsTab &&
-              preferences.map((pref, i) => {
+              preferences.map((pref) => {
                 const badge = getCategoryColor(pref.categoryName);
                 return (
                   <TableRow key={pref.id}>
@@ -450,7 +449,7 @@ export default function Preferences() {
 
             {!loading &&
               !isPrefsTab &&
-              filteredCats.map((cat, i) => (
+              filteredCats.map((cat) => (
                 <TableRow key={cat.id}>
                   <TableCell className="font-semibold text-text-primary">
                     {getLocalizedCulture(cat.name, i18n.resolvedLanguage as 'en' | 'ar') ||
